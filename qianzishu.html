@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副本 #5732 — 千子树下 | 回放</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #080808;
+  --bg-card: #0e0e0e;
+  --bg-card-alt: #111;
+  --accent-red: #8b0000;
+  --accent-red-bright: #cc1111;
+  --accent-red-dim: #8b000033;
+  --accent-gold: #c4a35a;
+  --accent-gold-dim: #c4a35a22;
+  --accent-green: #2a6e3f;
+  --accent-green-bright: #44aa66;
+  --text-primary: #ede7e0;
+  --text-dim: #a89a8e;
+  --text-ghost: #4a3e3e;
+  --text-hidden: #080808;
+  --border: #1e1a1a;
+  --border-light: #2e2828;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'Noto Serif SC', serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Subtle static noise */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ═══ TOP STATUS BAR ═══ */
+.status-bar {
+  position: sticky; top: 0;
+  background: #080808ee;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.status-bar .back-link {
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+  transition: all 0.3s;
+}
+.status-bar .back-link:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+
+.status-bar .rec-indicator {
+  color: var(--accent-gold);
+  animation: recBlink 2.5s infinite;
+}
+@keyframes recBlink { 0%, 60% { opacity: 1; } 70%, 90% { opacity: 0.4; } }
+
+.status-bar .signal-info { color: var(--text-ghost); }
+
+/* ═══ HEADER BLOCK ═══ */
+.broadcast-header {
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 1.5rem 2rem;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+.broadcast-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-ghost);
+  margin-bottom: 1rem;
+  line-height: 2;
+}
+
+.broadcast-title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  color: var(--text-primary);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+
+.broadcast-subtitle {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+}
+
+.broadcast-warning {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-red-bright);
+  border: 1px solid var(--accent-red-dim);
+  padding: 0.5rem 1rem;
+  display: inline-block;
+  animation: warningPulse 3s infinite;
+}
+@keyframes warningPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* ═══ MAIN CONTENT ═══ */
+.content {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══ TIMELINE ═══ */
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+/* Vertical line */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border) 5%, var(--border) 95%, transparent);
+}
+
+/* ═══ LOG ENTRY ═══ */
+.log-entry {
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.6s ease-out both;
+}
+
+.log-entry::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.6rem;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--border-light);
+  border: 1px solid var(--border);
+}
+
+/* Different dot colors for entry types */
+.log-entry.type-system::before { background: var(--text-dim); }
+.log-entry.type-dialogue::before { background: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.log-entry.type-action::before { background: var(--accent-green); border-color: var(--accent-green); }
+.log-entry.type-anomaly::before { background: var(--accent-red-bright); border-color: var(--accent-red); animation: anomalyDot 1s infinite; }
+.log-entry.type-redacted::before { background: var(--text-ghost); }
+
+@keyframes anomalyDot { 0%, 100% { box-shadow: 0 0 0 0 var(--accent-red-dim); } 50% { box-shadow: 0 0 8px 2px var(--accent-red-dim); } }
+
+.log-timestamp {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.3rem;
+}
+
+.log-speaker {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+
+.log-speaker.speaker-system { color: var(--text-dim); }
+.log-speaker.speaker-anomaly { color: var(--accent-red-bright); }
+.log-speaker.speaker-unknown { color: var(--text-ghost); font-style: italic; }
+
+.log-content {
+  font-size: 0.88rem;
+  line-height: 2;
+  color: var(--text-dim);
+}
+
+.log-content p { margin-bottom: 0.5rem; }
+.log-content p:last-child { margin-bottom: 0; }
+
+/* System messages */
+.log-system-msg {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+  border-left: 2px solid var(--border);
+  padding: 0.5rem 0.8rem;
+  background: #0a0a0a;
+}
+
+/* Anomaly block - glitchy */
+.log-anomaly-msg {
+  color: var(--accent-red-bright);
+  border-left: 2px solid var(--accent-red);
+  padding: 0.5rem 0.8rem;
+  background: #0d0808;
+}
+
+/* ═══ SECTION DIVIDERS ═══ */
+.log-divider {
+  text-align: center;
+  padding: 1.5rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  position: relative;
+  margin-left: 2.5rem;
+}
+.log-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+  z-index: -1;
+}
+.log-divider span {
+  background: var(--bg);
+  padding: 0 1rem;
+}
+
+/* ═══ HIDDEN TEXT (same system as main page) ═══ */
+.hidden-text { color: var(--text-hidden); background: transparent; transition: all 0.6s ease; position: relative; cursor: default; padding: 0 2px; text-shadow: 0 0 2px #8b000008; }
+.hidden-text::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--accent-red); opacity: 0; transition: opacity 0.6s; }
+.hidden-text:hover { color: var(--accent-red-bright) !important; text-shadow: 0 0 20px var(--accent-red-dim); }
+.hidden-text:hover::after { opacity: 0.5; }
+
+.select-reveal { color: var(--bg); background: var(--bg); transition: none; user-select: text; }
+.select-reveal::selection { background: var(--accent-red); color: white; }
+
+.redacted { background: var(--text-dim); color: var(--text-dim); padding: 0 4px; cursor: default; user-select: none; transition: all 0.4s; }
+.redacted:hover { background: var(--accent-red-dim); color: var(--accent-red-bright); }
+
+/* ═══ SIGNAL LOST BLOCK ═══ */
+.signal-lost {
+  text-align: center;
+  padding: 3rem 1rem;
+  margin: 2rem 0;
+  border: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+}
+.signal-lost .lost-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+  animation: staticFlicker 4s infinite;
+}
+@keyframes staticFlicker { 0%, 90%, 100% { opacity: 0.3; } 92% { opacity: 0.6; } 94% { opacity: 0.1; } }
+
+/* ═══ FOOTER ═══ */
+.broadcast-footer {
+  max-width: 750px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  border-top: 1px solid var(--border);
+  line-height: 2.2;
+}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.log-entry:nth-child(1) { animation-delay: 0.1s; }
+.log-entry:nth-child(2) { animation-delay: 0.15s; }
+.log-entry:nth-child(3) { animation-delay: 0.2s; }
+.log-entry:nth-child(4) { animation-delay: 0.25s; }
+.log-entry:nth-child(5) { animation-delay: 0.3s; }
+.log-entry:nth-child(6) { animation-delay: 0.35s; }
+.log-entry:nth-child(7) { animation-delay: 0.4s; }
+.log-entry:nth-child(8) { animation-delay: 0.45s; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 600px) {
+  .broadcast-header { padding: 1.5rem 1rem; }
+  .content { padding: 0 1rem 2rem; }
+  .log-entry { padding-left: 2rem; }
+}
+
+/* ═══ SECOND VISIT ═══ */
+.visit-variation { display: none; }
+.visit-variation.show { display: block; }
+.first-visit-only { display: block; }
+.first-visit-only.hide { display: none; }
+
+/* ═══ MEDIA: AUDIO PLAYER ═══ */
+.log-audio {
+  margin-top: 0.8rem;
+}
+.log-audio audio {
+  width: 100%;
+  height: 36px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+  filter: sepia(0.3) saturate(0.6);
+}
+.log-audio audio:hover { opacity: 1; }
+.log-audio-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.3rem;
+}
+
+/* ═══ MEDIA: IMAGES ═══ */
+.log-image {
+  margin-top: 0.8rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.log-image img {
+  width: 100%;
+  display: block;
+  filter: grayscale(0.3) brightness(0.85);
+  transition: filter 0.4s;
+}
+.log-image img:hover {
+  filter: grayscale(0) brightness(1);
+}
+.log-image-caption {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+/* Glitch effect on anomaly images */
+.log-image.image-glitch img {
+  animation: imgGlitch 5s infinite;
+}
+@keyframes imgGlitch {
+  0%, 94%, 100% { filter: grayscale(0.3) brightness(0.85); transform: translate(0); }
+  95% { filter: grayscale(1) brightness(1.2) contrast(1.5); transform: translate(-2px, 1px); }
+  96% { filter: grayscale(0.5) brightness(0.6); transform: translate(1px, -1px); }
+  97% { filter: grayscale(0.3) brightness(0.85); transform: translate(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <a href="index.html" class="back-link">← 返回副本列表</a>
+  <div class="rec-indicator">▶ PLAYBACK — 回放（权限限制中）</div>
+  <div class="signal-info">SIGNAL: <span id="signalStrength">██░░░</span></div>
+</div>
+
+<!-- HEADER -->
+<div class="broadcast-header">
+  <div class="broadcast-meta">
+    副本编号 #5732 // 类型：溯源<br>
+    收视评分：★★★★☆ // 状态：回放中（权限限制）<br>
+    信号源：祈殃娱乐中继节点 QY-NODE-17
+  </div>
+  <h1 class="broadcast-title">千子树下</h1>
+  <div class="broadcast-subtitle">「回到悲剧发生之前」</div>
+  <div class="broadcast-warning">⚠ 请勿违抗系统任务 — 违者后果自负</div>
+</div>
+
+<!-- MAIN TIMELINE -->
+<div class="content">
+  <div class="timeline" id="timeline">
+    <!-- 时间线内容由下方数据驱动 -->
+  </div>
+
+  <!-- SIGNAL LOST BLOCK -->
+  <div class="signal-lost" id="signalLost">
+    <div class="lost-icon">◌</div>
+    信号中断<br>
+    转播数据不完整 — 剩余记录正在恢复中<br><br>
+    <span style="opacity:0.3">最后一条记录的时间戳与当前时间不匹配。差值：<span class="hidden-text">负数。</span></span>
+  </div>
+
+  <!-- BROADCAST FOOTER -->
+  <div class="broadcast-footer">
+    祈殃娱乐 — 副本回放系统 v4.2<br>
+    本记录由系统自动生成，未经人工审核<br>
+    <span class="hidden-text">这段记录被播放了不止一次。每次结局都不同。但悲剧从未改变。</span>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════
+//
+//  ██  转 播 记 录 数 据  ██
+//
+//  在 LOG_ENTRIES 数组里添加新的记录条目即可
+//  不需要修改其他代码！
+//
+// ══════════════════════════════════════════════════════════
+
+/*
+ * 每一条记录是一个 { } 对象，字段说明：
+ *
+ * timestamp:  时间戳文字（显示在左上角，灰色小字）
+ * speaker:    说话人/来源（可选，不填则不显示）
+ * speakerType: 说话人样式（可选）
+ *              "character" — 金色（默认，角色对话）
+ *              "system"    — 灰色（系统消息）
+ *              "anomaly"   — 红色（异常/未知来源）
+ *              "unknown"   — 暗灰斜体（未知）
+ *
+ * content:    内容（支持 HTML 和 {{hidden:}} {{redacted:}} {{select:}} 标记）
+ *             用 <p>段落</p> 来分段
+ *
+ * type:       条目类型（决定时间线上的圆点颜色）
+ *             "system"   — 灰色圆点（系统消息）
+ *             "dialogue" — 金色圆点（对话）
+ *             "action"   — 绿色圆点（动作/场景描写）
+ *             "anomaly"  — 红色闪烁圆点（异常事件）
+ *             "redacted" — 暗灰圆点（被删除/涂黑的内容）
+ *
+ * format:     内容框样式（可选）
+ *             "normal"  — 普通文本（默认）
+ *             "system"  — 系统消息框（灰色左边框，深色背景）
+ *             "anomaly" — 异常消息框（红色左边框，暗红背景）
+ *
+ * audio:      音频文件路径（可选），例如 "audio/voice01.mp3"
+ *             需要先把音频文件上传到 qiyang 文件夹（或子文件夹）
+ * audioLabel: 音频标签文字（可选），例如 "参与者A 语音记录"
+ *
+ * image:      图片文件路径（可选），例如 "images/scene01.jpg"
+ *             需要先把图片上传到 qiyang 文件夹（或子文件夹）
+ * imageCaption: 图片说明文字（可选）
+ * imageGlitch: 设为 true 则图片会有故障抖动效果（可选）
+ *
+ * onReturn:   二次访问时替换 content 的内容（可选）
+ *
+ * ————————————————————————
+ * 特殊条目：分隔线
+ * 只需写 { divider: "分隔线文字" }
+ * ————————————————————————
+ */
+
+const LOG_ENTRIES = [
+
+  // ═══ 转播开始 ═══
+  {
+    timestamp: "T-00:00:00",
+    type: "system",
+    format: "system",
+    content: "回放信号接入中...连接已建立。<br>副本 #5732「千子树下」回放开始。<br>⚠ 部分内容因权限限制已被截断。"
+  },
+
+  {
+    timestamp: "T-00:00:12",
+    type: "action",
+    content: "<p>画面逐渐清晰。一棵巨大的古树占据了视野的中央，枝干遮天蔽日。树下散落着无数细小的、苍白的东西。</p><p>{{hidden:那不是树叶。}}</p>"
+  },
+
+  {
+    timestamp: "T-00:01:34",
+    speaker: "参与者 A",
+    speakerType: "character",
+    type: "dialogue",
+    content: "<p>（请在此替换为你的小说内容——角色的第一句对话）</p>"
+  },
+
+  {
+    timestamp: "T-00:02:10",
+    speaker: "系统提示",
+    speakerType: "system",
+    type: "system",
+    format: "system",
+    content: "当前任务：████████████<br>任务目标：回到悲剧发生之前。<br>{{hidden:系统没有说明「之前」是多久之前。}}"
+  },
+
+  {
+    timestamp: "T-00:03:45",
+    speaker: "参与者 B",
+    speakerType: "character",
+    type: "dialogue",
+    content: "<p>（另一位角色的对话）</p>"
+  },
+
+  { divider: "—— 时间线波动检测 ——" },
+
+  {
+    timestamp: "T-00:07:22",
+    type: "action",
+    content: "<p>（在这里描写一段场景/动作）</p><p>{{hidden:（可以在这里藏一句隐藏信息）}}</p>"
+  },
+
+  {
+    timestamp: "T-00:10:00",
+    speaker: "???",
+    speakerType: "anomaly",
+    type: "anomaly",
+    format: "anomaly",
+    content: "{{hidden:假的假的假的假的假的}}<br>这不是回溯。这是重演。<br>{{select:第37次重演。没有一次成功。}}",
+    onReturn: "你又来了。<br>你以为这次会不同吗？<br>{{hidden:第38次。}}"
+  },
+
+  { divider: "—— 信号不稳定 ——" },
+
+  {
+    timestamp: "T-00:??:??",
+    speaker: "参与者 A",
+    speakerType: "character",
+    type: "dialogue",
+    content: "<p>（关键对话——也许是接近真相的那句话）</p>"
+  },
+
+  {
+    timestamp: "T-00:??:??",
+    type: "system",
+    format: "system",
+    content: "⚠ 检测到任务偏离。请参与者立即返回指定路径。<br>{{hidden:没有指定路径。从来就没有。}}"
+  },
+
+  {
+    timestamp: "T-00:??:??",
+    type: "anomaly",
+    format: "anomaly",
+    content: "<span style='color:var(--accent-red-bright)'>█████ 信号中断 █████</span><br><br>{{redacted:最后的画面是树下的东西开始生长。}}"
+  },
+
+];
+
+
+// ══════════════════════════════════════════════════════════
+//
+//  以下为渲染引擎，一般不需要修改
+//
+// ══════════════════════════════════════════════════════════
+
+// --- Visit Tracking ---
+const VK = 'qiyang_qianzishu_visits';
+function getVisits() { return parseInt(localStorage.getItem(VK) || '0'); }
+function recordVisit() { const c = getVisits() + 1; localStorage.setItem(VK, c.toString()); return c; }
+const visitCount = recordVisit();
+const isReturn = visitCount > 1;
+
+// --- Parse Markup ---
+function parseMarkup(text) {
+  return text
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
+}
+
+// --- Render Timeline ---
+function renderTimeline() {
+  const container = document.getElementById('timeline');
+
+  LOG_ENTRIES.forEach((entry, i) => {
+    // Divider
+    if (entry.divider) {
+      const div = document.createElement('div');
+      div.className = 'log-divider';
+      div.innerHTML = `<span>${entry.divider}</span>`;
+      container.appendChild(div);
+      return;
+    }
+
+    const el = document.createElement('div');
+    el.className = `log-entry type-${entry.type || 'action'}`;
+    el.style.animationDelay = (i * 0.08) + 's';
+
+    let html = '';
+
+    // Timestamp
+    if (entry.timestamp) {
+      html += `<div class="log-timestamp">${entry.timestamp}</div>`;
+    }
+
+    // Speaker
+    if (entry.speaker) {
+      const spType = entry.speakerType || 'character';
+      html += `<div class="log-speaker speaker-${spType}">${entry.speaker}</div>`;
+    }
+
+    // Content
+    let content = entry.content;
+    if (isReturn && entry.onReturn) {
+      content = entry.onReturn;
+    }
+
+    const fmt = entry.format || 'normal';
+    if (fmt === 'system') {
+      html += `<div class="log-content log-system-msg">${parseMarkup(content)}</div>`;
+    } else if (fmt === 'anomaly') {
+      html += `<div class="log-content log-anomaly-msg">${parseMarkup(content)}</div>`;
+    } else {
+      html += `<div class="log-content">${parseMarkup(content)}</div>`;
+    }
+
+    // Image
+    if (entry.image) {
+      const glitchClass = entry.imageGlitch ? ' image-glitch' : '';
+      html += `<div class="log-image${glitchClass}">`;
+      html += `<img src="${entry.image}" alt="${entry.imageCaption || ''}" loading="lazy">`;
+      if (entry.imageCaption) {
+        html += `<div class="log-image-caption">${parseMarkup(entry.imageCaption)}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Audio
+    if (entry.audio) {
+      html += `<div class="log-audio">`;
+      if (entry.audioLabel) {
+        html += `<div class="log-audio-label">${entry.audioLabel}</div>`;
+      }
+      html += `<audio controls preload="none"><source src="${entry.audio}">浏览器不支持音频播放</audio>`;
+      html += `</div>`;
+    }
+
+    el.innerHTML = html;
+    container.appendChild(el);
+  });
+}
+
+renderTimeline();
+
+// --- Signal strength animation ---
+const signals = ['█░░░░', '██░░░', '███░░', '██░░░', '█░░░░', '██░░░', '░░░░░', '██░░░'];
+let sigIdx = 0;
+setInterval(() => {
+  document.getElementById('signalStrength').textContent = signals[sigIdx % signals.length];
+  sigIdx++;
+}, 2000);
+</script>
+
+</body>
+</html>
