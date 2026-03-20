@@ -3,375 +3,776 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>▦ 次元交界面 | DIMENSIONAL INTERFACE</title>
+<title>祈殃娱乐 | 公告平台</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg-deep: #0a0a0f;
-  --bg-panel: #0d0d18;
-  --accent-cyan: #00f0ff;
-  --accent-cyan-dim: #00f0ff33;
-  --accent-magenta: #ff00aa;
-  --accent-magenta-dim: #ff00aa22;
-  --text-primary: #e0e8f0;
-  --text-dim: #5a6a7a;
-  --text-ghost: #2a3a4a;
-  --grid-line: #ffffff08;
-  --scan-line: #00f0ff06;
-  --font-display: 'Orbitron', monospace;
+  --bg: #0c0a0a;
+  --bg-card: #141010;
+  --bg-card-hover: #1a1414;
+  --accent-red: #8b0000;
+  --accent-red-bright: #cc1111;
+  --accent-red-dim: #8b000033;
+  --accent-gold: #c4a35a;
+  --accent-gold-dim: #c4a35a22;
+  --text-primary: #d4ccc4;
+  --text-dim: #6a5a50;
+  --text-ghost: #2a2222;
+  --text-hidden: #0c0a0a;
+  --border: #2a1e1e;
+  --border-light: #3a2e2e;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'Noto Serif SC', serif;
   --font-mono: 'Share Tech Mono', monospace;
-  --font-body: 'Noto Sans SC', sans-serif;
 }
 
-html { font-size: 16px; }
 body {
-  background: var(--bg-deep);
+  background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-body);
-  overflow-x: hidden;
   min-height: 100vh;
-  cursor: crosshair;
+  overflow-x: hidden;
 }
 
-/* ═══ SCAN LINES ═══ */
 body::before {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    var(--scan-line) 2px,
-    var(--scan-line) 4px
-  );
+  background:
+    radial-gradient(ellipse at 20% 50%, #1a000044 0%, transparent 70%),
+    radial-gradient(ellipse at 80% 20%, #0a000044 0%, transparent 70%);
   pointer-events: none;
-  z-index: 9999;
-  animation: scanFlicker 8s infinite;
+  z-index: 1;
 }
 
-@keyframes scanFlicker {
-  0%, 95%, 100% { opacity: 0.3; }
-  96% { opacity: 0.6; }
-  97% { opacity: 0.1; }
-}
-
-/* ═══ GRID BACKGROUND ═══ */
 body::after {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 60px 60px;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: -1;
+  z-index: 1;
 }
 
-/* ═══ TOP BAR ═══ */
-.top-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 40px;
-  background: linear-gradient(90deg, var(--bg-panel), transparent 30%, transparent 70%, var(--bg-panel));
-  border-bottom: 1px solid var(--accent-cyan-dim);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2rem;
+a { color: inherit; text-decoration: none; }
+
+/* ═══ NAV BAR ═══ */
+.nav {
+  position: sticky; top: 0;
+  background: #0c0a0aee;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
   z-index: 100;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--text-dim);
 }
-.top-bar .status-left span { color: var(--accent-cyan); }
-.top-bar .status-right { color: var(--text-ghost); }
-.top-bar .blink { animation: blink 1.2s infinite; }
-@keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+.nav-brand { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent-red-bright); letter-spacing: 0.2em; }
+.nav-back { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); border: 1px solid var(--border); padding: 0.3rem 0.8rem; transition: all 0.3s; }
+.nav-back:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.nav-status { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); }
 
-/* ═══ MAIN CONTAINER ═══ */
-.container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 2rem;
-}
+/* ═══ HERO ═══ */
+.hero { position: relative; padding: 5rem 2rem 4rem; text-align: center; border-bottom: 1px solid var(--border); overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 60%); pointer-events: none; }
+.hero-title { font-family: var(--font-title); font-size: clamp(2.5rem, 8vw, 5rem); color: var(--accent-red-bright); text-shadow: 0 0 60px var(--accent-red-dim); letter-spacing: 0.3em; margin-bottom: 1rem; position: relative; }
+.hero-slogan { font-family: var(--font-body); font-size: 1rem; color: var(--text-dim); max-width: 500px; margin: 0 auto; line-height: 2; letter-spacing: 0.1em; }
+.hero-notice { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-ghost); padding: 0.5rem 1rem; border: 1px dashed var(--text-ghost); display: inline-block; }
 
-/* ═══ HEADER ═══ */
-.header {
-  text-align: center;
-  margin-bottom: 4rem;
-  animation: fadeInDown 1.5s ease-out;
-}
+/* ═══ RETURN BANNER ═══ */
+.return-banner { display: none; background: linear-gradient(90deg, transparent, var(--accent-red-dim), transparent); border: 1px solid var(--accent-red-dim); padding: 1rem 2rem; margin: 1.5rem 2rem 0; text-align: center; font-family: var(--font-body); font-size: 0.85rem; color: var(--accent-red-bright); animation: returnFadeIn 2s ease-out; }
+.return-banner.show { display: block; }
+@keyframes returnFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* ═══ CONTENT ═══ */
+.content-wrapper { max-width: 800px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
 
-.header-glyph {
-  font-size: 3rem;
-  letter-spacing: 1rem;
-  color: var(--accent-cyan);
-  text-shadow: 0 0 30px var(--accent-cyan-dim);
-  margin-bottom: 1rem;
-  font-family: var(--font-display);
-}
+.section-head { display: flex; align-items: center; gap: 1rem; margin: 3rem 0 1.5rem; }
+.section-head::before, .section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section-head h2 { font-family: var(--font-display); font-size: 1.1rem; color: var(--accent-gold); letter-spacing: 0.3em; white-space: nowrap; }
 
-.header h1 {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 4vw, 2.8rem);
-  font-weight: 900;
-  letter-spacing: 0.3em;
-  color: var(--text-primary);
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
+/* ═══ CARDS ═══ */
+.bulletin-card { background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 1.5rem; position: relative; transition: all 0.4s; }
+.bulletin-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent-red); opacity: 0; transition: opacity 0.4s; }
+.bulletin-card:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+.bulletin-card:hover::before { opacity: 1; }
+.card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.8rem; }
+.card-title { font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary); letter-spacing: 0.1em; }
+.card-date { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); }
+.card-body { font-size: 0.9rem; line-height: 2; color: var(--text-dim); }
+.card-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.6rem; padding: 0.2rem 0.6rem; margin-top: 0.8rem; border: 1px solid var(--border); color: var(--text-dim); }
+.card-tag.tag-urgent { border-color: var(--accent-red-dim); color: var(--accent-red-bright); }
+.card-tag.tag-secret { border-color: var(--accent-gold-dim); color: var(--accent-gold); }
 
-.header .subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  letter-spacing: 0.2em;
-}
+/* ═══ HIDDEN TEXT ═══ */
+.hidden-text { color: var(--text-hidden); background: transparent; transition: all 0.6s ease; position: relative; cursor: default; padding: 0 2px; text-shadow: 0 0 2px #8b000008; }
+.hidden-text::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--accent-red); opacity: 0; transition: opacity 0.6s; }
+.hidden-text:hover { color: var(--accent-red-bright) !important; text-shadow: 0 0 20px var(--accent-red-dim); }
+.hidden-text:hover::after { opacity: 0.5; }
 
-.header .warning-line {
-  margin-top: 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--accent-magenta);
-  opacity: 0.6;
-  animation: warningPulse 3s infinite;
-}
-@keyframes warningPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
-}
+.select-reveal { color: var(--bg); background: var(--bg); transition: none; user-select: text; }
+.select-reveal::selection { background: var(--accent-red); color: white; }
 
-/* ═══ WORLD GRID ═══ */
-.world-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  max-width: 1000px;
-  width: 100%;
-  animation: fadeInUp 1.8s ease-out 0.3s both;
-}
+.redacted { background: var(--text-dim); color: var(--text-dim); padding: 0 4px; cursor: default; user-select: none; transition: all 0.4s; }
+.redacted:hover { background: var(--accent-red-dim); color: var(--accent-red-bright); }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ═══ WORLD CARD ═══ */
-.world-card {
-  position: relative;
-  border: 1px solid var(--accent-cyan-dim);
-  background: var(--bg-panel);
-  padding: 2rem;
-  text-decoration: none;
-  color: var(--text-primary);
-  transition: all 0.4s ease;
-  overflow: hidden;
-  display: block;
-}
-
-.world-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.world-card:hover::before { opacity: 1; }
-
-.world-card:hover {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 40px var(--accent-cyan-dim), inset 0 0 40px #00f0ff08;
-  transform: translateY(-4px);
-}
-
-.world-card .card-index {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-ghost);
-  margin-bottom: 1rem;
-}
-
-.world-card .card-title {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  margin-bottom: 0.5rem;
-}
-
-.world-card .card-subtitle {
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.world-card .card-status {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  padding: 0.3rem 0.8rem;
-  display: inline-block;
-}
-
-.status-active {
-  color: var(--accent-cyan);
-  border: 1px solid var(--accent-cyan-dim);
-}
-.status-locked {
-  color: var(--text-ghost);
-  border: 1px solid var(--text-ghost);
-}
-
-/* locked card */
-.world-card.locked {
-  opacity: 0.35;
-  pointer-events: none;
-  border-style: dashed;
-}
-.world-card.locked .card-title {
-  color: var(--text-ghost);
-}
+/* ═══ VISIT COUNTER ═══ */
+.visit-counter { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-ghost); text-align: center; padding: 1rem; border-top: 1px solid var(--border); margin-top: 3rem; }
 
 /* ═══ FOOTER ═══ */
-.footer {
-  margin-top: 4rem;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-ghost);
-  animation: fadeInUp 2s ease-out 0.6s both;
-  line-height: 2;
+.site-footer { text-align: center; padding: 3rem 2rem; font-size: 0.75rem; color: var(--text-ghost); line-height: 2.2; border-top: 1px solid var(--border); margin-top: 2rem; }
+.site-footer .hidden-text { font-size: 0.7rem; }
+
+/* ═══ TIME NOTICE ═══ */
+.time-notice { display: none; background: #0a0808; border: 1px solid var(--accent-gold-dim); padding: 1rem 1.5rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-gold); text-align: center; animation: gentlePulse 4s infinite; }
+.time-notice.show { display: block; }
+@keyframes gentlePulse { 0%, 100% { border-color: var(--accent-gold-dim); } 50% { border-color: var(--accent-gold); } }
+
+/* ═══ ANIMATIONS ═══ */
+.fade-in { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s ease-out forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+.fade-in:nth-child(1) { animation-delay: 0.1s; }
+.fade-in:nth-child(2) { animation-delay: 0.2s; }
+.fade-in:nth-child(3) { animation-delay: 0.3s; }
+.fade-in:nth-child(4) { animation-delay: 0.4s; }
+.fade-in:nth-child(5) { animation-delay: 0.5s; }
+
+.visit-variation { display: none; }
+.visit-variation.show { display: inline; }
+.first-visit-only { display: inline; }
+.first-visit-only.hide { display: none; }
+
+
+/* ══════════════════════════════════════
+   ═══ SEARCH BOX ═══
+   ══════════════════════════════════════ */
+.search-section { margin: 2rem 0; }
+
+.search-box {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: border-color 0.4s;
+}
+.search-box:focus-within { border-color: var(--accent-red-dim); }
+
+.search-box input {
+  flex: 1; background: transparent; border: none;
+  padding: 0.8rem 1.2rem; color: var(--text-primary);
+  font-family: var(--font-body); font-size: 0.9rem; outline: none;
+}
+.search-box input::placeholder { color: var(--text-ghost); font-style: italic; }
+
+.search-box button {
+  background: var(--accent-red); border: none;
+  padding: 0.8rem 1.5rem; color: var(--text-primary);
+  font-family: var(--font-display); font-size: 0.85rem;
+  letter-spacing: 0.15em; cursor: pointer; transition: all 0.3s;
+}
+.search-box button:hover { background: var(--accent-red-bright); }
+
+.search-result {
+  margin-top: 1rem; overflow: hidden;
+  max-height: 0; opacity: 0;
+  transition: max-height 0.6s ease, opacity 0.6s ease;
+}
+.search-result.show { max-height: 600px; opacity: 1; }
+
+.search-result-inner {
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 1.2rem 1.5rem; font-size: 0.85rem;
+  line-height: 2; color: var(--text-dim); position: relative;
+}
+.search-result-inner::before {
+  content: '◈ 查询结果'; display: block;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-ghost); margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
 }
 
-/* ═══ GLITCH EFFECT ═══ */
-.glitch-trigger:hover .card-title {
-  animation: glitch 0.3s infinite;
+.typing-cursor::after { content: '█'; animation: cursorBlink 0.8s infinite; color: var(--accent-red); font-size: 0.8em; }
+@keyframes cursorBlink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+.result-glitch { animation: resultGlitch 0.15s infinite; }
+@keyframes resultGlitch { 0% { transform: translate(0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(1px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(0); } }
+
+
+/* ══════════════════════════════════════
+   ═══ EMPLOYEE LOGIN ═══
+   ══════════════════════════════════════ */
+.login-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px dashed var(--border); }
+.login-header { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-ghost); text-align: center; margin-bottom: 1rem; letter-spacing: 0.1em; }
+
+.login-box {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  max-width: 400px; margin: 0 auto;
+  transition: border-color 0.4s;
 }
-@keyframes glitch {
-  0% { text-shadow: 2px 0 var(--accent-magenta), -2px 0 var(--accent-cyan); }
-  25% { text-shadow: -2px 0 var(--accent-magenta), 2px 0 var(--accent-cyan); }
-  50% { text-shadow: 2px 2px var(--accent-magenta), -2px -2px var(--accent-cyan); }
-  75% { text-shadow: -2px -1px var(--accent-magenta), 2px 1px var(--accent-cyan); }
-  100% { text-shadow: 1px 0 var(--accent-magenta), -1px 0 var(--accent-cyan); }
+.login-box:focus-within { border-color: var(--accent-gold-dim); }
+
+.login-box input {
+  flex: 1; background: transparent; border: none;
+  padding: 0.7rem 1rem; color: var(--text-primary);
+  font-family: var(--font-mono); font-size: 0.8rem;
+  outline: none; letter-spacing: 0.15em;
 }
+.login-box input::placeholder { color: var(--text-ghost); letter-spacing: 0.1em; }
+
+.login-box button {
+  background: transparent; border: none;
+  border-left: 1px solid var(--border);
+  padding: 0.7rem 1.2rem; color: var(--text-dim);
+  font-family: var(--font-mono); font-size: 0.7rem;
+  cursor: pointer; transition: all 0.3s; letter-spacing: 0.1em;
+}
+.login-box button:hover { color: var(--accent-gold); background: #ffffff05; }
+
+.login-result {
+  max-width: 400px; margin: 0.8rem auto 0;
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height 0.6s ease, opacity 0.6s ease;
+}
+.login-result.show { max-height: 500px; opacity: 1; }
+
+.login-result-inner {
+  background: #0a0808; border: 1px solid var(--border);
+  padding: 1rem 1.2rem; font-family: var(--font-mono);
+  font-size: 0.75rem; line-height: 2;
+  color: var(--text-dim); text-align: center;
+}
+.login-denied { color: var(--accent-red-bright); }
+.login-granted { color: var(--accent-gold); }
+
+.login-attempts { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-ghost); text-align: center; margin-top: 0.5rem; }
+
+@keyframes screenShake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); } 20%, 40%, 60%, 80% { transform: translateX(3px); } }
+.shake { animation: screenShake 0.4s ease-out; }
+
+.screen-flash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent-red); z-index: 9998; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
+.screen-flash.active { opacity: 0.15; transition: opacity 0s; }
 
 /* ═══ RESPONSIVE ═══ */
 @media (max-width: 600px) {
-  .world-grid { grid-template-columns: 1fr; }
-  .header-glyph { font-size: 2rem; letter-spacing: 0.5rem; }
+  .content-wrapper { padding: 1rem; }
+  .bulletin-card { padding: 1rem 1.2rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .card-header { flex-direction: column; gap: 0.3rem; }
+  .search-box { flex-direction: column; }
+  .search-box button { border-top: 1px solid var(--border); }
 }
-
-/* ═══ CUSTOM CURSOR TRAIL ═══ */
-.cursor-dot {
-  position: fixed;
-  width: 6px;
-  height: 6px;
-  background: var(--accent-cyan);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  opacity: 0;
-  transition: opacity 0.3s;
-  box-shadow: 0 0 10px var(--accent-cyan);
-}
-body:hover .cursor-dot { opacity: 0.8; }
 </style>
 </head>
 <body>
 
-<div class="cursor-dot" id="cursorDot"></div>
+<div class="screen-flash" id="screenFlash"></div>
 
-<div class="top-bar">
-  <div class="status-left">
-    SYS.<span>LINK</span> // DIMENSIONAL INTERFACE v2.7.1
-    <span class="blink">_</span>
-  </div>
-  <div class="status-right" id="clock"></div>
+<!-- NAV -->
+<nav class="nav">
+  <a href="../index.html" class="nav-back">← 返回交界面</a>
+  <div class="nav-brand">祈殃娱乐</div>
+  <div class="nav-status">访问编号: <span id="visitorId">----</span></div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1 class="hero-title">祈殃娱乐</h1>
+  <p class="hero-slogan">
+    「为您甄选最优质的娱乐体验」<br>
+    <span class="first-visit-only" data-visit="first">安全・可控・满意率 99.7%</span>
+    <span class="visit-variation" data-visit="return">安全・可控・<span class="hidden-text">存活</span>率 99.7%</span>
+  </p>
+  <div class="hero-notice">本平台内容仅面向已签署免责协议之用户 // 未授权访问已被记录</div>
 </div>
 
-<div class="container">
-  <header class="header">
-    <div class="header-glyph">▦ ◈ ▦</div>
-    <h1>次元交界面</h1>
-    <div class="subtitle">DIMENSIONAL INTERFACE // 已检测到未授权访问</div>
-    <div class="warning-line">⚠ 警告：你不应该在这里。但既然来了——请选择一个世界。</div>
-  </header>
+<div class="return-banner" id="returnBanner">
+  ⚠ 系统检测到您曾访问过同系列文字转播系统。部分内容已根据您的<span class="redacted">风险等级</span>进行调整。
+</div>
 
-  <div class="world-grid">
+<div class="time-notice" id="timeNotice"></div>
 
-    <a href="qiyang/index.html" class="world-card glitch-trigger">
-      <div class="card-index">WORLD_001 // 怪谈层</div>
-      <div class="card-title">祈殃娱乐</div>
-      <div class="card-subtitle">
-        「本公司致力于为您提供最优质的灵异体验服务。所有副本均经严格安全认证。」
-      </div>
-      <div class="card-status status-active">◉ 已解锁 — ACCESSIBLE</div>
-    </a>
+<!-- MAIN CONTENT -->
+<div class="content-wrapper">
 
-    <div class="world-card locked">
-      <div class="card-index">WORLD_002 // ██████</div>
-      <div class="card-title">██████████</div>
-      <div class="card-subtitle">
-        权限不足。该世界线尚未稳定。请勿强行接入。
-      </div>
-      <div class="card-status status-locked">◌ 未解锁 — LOCKED</div>
+  <!-- ═══ SEARCH BOX ═══ -->
+  <div class="search-section">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="输入副本名称、关键词或编号查询..." autocomplete="off">
+      <button id="searchBtn">查 询</button>
     </div>
-
-    <div class="world-card locked">
-      <div class="card-index">WORLD_003 // ██████</div>
-      <div class="card-title">████████</div>
-      <div class="card-subtitle">
-        [数据已损坏] ...不建议...进入...
-      </div>
-      <div class="card-status status-locked">◌ 未解锁 — LOCKED</div>
+    <div class="search-result" id="searchResult">
+      <div class="search-result-inner" id="searchResultInner"></div>
     </div>
-
   </div>
 
-  <footer class="footer">
-    DIMENSIONAL INTERFACE © 时间线未知<br>
-    本系统不隶属于任何已知组织 // 一切后果自负<br>
-    <span style="opacity:0.3">你确定你是偶然来到这里的吗？</span>
-  </footer>
+  <!-- 公告 -->
+  <div class="section-head"><h2>公 告</h2></div>
+  <div id="bulletinContainer"></div>
+
+  <!-- 副本列表 -->
+  <div class="section-head"><h2>副 本 一 览</h2></div>
+  <div id="instanceContainer"></div>
+
+  <!-- ═══ EMPLOYEE LOGIN ═══ -->
+  <div class="login-section">
+    <div class="login-header">
+      ——— 内部通道 ———<br>
+      仅限祈殃娱乐授权员工使用
+    </div>
+    <div class="login-box">
+      <input type="password" id="loginInput" placeholder="请输入员工识别码..." autocomplete="off">
+      <button id="loginBtn">验 证</button>
+    </div>
+    <div class="login-result" id="loginResult">
+      <div class="login-result-inner" id="loginResultInner"></div>
+    </div>
+    <div class="login-attempts" id="loginAttempts"></div>
+  </div>
+
+  <div class="visit-counter" id="visitCounter"></div>
 </div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  祈殃娱乐 — 隶属于 ████ 交互集团<br>
+  本平台发布之所有信息均为事实 <span class="hidden-text">（以上为要求公开的声明）</span><br>
+  <span style="opacity:0.2">如果你能看到这行字，说明你还是你。</span>
+</footer>
+
 
 <script>
-// Clock
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent =
-    `LOCAL_TIME: ${h}:${m}:${s} // NODE: ${Math.floor(Math.random()*9000+1000)}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+// ══════════════════════════════════════════════════════════
+//
+//  ██  内 容 数 据 区  ██
+//
+//  添加新内容只需修改以下数组，不需要改其他代码！
+//
+// ══════════════════════════════════════════════════════════
 
-// Cursor trail
-const dot = document.getElementById('cursorDot');
-document.addEventListener('mousemove', e => {
-  dot.style.left = e.clientX - 3 + 'px';
-  dot.style.top = e.clientY - 3 + 'px';
-});
+/*
+ * 特殊标记语法（可用于所有文本字段）：
+ *
+ *  {{hidden:文字}}   → 鼠标悬停显示
+ *  {{redacted:文字}} → 涂黑遮挡，悬停可见
+ *  {{select:文字}}   → 需鼠标拖选才能看
+ *
+ * 公告/副本的 tag 类型: normal / urgent / secret
+ * 公告的 onReturn: 二次访问时替换 body 内容
+ */
+
+
+// ═══ 公告数据 ═══
+const BULLETINS = [
+  {
+    title: "关于近期副本异常的说明",
+    date: "公告编号 QY-2024-0312",
+    body: "近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经核实，该副本所有指标均在安全范围内。{{hidden:第七层走廊尽头的门不属于原始设计。请勿开启。}}请各位用户放心继续参与。",
+    tag: "官方公告",
+    tagType: "normal",
+    onReturn: "近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经核实，该副本{{hidden:已无法}}正常运行。{{hidden:我们失去了三名员工。}}请各位用户暂停参与该副本。"
+  },
+  {
+    title: "新副本上线预告",
+    date: "公告编号 QY-2024-0287",
+    body: "「深海旅馆」副本将于下月正式开放。本副本主打沉浸式深海探索体验，恐惧指数：★★★☆☆。{{hidden:实际恐惧指数已在内部测试中突破量表上限。}}欢迎提前预约。",
+    tag: "新副本",
+    tagType: "normal"
+  },
+  {
+    title: "⚠ 紧急通知",
+    date: "公告编号 QY-2024-0301",
+    body: "请所有用户立即停止尝试与副本内NPC进行\"超出剧本范围的对话\"。{{hidden:他们已经开始回答了。}}此类行为可能导致系统不稳定，违者将被{{redacted:永久移除}}暂停使用资格。",
+    tag: "紧急",
+    tagType: "urgent",
+    onReturn: "请所有用户立即停止尝试与副本内NPC进行\"超出剧本范围的对话\"。{{hidden:他们不是NPC。}}此类行为{{hidden:正是它们等待的触发条件}}可能导致系统不稳定。——此条公告已被{{redacted:它们}}管理层要求修改措辞。"
+  },
+  {
+    title: "用户满意度调查结果公示",
+    date: "公告编号 QY-2024-0256",
+    body: "本季度用户满意度达到 98.3%，续约率 97.1%。感谢各位的信任与支持。{{select:剩余1.7%的用户目前处于失联状态。}}{{hidden:请不要去找他们。}}",
+    tag: "数据公示",
+    tagType: "normal"
+  }
+];
+
+
+// ═══ 副本数据 ═══
+const INSTANCES = [
+    {
+    title: "拍花戏",
+    date: "副本编号 #3211",
+    body: "类型：案件还原 | 收视评分：★★★☆☆<br>简介：看门的黑犬、摘月的猴儿、褪鳞的美人..哪个是你的孩子？{{hidden:嘘..不要开门，是羊在吃草。}}回放：部分权限",
+    tag: "经典副本",
+    tagType: "normal"
+  },
+  {
+    title: "下楼",
+    date: "副本编号 #3241",
+    body: "类型：密室逃脱 | 收视评分：★★★☆☆<br>简介：我在下楼，下一座忘记如何而来，又该如何离去的楼。{{hidden:污染..重生。}}回放：部分权限",
+    tag: "单人副本",
+    tagType: "normal"
+  },
+  {
+    title: "千子树下",
+    date: "副本编号 #5732",
+    body: "类型：溯源 | 收视评分：★★★★☆<br>简介：回到悲剧发生之前{{hidden:假的假的假的假的假的！！！！}}回放：部分权限",
+    tag: "请勿违抗系统任务",
+    tagType: "secret"
+  },
+    {
+    title: "百疫",
+    date: "副本编号 #6786",
+    body: "类型：规则| 收视评分：★★★★☆<br>简介：████████████████████。{{hidden:请勿探究}}回放权限已关闭",
+    tag: "█████",
+    tagType: "secret"
+  },
+  {
+    title: "█████",
+    date: "副本编号 #???",
+    body: "类型：{{redacted:已删除}} | 收视评分：<span style='color:var(--accent-red-bright)'>数据溢出</span><br>简介：{{redacted:该副本从未存在。}}{{hidden:该副本无法关闭。}}",
+    tag: "???",
+    tagType: "urgent"
+  }
+];
+
+
+// ══════════════════════════════════════════════════════════
+// ═══ 搜索关键词数据 ═══
+// ══════════════════════════════════════════════════════════
+/*
+ *  添加新关键词：在数组里加一个 { } 对象即可
+ *
+ *  keywords:  触发词数组，输入包含其中任何一个就触发
+ *  response:  显示的回复（支持 {{hidden:}} 等标记和 <br> 换行）
+ *  effect:    特效（可选）
+ *             "normal"  — 正常显示（默认）
+ *             "glitch"  — 文字抖动故障
+ *             "flash"   — 全屏红色闪烁
+ *             "delayed" — 逐字打出效果
+ *             "deny"    — 红色拒绝风格
+ */
+
+const SEARCH_TRIGGERS = [
+  {
+    keywords: ["拍花戏", "拍花", "花戏", "花"],
+    response: "副本 #「拍花戏」<br>状态：运营中<br>安全等级：B<br><br>提示：请勿在第七层停留超过3分钟。{{hidden:第七层没有镜子。那些是窗户。窗户另一边有东西在看你。}}",
+    effect: "normal"
+  },
+  {
+    keywords: ["下楼"],
+    response: "副本 #「下楼」<br>状态：运营中<br>安全等级：A<br><br>{{hidden:最后一批测试员在307号房间集体失去了对「上」和「下」的概念。他们现在认为海面才是深渊。}}",
+    effect: "normal"
+  },
+  {
+    keywords: ["救命", "help", "救我", "出不去"],
+    response: "检测到求助信号...<br><br>正在定位您的位置...<br><br>{{hidden:我们找到了您的位置。但那里没有人。请确认自己真实存在}}<br><br><span style='color:var(--accent-red-bright)'>错误：用户身份与终端记录不符。</span>",
+    effect: "glitch"
+  },
+  {
+    keywords: ["真相", "真实", "谎言", "骗"],
+    response: "<span style='color:var(--accent-red-bright)'>⚠ 该关键词已被列入监控名单。</span><br><br>友情提醒：本平台所有信息均为事实。质疑本平台等同于质疑现实本身。<br>{{hidden:你是对的。但知道真相的人最后都选择了遗忘。不是自愿的那种。}}",
+    effect: "flash"
+  },
+  {
+    keywords: ["出口", "退出", "离开", "逃"],
+    response: "正在为您查询退出通道...<br><br>查询完成。结果：0 条。<br><br>{{hidden:请纵情享受欢愉。}}<br>如需帮助，请联系您的专属顾问（编号：NULL）。",
+    effect: "normal"
+  },
+  {
+    keywords: ["NPC", "npc", "角色", "人物"],
+    response: "本公司所有副本内人物均为高仿真AI驱动。请放心互动。<br><br>{{hidden:请不要在意牠们的感情，您的快乐是我们服务的第一要务}}",
+    effect: "normal"
+  },
+  {
+    keywords: ["死", "死亡", "死了", "杀"],
+    response: "<span style='color:var(--accent-red-bright)'>⚠ 敏感词汇已触发安全协议。</span><br><br>祈殃娱乐郑重声明：本公司运营期间未发生任何安全事故。<br>{{select:截至目前共计 ██ 人在副本内永久离线。他们的数据仍在运行。}}",
+    effect: "flash"
+  },
+  {
+    keywords: ["员工", "工作", "招聘", "入职"],
+    response: "祈殃娱乐长期招聘以下岗位：<br>・副本维护员（夜班）<br>・用户体验观察员<br>・{{redacted:遗体整理}}现场清洁员<br><br>福利待遇优厚。{{hidden:离职率 0%。因为没有人离职。也没有人确认还活着。}}",
+    effect: "normal"
+  },
+  {
+    keywords: ["我是谁", "你是谁", "这是哪"],
+    response: "用户身份核实中...<br><br>结果：未在本系统用户数据库中找到匹配记录。<br><br>{{hidden:但你的生物信息已存在于副本 #??? 的角色数据库中。为了您的安全，请勿探究}}",
+    effect: "delayed"
+  }
+];
+
+// 无匹配时的随机回复
+const SEARCH_FALLBACKS = [
+  "未找到相关信息。<br>{{hidden:或者说，相关信息不希望被你找到。}}",
+  "查询失败。该条目可能已被删除，或从未存在。<br>{{hidden:两者之间的区别在这里并不重要。}}",
+  "无结果。<br><br><span style='opacity:0.3'>...但在你搜索的瞬间，有什么注意到了你。</span>",
+  "数据库返回结果：0 条。<br>{{hidden:您无权查阅相关信息。}}",
+  "你确定它存在吗？<br>{{hidden:你确定「你」存在吗？}}"
+];
+
+
+// ══════════════════════════════════════════════════════════
+// ═══ 密码/员工识别码数据 ═══
+// ══════════════════════════════════════════════════════════
+/*
+ *  添加新密码：在数组里加一个 { } 对象即可
+ *
+ *  passwords: 触发密码数组（精确匹配，区分大小写）
+ *  response:  回复内容（支持标记和HTML）
+ *  type:      样式类型
+ *             "denied"  — 红色拒绝（默认）
+ *             "granted" — 金色通过
+ *             "warning" — 红色 + 屏幕震动
+ *             "special" — 金色 + 全屏闪烁（最高秘密）
+ */
+
+const PASSWORD_TRIGGERS = [
+  {
+    passwords: ["admin", "Admin", "ADMIN", "管理员"],
+    response: "身份验证失败。<br>「admin」不是有效的员工识别码。<br>{{hidden:但如果你知道这个词，说明你见过内部文档。谁给你的？}}",
+    type: "denied"
+  },
+  {
+    passwords: ["000000", "123456", "password", "666666"],
+    response: "身份验证失败。<br><br>安全提示：简单密码已于三年前被全面禁用。<br>原因：{{redacted:某位前员工使用弱密码导致副本 #003 的边界被突破，至今尚未修复。}}",
+    type: "denied"
+  },
+  {
+    passwords: ["qiyang", "祈殃", "祈殃娱乐"],
+    response: "检测到公司名称作为识别码输入。<br><br>这不是密码。但系统已记录您知道这个名字。<br>{{hidden:知道这个名字的人分为两类：员工和猎物。你是哪一类？}}",
+    type: "warning"
+  },
+  {
+    passwords: ["7777777"],
+    response: "▓▓▓ 识别码验证中 ▓▓▓<br><br>权限等级：<span style='color:var(--accent-gold)'>Ω-7</span><br>欢迎回来。<br><br>待处理事项：<br>・副本 #001 第七层异常未闭合<br>・用户 V-████ 已连续 72 小时在线，确认是否仍为本人操作<br>・{{hidden:地下三层的声音越来越大了。请不要派人去查看。我们没有足够的测试人员。}}<br><br><span style='opacity:0.4'>如感疲惫，请联系您的搭档。</span>",
+    type: "special"
+  },
+  {
+    passwords: ["help", "救命", "放我出去", "let me out"],
+    response: "<span style='color:var(--accent-red-bright)'>⚠ 检测到非正常输入</span><br><br>该输入模式与副本内被困用户特征匹配。<br><br>{{hidden:如果你真的被困住了——这个输入框不会救你。但至少现在有人知道你还在。}}<br><br>系统已通知相关部门。请保持冷静。{{select:5min。}}",
+    type: "warning"
+  }
+];
+
+// 密码无匹配时的回复（按尝试次数逐步升级）
+const PASSWORD_FALLBACKS = [
+  "身份验证失败。请确认您的员工识别码。",
+  "身份验证失败。剩余尝试次数有限。",
+  "身份验证失败。{{hidden:系统已开始追踪您的操作。}}",
+  "身份验证失败。您的访问行为已被标记为可疑。",
+  "⚠ 多次验证失败。安全协议已激活。{{hidden:你为什么这么执着于进入？里面的东西比外面的更危险。}}",
+  "<span style='color:var(--accent-red-bright)'>⚠ 终端即将被锁定。</span><br><br>{{hidden:请及时收手。}}<br>{{select:或者你想加入我们？}}"
+];
+
+
+// ══════════════════════════════════════════════════════════
+//
+//  以下为渲染引擎，一般不需要修改
+//
+// ══════════════════════════════════════════════════════════
+
+// --- Visit Tracking ---
+const VISIT_KEY = 'qiyang_visits';
+const FIRST_VISIT_KEY = 'qiyang_first_visit';
+function getVisitCount() { return parseInt(localStorage.getItem(VISIT_KEY) || '0'); }
+function recordVisit() {
+  const count = getVisitCount() + 1;
+  localStorage.setItem(VISIT_KEY, count.toString());
+  if (!localStorage.getItem(FIRST_VISIT_KEY)) localStorage.setItem(FIRST_VISIT_KEY, new Date().toISOString());
+  return count;
+}
+const visitCount = recordVisit();
+const isReturn = visitCount > 1;
+
+// --- Visitor ID ---
+function genVisitorId() {
+  let id = localStorage.getItem('qiyang_vid');
+  if (!id) { id = 'V-' + Math.random().toString(36).substr(2, 8).toUpperCase(); localStorage.setItem('qiyang_vid', id); }
+  return id;
+}
+document.getElementById('visitorId').textContent = genVisitorId();
+
+// --- Parse Markup ---
+function parseMarkup(text) {
+  return text
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
+}
+
+// --- Render Cards ---
+function renderCards(data, containerId, showReturnVariant) {
+  const container = document.getElementById(containerId);
+  data.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'bulletin-card fade-in';
+    card.style.animationDelay = (i * 0.15) + 's';
+    let bodyContent = (showReturnVariant && item.onReturn) ? item.onReturn : item.body;
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-title">${item.title}</div>
+        <div class="card-date">${item.date}</div>
+      </div>
+      <div class="card-body">${parseMarkup(bodyContent)}</div>
+      <span class="card-tag tag-${item.tagType}">${item.tag}</span>
+    `;
+    container.appendChild(card);
+  });
+}
+renderCards(BULLETINS, 'bulletinContainer', isReturn);
+renderCards(INSTANCES, 'instanceContainer', false);
+
+// --- Return Visit ---
+if (isReturn) {
+  document.getElementById('returnBanner').classList.add('show');
+  document.querySelectorAll('.first-visit-only').forEach(el => el.classList.add('hide'));
+  document.querySelectorAll('.visit-variation').forEach(el => el.classList.add('show'));
+}
+
+// --- Visit Counter ---
+document.getElementById('visitCounter').innerHTML =
+  `本终端已被访问 ${visitCount} 次` +
+  (isReturn ? ` // 首次访问: ${new Date(localStorage.getItem(FIRST_VISIT_KEY)).toLocaleDateString('zh-CN')}` : '') +
+  (visitCount >= 5 ? '<br><span style="color:var(--accent-red-bright)">⚠ 频繁访问已触发安全协议</span>' : '');
+
+// --- Time Notice ---
+(function checkTimeNotice() {
+  const hour = new Date().getHours();
+  const el = document.getElementById('timeNotice');
+  if (hour >= 0 && hour < 5) {
+    el.innerHTML = '⚠ 当前为非工作时段。您所看到的内容可能尚未经过审查。<br><span style="opacity:0.4">凌晨的信息最接近真相。</span>';
+    el.classList.add('show');
+  } else if (hour >= 23) {
+    el.innerHTML = parseMarkup('系统维护即将开始。此时段产生的浏览记录将{{hidden:被特别标注}}正常保存。');
+    el.classList.add('show');
+  }
+})();
+
+
+// ══════════════════════════════════════════
+// ═══ SEARCH ENGINE ═══
+// ══════════════════════════════════════════
+
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const searchResult = document.getElementById('searchResult');
+const searchResultInner = document.getElementById('searchResultInner');
+
+function triggerScreenFlash() {
+  const flash = document.getElementById('screenFlash');
+  flash.classList.add('active');
+  setTimeout(() => flash.classList.remove('active'), 150);
+  setTimeout(() => { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 100); }, 300);
+}
+
+function typewriterEffect(element, html, speed) {
+  speed = speed || 30;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  const plainText = tempDiv.textContent;
+  element.innerHTML = '<span class="typing-cursor"></span>';
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < plainText.length) {
+      element.innerHTML = plainText.substring(0, i + 1) + '<span class="typing-cursor"></span>';
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => { element.innerHTML = html; }, 500);
+    }
+  }, speed);
+}
+
+function doSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  let matched = null;
+  for (const trigger of SEARCH_TRIGGERS) {
+    if (trigger.keywords.some(kw => query.includes(kw))) { matched = trigger; break; }
+  }
+
+  let responseHTML, effect = 'normal';
+  if (matched) {
+    responseHTML = parseMarkup(matched.response);
+    effect = matched.effect || 'normal';
+  } else {
+    responseHTML = parseMarkup(SEARCH_FALLBACKS[Math.floor(Math.random() * SEARCH_FALLBACKS.length)]);
+  }
+
+  searchResultInner.className = 'search-result-inner';
+  if (effect === 'flash') triggerScreenFlash();
+  if (effect === 'glitch') { searchResultInner.classList.add('result-glitch'); setTimeout(() => searchResultInner.classList.remove('result-glitch'), 2000); }
+  if (effect === 'delayed') { typewriterEffect(searchResultInner, responseHTML); } else { searchResultInner.innerHTML = responseHTML; }
+
+  searchResult.classList.add('show');
+
+  // 记录搜索历史
+  const searches = JSON.parse(localStorage.getItem('qiyang_searches') || '[]');
+  searches.push({ query, time: new Date().toISOString() });
+  localStorage.setItem('qiyang_searches', JSON.stringify(searches));
+}
+
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+
+// ══════════════════════════════════════════
+// ═══ PASSWORD / LOGIN ENGINE ═══
+// ══════════════════════════════════════════
+
+const loginInput = document.getElementById('loginInput');
+const loginBtn = document.getElementById('loginBtn');
+const loginResult = document.getElementById('loginResult');
+const loginResultInner = document.getElementById('loginResultInner');
+const loginAttemptsEl = document.getElementById('loginAttempts');
+
+let loginAttemptCount = parseInt(localStorage.getItem('qiyang_login_attempts') || '0');
+
+function updateAttemptDisplay() {
+  if (loginAttemptCount > 0) loginAttemptsEl.textContent = `累计尝试: ${loginAttemptCount} 次`;
+}
+updateAttemptDisplay();
+
+function doLogin() {
+  const input = loginInput.value.trim();
+  if (!input) return;
+
+  loginAttemptCount++;
+  localStorage.setItem('qiyang_login_attempts', loginAttemptCount.toString());
+  updateAttemptDisplay();
+
+  let matched = null;
+  for (const trigger of PASSWORD_TRIGGERS) {
+    if (trigger.passwords.includes(input)) { matched = trigger; break; }
+  }
+
+  let responseHTML, resultType = 'denied';
+  if (matched) {
+    responseHTML = parseMarkup(matched.response);
+    resultType = matched.type || 'denied';
+  } else {
+    const idx = Math.min(loginAttemptCount - 1, PASSWORD_FALLBACKS.length - 1);
+    responseHTML = parseMarkup(PASSWORD_FALLBACKS[idx]);
+  }
+
+  loginResultInner.className = 'login-result-inner';
+  if (resultType === 'granted' || resultType === 'special') { loginResultInner.classList.add('login-granted'); }
+  else { loginResultInner.classList.add('login-denied'); }
+  if (resultType === 'warning') { document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 400); }
+  if (resultType === 'special') { triggerScreenFlash(); loginResultInner.classList.add('login-granted'); }
+
+  loginResultInner.innerHTML = responseHTML;
+  loginResult.classList.add('show');
+  loginInput.value = '';
+}
+
+loginBtn.addEventListener('click', doLogin);
+loginInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 </script>
 
 </body>
