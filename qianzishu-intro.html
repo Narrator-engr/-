@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副本 #5732 — 千子树下 | 简介</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #080808;
+  --bg-card: #0e0e0e;
+  --bg-card-hover: #141010;
+  --accent-red: #8b0000;
+  --accent-red-bright: #cc1111;
+  --accent-red-dim: #8b000033;
+  --accent-gold: #c4a35a;
+  --accent-gold-dim: #c4a35a22;
+  --accent-green: #2a6e3f;
+  --text-primary: #ede7e0;
+  --text-dim: #a89a8e;
+  --text-ghost: #4a3e3e;
+  --text-hidden: #080808;
+  --border: #1e1a1a;
+  --border-light: #2e2828;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'Noto Serif SC', serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Noise overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ═══ STATUS BAR ═══ */
+.status-bar {
+  position: sticky; top: 0;
+  background: #080808ee;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+.status-bar .back-link {
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+  transition: all 0.3s;
+}
+.status-bar .back-link:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.status-bar .mode-tag {
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold-dim);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.6rem;
+}
+
+/* ═══ HERO ═══ */
+.hero {
+  position: relative;
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-title {
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  color: var(--text-primary);
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  text-shadow: 0 0 60px var(--accent-red-dim);
+}
+.hero-sub {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.5rem;
+}
+.hero-mode {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold-dim);
+  padding: 0.4rem 1rem;
+  display: inline-block;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══ SECTION HEADS ═══ */
+.section-head {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 3rem 0 1.5rem;
+}
+.section-head::before, .section-head::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+}
+
+/* ═══ INFO PANEL ═══ */
+.info-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.info-item {
+  background: var(--bg-card);
+  padding: 1rem 1.2rem;
+}
+.info-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.info-value {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.info-value .highlight { color: var(--accent-gold); }
+.info-value .danger { color: var(--accent-red-bright); }
+
+/* ═══ SYNOPSIS ═══ */
+.synopsis {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  font-size: 0.9rem;
+  line-height: 2.2;
+  color: var(--text-dim);
+  position: relative;
+}
+.synopsis::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent-red);
+}
+.synopsis p { margin-bottom: 0.8rem; }
+.synopsis p:last-child { margin-bottom: 0; }
+
+/* ═══ GALLERY ═══ */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.gallery-item {
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.4s;
+}
+.gallery-item:hover { border-color: var(--border-light); }
+.gallery-item img {
+  width: 100%; display: block;
+  filter: grayscale(0.3) brightness(0.85);
+  transition: filter 0.4s;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+}
+.gallery-item:hover img { filter: grayscale(0) brightness(1); }
+.gallery-caption {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+/* ═══ AUDIO LIST ═══ */
+.audio-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  transition: border-color 0.3s;
+}
+.audio-item:hover { border-color: var(--border-light); }
+.audio-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+.audio-desc {
+  font-size: 0.8rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.6rem;
+  line-height: 1.8;
+}
+.audio-item audio {
+  width: 100%;
+  height: 36px;
+  opacity: 0.7;
+  filter: sepia(0.3) saturate(0.6);
+}
+.audio-item audio:hover { opacity: 1; }
+
+/* ═══ GUEST LIST ═══ */
+.guest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.guest-card {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.guest-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+a.guest-card:hover {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 20px var(--accent-gold-dim);
+  transform: translateY(-2px);
+}
+a.guest-card:hover::before { opacity: 1; }
+a.guest-card:hover .guest-name { color: var(--accent-gold); }
+
+.guest-card.locked {
+  opacity: 0.35;
+  pointer-events: none;
+  border-style: dashed;
+}
+
+.guest-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  margin-bottom: 0.8rem;
+  filter: grayscale(0.5) brightness(0.8);
+  object-fit: cover;
+}
+.guest-avatar-placeholder {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  margin-bottom: 0.8rem;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: var(--text-ghost);
+}
+.guest-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+  transition: color 0.3s;
+}
+.guest-role {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.5rem;
+}
+.guest-desc {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+.guest-status {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  margin-top: 0.6rem;
+  display: inline-block;
+  border: 1px solid var(--border);
+  color: var(--text-ghost);
+}
+.guest-status.status-alive { color: var(--accent-green); border-color: #2a6e3f44; }
+.guest-status.status-dead { color: var(--accent-red-bright); border-color: var(--accent-red-dim); }
+.guest-status.status-unknown { color: var(--text-ghost); border-style: dashed; }
+
+/* ═══ EASTER EGGS ═══ */
+.easter-egg {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--text-dim);
+  transition: border-color 0.4s;
+}
+.easter-egg:hover { border-color: var(--border-light); }
+.easter-egg .egg-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.5rem;
+}
+
+/* ═══ HIDDEN TEXT (same system) ═══ */
+.hidden-text { color: var(--text-hidden); background: transparent; transition: all 0.6s ease; position: relative; cursor: default; padding: 0 2px; text-shadow: 0 0 2px #8b000008; }
+.hidden-text::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--accent-red); opacity: 0; transition: opacity 0.6s; }
+.hidden-text:hover { color: var(--accent-red-bright) !important; text-shadow: 0 0 20px var(--accent-red-dim); }
+.hidden-text:hover::after { opacity: 0.5; }
+.select-reveal { color: var(--bg); background: var(--bg); transition: none; user-select: text; }
+.select-reveal::selection { background: var(--accent-red); color: white; }
+.redacted { background: var(--text-dim); color: var(--text-dim); padding: 0 4px; cursor: default; user-select: none; transition: all 0.4s; }
+.redacted:hover { background: var(--accent-red-dim); color: var(--accent-red-bright); }
+
+/* ═══ TIMELINE LINK ═══ */
+.timeline-link {
+  display: block;
+  text-align: center;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  transition: all 0.4s;
+  margin-top: 1rem;
+}
+.timeline-link:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  box-shadow: 0 0 20px var(--accent-gold-dim);
+}
+
+/* ═══ FOOTER ═══ */
+.page-footer {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  border-top: 1px solid var(--border);
+  line-height: 2.2;
+  margin-top: 3rem;
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-in {
+  opacity: 0; transform: translateY(15px);
+  animation: fadeUp 0.7s ease-out forwards;
+}
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ═══ SECOND VISIT ═══ */
+.visit-variation { display: none; }
+.visit-variation.show { display: block; }
+.first-visit-only { display: block; }
+.first-visit-only.hide { display: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 600px) {
+  .content { padding: 0 1rem 2rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .synopsis { padding: 1rem 1.2rem; }
+  .guest-grid { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <a href="index.html" class="back-link">← 返回副本列表</a>
+  <div class="mode-tag">◈ 文字转播模式</div>
+  <span style="color:var(--text-ghost)">INSTANCE #5732</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1 class="hero-title">千子树下</h1>
+  <div class="hero-sub">「回到悲剧发生之前」</div>
+  <div class="hero-mode">降维回放 — 权限受限 — 部分内容已截断</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- 基本信息 -->
+  <div class="section-head"><h2>基 本 信 息</h2></div>
+  <div class="info-panel" id="infoPanel"></div>
+
+  <!-- 简介 -->
+  <div class="section-head"><h2>副 本 简 介</h2></div>
+  <div class="synopsis" id="synopsis"></div>
+
+  <!-- 图片 -->
+  <div class="section-head" id="galleryHead" style="display:none"><h2>场 景 记 录</h2></div>
+  <div class="gallery" id="gallery"></div>
+
+  <!-- 音频 -->
+  <div class="section-head" id="audioHead" style="display:none"><h2>音 频 记 录</h2></div>
+  <div id="audioList"></div>
+
+  <!-- 嘉宾 -->
+  <div class="section-head"><h2>参 与 者</h2></div>
+  <div class="guest-grid" id="guestGrid"></div>
+
+  <!-- 隐藏彩蛋 -->
+  <div id="easterEggs"></div>
+
+  <!-- 时间线回放链接 -->
+  <div class="section-head"><h2>回 放 记 录</h2></div>
+  <a href="qianzishu.html" class="timeline-link" id="timelineLink">▶ 进入时间线回放</a>
+
+</div>
+
+<!-- FOOTER -->
+<div class="page-footer">
+  祈殃娱乐 — 副本简介系统<br>
+  本页面内容由系统自动生成 // 未经人工审核<br>
+  <span class="hidden-text">你在找什么？这里没有答案。只有更多的问题。</span>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════
+//
+//  ██  副 本 简 介 数 据  ██
+//
+//  修改以下数据即可更新页面内容，不需要改其他代码！
+//  所有文本字段支持 {{hidden:}} {{redacted:}} {{select:}} 标记
+//
+// ══════════════════════════════════════════════════════════
+
+
+// ═══ 基本信息面板 ═══
+/*
+ *  label: 标签名（灰色小字）
+ *  value: 值（支持标记和HTML）
+ */
+const INFO_ITEMS = [
+  { label: "副本编号", value: "#5732" },
+  { label: "副本名称", value: "千子树下" },
+  { label: "类型", value: "溯源" },
+  { label: "收视评分", value: "★★★★☆" },
+  { label: "安全等级", value: '<span class="danger">未评定</span>' },
+  { label: "参与人数", value: "██ 人" },
+  { label: "状态", value: '<span class="highlight">回放中（权限限制）</span>' },
+  { label: "信号源", value: "QY-NODE-17" },
+];
+
+
+// ═══ 副本简介 ═══
+/*
+ *  用 <p> 标签分段
+ *  支持 {{hidden:}} {{redacted:}} {{select:}} 标记
+ *  onReturn: 二次访问时替换的内容（可选）
+ */
+const SYNOPSIS = {
+  content: `
+    <p>在一棵遮天蔽日的巨树之下，参与者们被赋予了一项看似简单的任务——回到悲剧发生之前，阻止它的发生。</p>
+    <p>然而系统从未说明「之前」是多久之前，也没有告知悲剧的具体内容。参与者只能在不断循环的时间线中摸索，试图拼凑出真相的碎片。</p>
+    <p>{{hidden:这不是回溯。这是重演。每一次循环都在消耗参与者的记忆。}}</p>
+    <p>{{select:截至最后一次信号记录，该副本已循环了至少37次。没有一次成功改变结局。}}</p>
+  `,
+  onReturn: `
+    <p>在一棵遮天蔽日的巨树之下，参与者们被赋予了一项看似简单的任务——回到悲剧发生之前，阻止它的发生。</p>
+    <p>然而{{hidden:没有人记得}}系统从未说明「之前」是多久之前。参与者只能在不断循环的时间线中重复着相同的错误。</p>
+    <p>{{hidden:第38次。他们已经不记得自己的名字了。}}</p>
+    <p style="color:var(--accent-red-bright)">⚠ 该简介内容与上次访问存在差异。系统声称未进行修改。</p>
+  `
+};
+
+
+// ═══ 场景图片 ═══
+/*
+ *  src:      图片路径（相对于当前页面）
+ *  caption:  图片说明（支持标记）
+ *
+ *  如果数组为空，该栏目不显示
+ *  需要先把图片上传到 qiyang 文件夹（或子文件夹）
+ */
+const GALLERY_IMAGES = [
+  // 示例（取消注释并替换为真实图片路径）：
+  // { src: "images/qianzishu-tree.jpg", caption: "场景截取 — 古树全貌 {{hidden:树上挂着的不是果实}}" },
+  // { src: "images/qianzishu-ground.jpg", caption: "场景截取 — 树下地面 {{redacted:骨骼}}" },
+];
+
+
+// ═══ 音频记录 ═══
+/*
+ *  src:    音频文件路径
+ *  label:  标题/来源
+ *  desc:   描述（可选，支持标记）
+ *
+ *  如果数组为空，该栏目不显示
+ */
+const AUDIO_ITEMS = [
+  // 示例：
+  // { src: "audio/qianzishu-voice01.mp3", label: "语音记录 #01 — 参与者A", desc: "录制于第3次循环。{{hidden:背景中有第二个声音。}}" },
+];
+
+
+// ═══ 参与者/嘉宾列表 ═══
+/*
+ *  name:     名字
+ *  role:     身份/角色标签
+ *  desc:     简短描述（支持标记）
+ *  status:   状态类型
+ *            "alive"   — 绿色
+ *            "dead"    — 红色
+ *            "unknown" — 灰色虚线
+ *  statusText: 状态显示文字
+ *  link:     个人页链接（可选，不填则不可点击）
+ *  avatar:   头像图片路径（可选，不填则显示占位符）
+ *  locked:   设为 true 则卡片变灰不可点击（可选）
+ */
+const GUESTS = [
+  {
+    name: "参与者 A",
+    role: "身份待确认",
+    desc: "（在此填写简短描述）{{hidden:（隐藏信息）}}",
+    status: "unknown",
+    statusText: "状态未知",
+    // link: "qianzishu-guest-a.html",
+    // avatar: "images/guest-a.jpg",
+  },
+  {
+    name: "参与者 B",
+    role: "身份待确认",
+    desc: "（在此填写简短描述）",
+    status: "unknown",
+    statusText: "状态未知",
+    // link: "qianzishu-guest-b.html",
+  },
+  {
+    name: "参与者 C",
+    role: "身份待确认",
+    desc: "（在此填写简短描述）",
+    status: "unknown",
+    statusText: "状态未知",
+    // link: "qianzishu-guest-c.html",
+  },
+  {
+    name: "███",
+    role: "{{redacted:数据损坏}}",
+    desc: "该参与者信息已被系统抹除。{{hidden:但她的声音还留在录音里。}}",
+    status: "dead",
+    statusText: "已离线",
+    locked: true,
+  },
+];
+
+
+// ═══ 隐藏彩蛋 ═══
+/*
+ *  label:   标签/标题
+ *  content: 内容（支持标记和HTML）
+ *  showAfterVisits: 需要访问多少次后才显示（可选，默认 1 = 始终显示）
+ *
+ *  如果数组为空，该栏目不显示
+ */
+const EASTER_EGGS = [
+  {
+    label: "系统备注 [权限：内部]",
+    content: "该副本最初设计为单次体验。循环机制并非原始设计的一部分。{{hidden:是树自己开始循环的。我们只是无法关闭它。}}",
+    showAfterVisits: 1
+  },
+  {
+    label: "用户反馈摘录",
+    content: "「我明明改变了结局，为什么回来之后一切照旧？」——用户 V-████<br>{{select:系统日志显示该用户的记忆在每次循环后被重置。用户本人对此毫无察觉。}}",
+    showAfterVisits: 2
+  },
+  {
+    label: "{{redacted:已删除的备注}}",
+    content: "{{hidden:如果你能看到这条信息，说明系统权限正在失效。请立即停止浏览并关闭此页面。这不是彩蛋。这是警告。}}",
+    showAfterVisits: 3
+  },
+];
+
+
+// ═══ 时间线回放链接 ═══
+/*
+ *  设为 null 或空字符串则隐藏该按钮
+ */
+const TIMELINE_LINK = "qianzishu.html";
+const TIMELINE_LABEL = "▶ 进入时间线回放";
+
+
+// ══════════════════════════════════════════════════════════
+//
+//  以下为渲染引擎，一般不需要修改
+//
+// ══════════════════════════════════════════════════════════
+
+// --- Visit Tracking ---
+const VK = 'qiyang_qianzishu_intro_visits';
+function getVisits() { return parseInt(localStorage.getItem(VK) || '0'); }
+function recordVisit() { const c = getVisits() + 1; localStorage.setItem(VK, c.toString()); return c; }
+const visitCount = recordVisit();
+const isReturn = visitCount > 1;
+
+// --- Parse Markup ---
+function parseMarkup(text) {
+  return text
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
+}
+
+// --- Render Info Panel ---
+(function renderInfo() {
+  const panel = document.getElementById('infoPanel');
+  INFO_ITEMS.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'info-item';
+    el.innerHTML = `
+      <div class="info-label">${item.label}</div>
+      <div class="info-value">${parseMarkup(item.value)}</div>
+    `;
+    panel.appendChild(el);
+  });
+})();
+
+// --- Render Synopsis ---
+(function renderSynopsis() {
+  const el = document.getElementById('synopsis');
+  const content = (isReturn && SYNOPSIS.onReturn) ? SYNOPSIS.onReturn : SYNOPSIS.content;
+  el.innerHTML = parseMarkup(content);
+})();
+
+// --- Render Gallery ---
+(function renderGallery() {
+  if (GALLERY_IMAGES.length === 0) return;
+  document.getElementById('galleryHead').style.display = 'flex';
+  const container = document.getElementById('gallery');
+  GALLERY_IMAGES.forEach(img => {
+    const el = document.createElement('div');
+    el.className = 'gallery-item fade-in';
+    el.innerHTML = `
+      <img src="${img.src}" alt="${img.caption || ''}" loading="lazy">
+      ${img.caption ? '<div class="gallery-caption">' + parseMarkup(img.caption) + '</div>' : ''}
+    `;
+    container.appendChild(el);
+  });
+})();
+
+// --- Render Audio ---
+(function renderAudio() {
+  if (AUDIO_ITEMS.length === 0) return;
+  document.getElementById('audioHead').style.display = 'flex';
+  const container = document.getElementById('audioList');
+  AUDIO_ITEMS.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'audio-item fade-in';
+    el.innerHTML = `
+      <div class="audio-label">${item.label}</div>
+      ${item.desc ? '<div class="audio-desc">' + parseMarkup(item.desc) + '</div>' : ''}
+      <audio controls preload="none"><source src="${item.src}">浏览器不支持音频播放</audio>
+    `;
+    container.appendChild(el);
+  });
+})();
+
+// --- Render Guests ---
+(function renderGuests() {
+  const grid = document.getElementById('guestGrid');
+  GUESTS.forEach((g, i) => {
+    const isLink = g.link && !g.locked;
+    const tag = isLink ? 'a' : 'div';
+    const el = document.createElement(tag);
+    el.className = 'guest-card fade-in' + (g.locked ? ' locked' : '');
+    el.style.animationDelay = (i * 0.1) + 's';
+    if (isLink) el.href = g.link;
+
+    let avatarHTML;
+    if (g.avatar) {
+      avatarHTML = `<img class="guest-avatar" src="${g.avatar}" alt="${g.name}">`;
+    } else {
+      const initial = g.name.replace(/[█]/g, '?').charAt(0);
+      avatarHTML = `<div class="guest-avatar-placeholder">${initial}</div>`;
+    }
+
+    const statusClass = g.status ? 'status-' + g.status : '';
+    el.innerHTML = `
+      ${avatarHTML}
+      <div class="guest-name">${g.name}${isLink ? ' <span style="font-size:0.6rem;opacity:0.4">▸</span>' : ''}</div>
+      <div class="guest-role">${parseMarkup(g.role)}</div>
+      <div class="guest-desc">${parseMarkup(g.desc)}</div>
+      ${g.statusText ? '<div class="guest-status ' + statusClass + '">' + parseMarkup(g.statusText) + '</div>' : ''}
+    `;
+    grid.appendChild(el);
+  });
+})();
+
+// --- Render Easter Eggs ---
+(function renderEggs() {
+  const container = document.getElementById('easterEggs');
+  const validEggs = EASTER_EGGS.filter(e => visitCount >= (e.showAfterVisits || 1));
+  if (validEggs.length === 0) return;
+
+  // Add section head
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.style.marginTop = '3rem';
+  head.innerHTML = '<h2>附 录</h2>';
+  container.appendChild(head);
+
+  validEggs.forEach((egg, i) => {
+    const el = document.createElement('div');
+    el.className = 'easter-egg fade-in';
+    el.style.animationDelay = (i * 0.1) + 's';
+    el.innerHTML = `
+      <div class="egg-label">${parseMarkup(egg.label)}</div>
+      <div>${parseMarkup(egg.content)}</div>
+    `;
+    container.appendChild(el);
+  });
+})();
+
+// --- Timeline Link ---
+(function renderTimelineLink() {
+  if (!TIMELINE_LINK) {
+    document.getElementById('timelineLink').style.display = 'none';
+    return;
+  }
+  const link = document.getElementById('timelineLink');
+  link.href = TIMELINE_LINK;
+  link.textContent = TIMELINE_LABEL;
+})();
+</script>
+
+</body>
+</html>
