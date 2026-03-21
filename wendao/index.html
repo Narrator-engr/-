@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>问道山海 | 灵境终端</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #060a10;
+  --bg-panel: #0a1018;
+  --bg-card: #0c1420;
+  --bg-card-hover: #0f1a2a;
+  --accent-cyan: #4ac8e8;
+  --accent-cyan-bright: #6eddff;
+  --accent-cyan-dim: #4ac8e833;
+  --accent-cyan-glow: #4ac8e818;
+  --accent-gold: #d4a855;
+  --accent-gold-bright: #f0c866;
+  --accent-gold-dim: #d4a85533;
+  --accent-gold-glow: #d4a85518;
+  --accent-jade: #5abf8a;
+  --accent-jade-dim: #5abf8a33;
+  --accent-crimson: #c4444a;
+  --accent-crimson-dim: #c4444a33;
+  --accent-violet: #8a6cc8;
+  --accent-violet-dim: #8a6cc833;
+  --text-primary: #e8eef4;
+  --text-secondary: #c0d0e0;
+  --text-dim: #7a98b0;
+  --text-ghost: #3a5565;
+  --text-hidden: #060a10;
+  --border: #1a2a3a;
+  --border-light: #243848;
+  --border-glow: #4ac8e815;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'LXGW WenKai', serif;
+  --font-sans: 'Noto Sans SC', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══ AMBIENT BACKGROUND ═══ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, #0a1e3844 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, #0a182e44 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 0%, #1a3a5522 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle energy lines */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(180deg, transparent 0%, #4ac8e803 50%, transparent 100%),
+    radial-gradient(circle at 30% 40%, #4ac8e806 0%, transparent 30%),
+    radial-gradient(circle at 70% 60%, #d4a85506 0%, transparent 30%);
+  pointer-events: none;
+  z-index: 0;
+  animation: ambientShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes ambientShift {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ═══ FLOATING PARTICLES ═══ */
+.particle-field {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  0% { opacity: 0; transform: translateY(100vh) scale(0.5); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1.2); }
+}
+
+/* ═══ TOP STATUS BAR ═══ */
+.top-bar {
+  position: sticky; top: 0;
+  background: #060a10dd;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan-dim), transparent);
+}
+
+.bar-left { display: flex; align-items: center; gap: 1rem; }
+.bar-left .realm-tag {
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan-dim);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.6rem;
+}
+.bar-center { color: var(--text-ghost); font-size: 0.6rem; }
+.bar-right { display: flex; align-items: center; gap: 1rem; }
+
+.bar-back {
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+  transition: all 0.3s;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+}
+.bar-back:hover { color: var(--accent-cyan); border-color: var(--accent-cyan-dim); }
+
+.pulse-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--accent-jade);
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--accent-jade-dim); }
+  50% { opacity: 0.7; box-shadow: 0 0 6px 2px var(--accent-jade-dim); }
+}
+
+/* ═══ HERO SECTION ═══ */
+.hero {
+  position: relative;
+  padding: 5rem 2rem 4rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, #1a3a5515 0%, transparent 50%);
+  animation: heroGlow 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes heroGlow {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(2%, -2%); }
+}
+
+.hero-glyph {
+  font-size: 1.2rem;
+  letter-spacing: 1.5rem;
+  color: var(--accent-cyan);
+  opacity: 0.4;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  animation: fadeInDown 1.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 0.4; transform: translateY(0); }
+}
+
+.hero-title {
+  font-family: var(--font-title);
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--text-primary);
+  letter-spacing: 0.4em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  text-shadow: 0 0 80px var(--accent-cyan-dim), 0 0 120px #4ac8e810;
+  animation: titleReveal 1.5s ease-out;
+}
+
+@keyframes titleReveal {
+  from { opacity: 0; transform: translateY(15px); letter-spacing: 0.8em; }
+  to { opacity: 1; transform: translateY(0); letter-spacing: 0.4em; }
+}
+
+.hero-subtitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-dim);
+  letter-spacing: 0.3em;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 2s ease-out 0.3s both;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.hero-desc {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 2.2;
+  animation: fadeIn 2s ease-out 0.5s both;
+}
+
+.hero-border {
+  width: 60%;
+  max-width: 400px;
+  height: 1px;
+  margin: 2.5rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan-dim), var(--accent-gold-dim), var(--accent-cyan-dim), transparent);
+  animation: fadeIn 2s ease-out 0.8s both;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.content-wrapper {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 2rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══ SECTION HEADS ═══ */
+.section-head {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 3rem 0 1.5rem;
+}
+.section-head::before, .section-head::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.35em;
+  white-space: nowrap;
+  text-shadow: 0 0 20px var(--accent-gold-glow);
+}
+
+/* ═══ REALM NOTICE ═══ */
+.realm-notice {
+  background: linear-gradient(135deg, #0c1a2a, #0a1420);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-cyan);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.8s ease-out 1s both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.realm-notice::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 100px; height: 100%;
+  background: linear-gradient(90deg, transparent, #4ac8e806);
+  pointer-events: none;
+}
+
+.realm-notice .notice-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.realm-notice .notice-body {
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+/* ═══ POST CARDS (Forum Style) ═══ */
+.post-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 1rem;
+  position: relative;
+  transition: all 0.4s ease;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--accent-cyan);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.post-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  box-shadow: 0 4px 30px #0004;
+}
+.post-card:hover::before { opacity: 0.6; }
+
+.post-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 0.8rem;
+  gap: 1rem;
+}
+
+.post-author {
+  display: flex; align-items: center; gap: 0.6rem;
+}
+
+.author-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.avatar-righteous { background: linear-gradient(135deg, #1a3050, #1a4060); border: 1px solid var(--accent-cyan-dim); }
+.avatar-demonic { background: linear-gradient(135deg, #2a1528, #301828); border: 1px solid var(--accent-crimson-dim); }
+.avatar-neutral { background: linear-gradient(135deg, #1a2a20, #1a3028); border: 1px solid var(--accent-jade-dim); }
+.avatar-mysterious { background: linear-gradient(135deg, #1a1830, #201838); border: 1px solid var(--accent-violet-dim); }
+.avatar-official { background: linear-gradient(135deg, #1a2818, #283018); border: 1px solid var(--accent-gold-dim); }
+
+.author-info { display: flex; flex-direction: column; gap: 0.15rem; }
+
+.author-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+}
+
+.author-realm {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.post-time {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  white-space: nowrap;
+  margin-top: 0.2rem;
+}
+
+.post-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.post-body {
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--text-dim);
+}
+
+.post-footer {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #ffffff06;
+}
+
+.post-tag {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.tag-righteous { border-color: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.tag-demonic { border-color: var(--accent-crimson-dim); color: var(--accent-crimson); }
+.tag-official { border-color: var(--accent-gold-dim); color: var(--accent-gold); }
+.tag-secret { border-color: var(--accent-violet-dim); color: var(--accent-violet); }
+.tag-warning { border-color: var(--accent-crimson-dim); color: var(--accent-crimson); }
+
+.post-stats {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-ghost);
+  margin-left: auto;
+}
+
+/* Post with special styling */
+.post-card.post-pinned {
+  border-color: var(--accent-gold-dim);
+  background: linear-gradient(135deg, #0c1420, #10182008);
+}
+.post-card.post-pinned::before { opacity: 0.4; background: var(--accent-gold); }
+
+.post-card.post-warning {
+  border-color: var(--accent-crimson-dim);
+}
+.post-card.post-warning::before { opacity: 0.3; background: var(--accent-crimson); }
+
+.post-card.post-sealed {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+/* ═══ HIDDEN TEXT ═══ */
+.hidden-text {
+  color: var(--text-hidden);
+  background: transparent;
+  transition: all 0.6s ease;
+  position: relative;
+  cursor: default;
+  padding: 0 2px;
+}
+.hidden-text::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: var(--accent-cyan);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.hidden-text:hover {
+  color: var(--accent-cyan-bright) !important;
+  text-shadow: 0 0 15px var(--accent-cyan-dim);
+}
+.hidden-text:hover::after { opacity: 0.5; }
+
+.select-reveal {
+  color: var(--bg-deep);
+  background: var(--bg-deep);
+  user-select: text;
+}
+.select-reveal::selection { background: var(--accent-cyan); color: white; }
+
+.redacted {
+  background: var(--text-dim);
+  color: var(--text-dim);
+  padding: 0 4px;
+  cursor: default;
+  user-select: none;
+  transition: all 0.4s;
+}
+.redacted:hover {
+  background: var(--accent-crimson-dim);
+  color: var(--accent-crimson);
+}
+
+/* ═══ SECT LINKS (Bottom Section) ═══ */
+.sect-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sect-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  text-align: center;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.sect-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.sect-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px #0004;
+}
+.sect-card:hover::after { opacity: 0.6; }
+
+.sect-card.sect-locked {
+  opacity: 0.3;
+  pointer-events: none;
+  border-style: dashed;
+}
+
+.sect-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.4rem;
+}
+
+.sect-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.sect-status {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-ghost);
+  margin-top: 0.6rem;
+}
+
+/* ═══ FORUM ENTRY ═══ */
+.forum-entry {
+  text-align: center;
+  margin: 3rem 0 1rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, #0c1a2a, var(--bg-card));
+  position: relative;
+  overflow: hidden;
+}
+.forum-entry::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-dim), transparent);
+}
+.forum-entry-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+}
+.forum-entry-btn {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.25em;
+  padding: 0.8rem 2.5rem;
+  border: 1px solid var(--accent-gold-dim);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.4s;
+  text-decoration: none;
+}
+.forum-entry-btn:hover {
+  background: var(--accent-gold-glow);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 30px var(--accent-gold-glow), inset 0 0 30px var(--accent-gold-glow);
+  color: var(--accent-gold-bright);
+  transform: translateY(-2px);
+}
+.forum-entry-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-top: 0.8rem;
+}
+
+/* ═══ FOOTER ═══ */
+.site-footer {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  font-size: 0.7rem;
+  color: var(--text-ghost);
+  line-height: 2.5;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan-dim), transparent);
+}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-in {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeUp 0.6s ease-out forwards;
+}
+
+.fade-in:nth-child(1) { animation-delay: 0.05s; }
+.fade-in:nth-child(2) { animation-delay: 0.1s; }
+.fade-in:nth-child(3) { animation-delay: 0.15s; }
+.fade-in:nth-child(4) { animation-delay: 0.2s; }
+.fade-in:nth-child(5) { animation-delay: 0.25s; }
+.fade-in:nth-child(6) { animation-delay: 0.3s; }
+.fade-in:nth-child(7) { animation-delay: 0.35s; }
+.fade-in:nth-child(8) { animation-delay: 0.4s; }
+
+/* ═══ VISIT VARIATION ═══ */
+.visit-variation { display: none; }
+.visit-variation.show { display: inline; }
+.first-visit-only { display: inline; }
+.first-visit-only.hide { display: none; }
+
+.return-banner {
+  display: none;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-glow), transparent);
+  border: 1px solid var(--accent-gold-dim);
+  padding: 1rem 2rem;
+  margin: 0 2rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+  animation: fadeIn 1.5s ease-out;
+}
+.return-banner.show { display: block; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 600px) {
+  .content-wrapper { padding: 0 1rem 2rem; }
+  .post-card { padding: 1rem 1.2rem; }
+  .hero { padding: 3rem 1rem 2.5rem; }
+  .post-header { flex-direction: column; gap: 0.5rem; }
+  .post-time { align-self: flex-start; }
+  .sect-grid { grid-template-columns: 1fr; }
+  .bar-center { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div class="particle-field" id="particleField"></div>
+
+<!-- TOP BAR -->
+<nav class="top-bar">
+  <div class="bar-left">
+    <a href="../Index.html" class="bar-back">← 次元交互</a>
+    <span class="realm-tag">灵境终端</span>
+  </div>
+  <div class="bar-center">问道山海 · 修士信息互通灵台 // 灵脉稳定</div>
+  <div class="bar-right">
+    <span><span class="pulse-dot"></span>灵脉在线</span>
+    <span id="realmTime" style="color:var(--text-ghost)"></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glyph">☰ · ☷ · ☲ · ☵</div>
+  <h1 class="hero-title">问道山海</h1>
+  <div class="hero-subtitle">修 士 信 息 互 通 灵 台</div>
+  <p class="hero-desc">
+    「三界修士共聚之所，论道传法，互通有无。」<br>
+    <span class="first-visit-only" data-visit="first">山海有灵，问道无涯。欢迎来到修士们的聚集之地。</span>
+    <span class="visit-variation" data-visit="return">欢迎回来，道友。灵台记得你的气息。{{hidden:你上次走的时候忘记带走你寄存的灵茶了。}}</span>
+  </p>
+  <div class="hero-border"></div>
+</div>
+
+<div class="return-banner" id="returnBanner">
+  灵台检测到您的神识印记。欢迎回来，道友——你关注的帖子有了新回复。
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-wrapper">
+
+  <!-- 灵台公告 -->
+  <div class="section-head"><h2>灵 台 公 告</h2></div>
+  <div id="noticeContainer"></div>
+
+  <!-- 修士论道 -->
+  <div class="section-head"><h2>修 士 论 道</h2></div>
+  <div id="postContainer"></div>
+
+  <!-- 宗门灵境 -->
+  <div class="section-head"><h2>宗 门 灵 境</h2></div>
+  <div class="sect-grid" id="sectContainer"></div>
+
+  <!-- 论道入口 -->
+  <div class="forum-entry">
+    <div class="forum-entry-label">三 界 论 道 · 广 场</div>
+    <a href="forum.html" class="forum-entry-btn">☰ 进入论道广场</a>
+    <div class="forum-entry-hint">在此留下你的道痕 — 所有修士均可发言</div>
+  </div>
+
+  <!-- 访客记录 -->
+  <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost);text-align:center;padding:1rem;border-top:1px solid var(--border);margin-top:2rem;" id="visitCounter"></div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  问道山海 — 灵境终端 v3.1.7<br>
+  由三界灵脉共同维护 · 受天道法则约束<span class="hidden-text">（天道今天心情不错。）</span><br>
+  <span style="opacity:0.2">山海有灵，愿你问道有所得。</span>
+</footer>
+
+
+<script>
+// ══════════════════════════════════════════════════════════
+//
+//  ██  内 容 数 据 区  ██
+//
+//  添加新内容只需修改以下数组，不需要改其他代码！
+//
+// ══════════════════════════════════════════════════════════
+
+/*
+ * 特殊标记语法（可用于所有文本字段）：
+ *  {{hidden:文字}}   → 鼠标悬停显示（青色光效）
+ *  {{redacted:文字}} → 涂黑遮挡，悬停可见（赤色）
+ *  {{select:文字}}   → 需鼠标拖选才能看
+ *
+ * 帖子的 avatarType: righteous / demonic / neutral / mysterious / official
+ * 帖子的 tagType:    righteous / demonic / official / secret / warning / (默认无色)
+ * 帖子的 cardStyle:  normal / pinned / warning / sealed
+ */
+
+
+// ═══ 公告数据 ═══
+const NOTICES = [
+  {
+    label: "灵台公告 · 天道历三千七百二十一年",
+    body: "一年一度的「万仙博览会」将于下月在昆仑墟举办，届时各宗门均有设摊展示独门丹药、法器与灵宠。散修亦可凭灵台身份牌入场。欢迎各位道友踊跃参与！{{hidden:去年有位妖族道友带了一只会唱歌的灵蛤蟆参展，拿了人气第一。今年他说要带一只会下棋的。}}",
+    onReturn: "万仙博览会筹备进行中！目前已收到三百余宗门的报名。{{hidden:据说今年有一个从未听过名字的宗门报了名，报名表上的宗门地址写的是「你梦里」。灵台执事表示头很大。}}"
+  }
+];
+
+
+// ═══ 帖子数据 ═══
+const POSTS = [
+  {
+    author: "灵台执事",
+    authorAvatar: "台",
+    avatarType: "official",
+    realm: "灵台管理组",
+    time: "今日",
+    title: "灵台社区公约（新人必读）",
+    body: "欢迎加入问道山海灵台！发帖请遵守基本礼仪，禁止人身攻击、售卖假丹药、以及在帖子里偷偷夹带摄魂术。{{hidden:上个月有人在帖子里藏了一个迷你幻阵，点开帖子的人全做了一下午的梦。我们加班三天才清理完。}}",
+    tag: "官方",
+    tagType: "official",
+    stats: "回复 233 · 已置顶",
+    cardStyle: "pinned"
+  },
+  {
+    author: "云中君",
+    authorAvatar: "云",
+    avatarType: "righteous",
+    realm: "元婴境 · 青云宗",
+    time: "半刻前",
+    title: "今天炼丹又炸炉了，第三十七次。",
+    body: "有没有道友能告诉我，为什么我严格按照丹方投料，每次到第七味药材的时候炉子就炸？？？我师父说是我心不静，但我已经提前打坐了两个时辰了啊！！{{hidden:其实我怀疑是我新买的丹炉有问题。卖家是个笑眯眯的老头，总感觉在哪见过他……}}求各位炼丹大佬指点。",
+    tag: "求助",
+    tagType: "",
+    stats: "回复 56 · 收藏 89",
+    cardStyle: "normal"
+  },
+  {
+    author: "桃夭夭",
+    authorAvatar: "桃",
+    avatarType: "neutral",
+    realm: "金丹境 · 百花谷",
+    time: "一个时辰前",
+    title: "分享！我种了三百年的桃树终于结果了！",
+    body: "呜呜呜姐妹们我真的哭了TAT 三百年前种下的第一颗灵桃核，今天终于结出了第一颗果实！虽然只有一颗，但它散发着淡淡的霞光，闻起来有日出的味道！！发个帖纪念一下～{{hidden:其实果子结了三颗，但另外两颗被隔壁的灵猴偷吃了。我决定不追究。因为那只猴子吃完之后毛变成粉色了，已经是最好的报应。}}",
+    tag: "分享",
+    tagType: "",
+    stats: "回复 312 · 收藏 1.2k",
+    cardStyle: "normal"
+  },
+  {
+    author: "赤炎魔君",
+    authorAvatar: "炎",
+    avatarType: "demonic",
+    realm: "化神境 · 赤焰山",
+    time: "两个时辰前",
+    title: "谁说魔修不能开茶馆的？？？",
+    body: "今天有个正道弟子路过我山门口的茶馆，看了一眼招牌就跑了。我就想问问，「赤炎真火手冲灵茶」这个名字有什么问题吗？？我泡茶技术在整个魔道排前三好吧。水温用真火控制精确到个位数。不服来品。",
+    tag: "吐槽",
+    tagType: "demonic",
+    stats: "回复 187 · 收藏 445",
+    cardStyle: "normal"
+  },
+  {
+    author: "小白龙",
+    authorAvatar: "龙",
+    avatarType: "mysterious",
+    realm: "筑基境 · 东海龙裔",
+    time: "三个时辰前",
+    title: "【结伴】有没有人一起去北海捞星砂？",
+    body: "下周北海会有一次百年难遇的星雨，星砂落入海底之后会沉到珊瑚层，需要至少三个人配合才能捞到。本龙提供水下呼吸法术和导航，但需要一位擅长防御的道友（海底有脾气不好的老蚌精）和一位能辨别真假星砂的炼器师。报酬五五分。有意者留言～",
+    tag: "结伴",
+    tagType: "",
+    stats: "回复 28 · 收藏 67",
+    cardStyle: "normal"
+  },
+  {
+    author: "天机阁掌柜",
+    authorAvatar: "机",
+    avatarType: "official",
+    realm: "天机阁 · 坊市管理",
+    time: "昨日",
+    title: "【市集公告】本周灵石汇率波动提醒",
+    body: "受南荒妖族大量采购炼器材料影响，本周玄铁价格上涨两成，火晶石暂时缺货。另外提醒各位，近期有人在坊市兜售「一夜筑基丹」，经鉴定成分为普通糯米粉加了点荧光粉。请各位道友擦亮法眼。{{hidden:买到假丹的那位兄弟别灰心，至少糯米粉吃了不亏。}}",
+    tag: "市集",
+    tagType: "official",
+    stats: "回复 45 · 收藏 102",
+    cardStyle: "pinned"
+  },
+  {
+    author: "青梅煮酒",
+    authorAvatar: "梅",
+    avatarType: "neutral",
+    realm: "金丹境 · 散修",
+    time: "昨日",
+    title: "各位道友，你们修仙之后最怀念凡间的什么？",
+    body: "我先说：我最怀念凡间集市上三文钱一碗的馄饨。现在吃什么灵果仙酿都觉得少了点什么。上次下山偷偷吃了一碗，店家还是那个老婆婆的后代，味道居然一模一样。坐在那里吃着馄饨看人来人往，觉得那一刻比突破境界还开心。",
+    tag: "闲聊",
+    tagType: "",
+    stats: "回复 892 · 收藏 2.3k",
+    cardStyle: "normal"
+  }
+];
+
+
+// ═══ 宗门数据 ═══
+const SECTS = [
+  { name: "青云宗", desc: "剑修圣地，云海之上", status: "◉ 灵境开放", locked: false },
+  { name: "百花谷", desc: "灵药百草，四季如春", status: "◉ 灵境开放", locked: false },
+  { name: "赤焰山", desc: "魔道炼火，茶亦飘香", status: "◉ 灵境开放", locked: false },
+  { name: "东海龙宫", desc: "龙裔居所，深海奇珍", status: "◉ 灵境开放", locked: false },
+  { name: "天机阁", desc: "坊市枢纽，万物流通", status: "◉ 灵境开放", locked: false },
+  { name: "██████", desc: "尚未开放", status: "◌ 敬请期待", locked: true },
+];
+
+
+// ══════════════════════════════════════════════════════════
+//
+//  以下为渲染引擎，一般不需要修改
+//
+// ══════════════════════════════════════════════════════════
+
+// --- Visit Tracking ---
+const VISIT_KEY = 'wendao_visits';
+const FIRST_VISIT_KEY = 'wendao_first_visit';
+function getVisitCount() { return parseInt(localStorage.getItem(VISIT_KEY) || '0'); }
+function recordVisit() {
+  const count = getVisitCount() + 1;
+  localStorage.setItem(VISIT_KEY, count.toString());
+  if (!localStorage.getItem(FIRST_VISIT_KEY)) localStorage.setItem(FIRST_VISIT_KEY, new Date().toISOString());
+  return count;
+}
+const visitCount = recordVisit();
+const isReturn = visitCount > 1;
+
+// --- Parse Markup ---
+function parseMarkup(text) {
+  if (!text) return '';
+  return text
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
+}
+
+// --- Render Notices ---
+function renderNotices() {
+  const container = document.getElementById('noticeContainer');
+  NOTICES.forEach(notice => {
+    const el = document.createElement('div');
+    el.className = 'realm-notice fade-in';
+    let body = (isReturn && notice.onReturn) ? notice.onReturn : notice.body;
+    el.innerHTML = `
+      <div class="notice-label">${notice.label}</div>
+      <div class="notice-body">${parseMarkup(body)}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// --- Render Posts ---
+function renderPosts() {
+  const container = document.getElementById('postContainer');
+  POSTS.forEach((post, i) => {
+    const el = document.createElement('div');
+    const style = post.cardStyle || 'normal';
+    el.className = `post-card fade-in post-${style}`;
+    el.style.animationDelay = (i * 0.1) + 's';
+
+    let body = (isReturn && post.onReturn) ? post.onReturn : post.body;
+    const tagClass = post.tagType ? ' tag-' + post.tagType : '';
+
+    el.innerHTML = `
+      <div class="post-header">
+        <div class="post-author">
+          <div class="author-avatar avatar-${post.avatarType}">${post.authorAvatar}</div>
+          <div class="author-info">
+            <div class="author-name">${post.author}</div>
+            <div class="author-realm">${parseMarkup(post.realm)}</div>
+          </div>
+        </div>
+        <div class="post-time">${post.time}</div>
+      </div>
+      <div class="post-title">${parseMarkup(post.title)}</div>
+      <div class="post-body">${parseMarkup(body)}</div>
+      <div class="post-footer">
+        <span class="post-tag${tagClass}">${post.tag}</span>
+        <span class="post-stats">${post.stats}</span>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// --- Render Sects ---
+function renderSects() {
+  const container = document.getElementById('sectContainer');
+  SECTS.forEach(sect => {
+    const el = document.createElement('div');
+    el.className = 'sect-card' + (sect.locked ? ' sect-locked' : '');
+    el.innerHTML = `
+      <div class="sect-name">${sect.name}</div>
+      <div class="sect-desc">${sect.desc}</div>
+      <div class="sect-status">${sect.status}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// --- Init ---
+renderNotices();
+renderPosts();
+renderSects();
+
+// --- Return Visit ---
+if (isReturn) {
+  document.getElementById('returnBanner').classList.add('show');
+  document.querySelectorAll('.first-visit-only').forEach(el => el.classList.add('hide'));
+  document.querySelectorAll('.visit-variation').forEach(el => el.classList.add('show'));
+}
+
+// --- Visit Counter ---
+document.getElementById('visitCounter').innerHTML =
+  `本灵台已被神识触及 ${visitCount} 次` +
+  (isReturn ? ` // 首次接入: ${new Date(localStorage.getItem(FIRST_VISIT_KEY)).toLocaleDateString('zh-CN')}` : '') +
+  (visitCount >= 5 ? '<br><span style="color:var(--accent-crimson)">⚠ 频繁接入已引起天道注视</span>' : '');
+
+// --- Realm Time ---
+function updateRealmTime() {
+  const now = new Date();
+  const h = now.getHours();
+  let period;
+  if (h >= 23 || h < 1) period = '子时';
+  else if (h < 3) period = '丑时';
+  else if (h < 5) period = '寅时';
+  else if (h < 7) period = '卯时';
+  else if (h < 9) period = '辰时';
+  else if (h < 11) period = '巳时';
+  else if (h < 13) period = '午时';
+  else if (h < 15) period = '未时';
+  else if (h < 17) period = '申时';
+  else if (h < 19) period = '酉时';
+  else if (h < 21) period = '戌时';
+  else period = '亥时';
+  document.getElementById('realmTime').textContent = period;
+}
+setInterval(updateRealmTime, 60000);
+updateRealmTime();
+
+// --- Particles ---
+(function createParticles() {
+  const field = document.getElementById('particleField');
+  const count = 25;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (12 + Math.random() * 18) + 's';
+    p.style.animationDelay = (Math.random() * 15) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    if (Math.random() > 0.7) p.style.background = 'var(--accent-gold)';
+    field.appendChild(p);
+  }
+})();
+</script>
+
+</body>
+</html>

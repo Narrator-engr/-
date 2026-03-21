@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论道广场 | 问道山海</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #060a10;
+  --bg-panel: #0a1018;
+  --bg-card: #0c1420;
+  --bg-card-hover: #0f1a2a;
+  --bg-input: #081018;
+  --accent-cyan: #4ac8e8;
+  --accent-cyan-bright: #6eddff;
+  --accent-cyan-dim: #4ac8e833;
+  --accent-cyan-glow: #4ac8e818;
+  --accent-gold: #d4a855;
+  --accent-gold-bright: #f0c866;
+  --accent-gold-dim: #d4a85533;
+  --accent-gold-glow: #d4a85518;
+  --accent-jade: #5abf8a;
+  --accent-jade-dim: #5abf8a33;
+  --accent-crimson: #c4444a;
+  --accent-crimson-dim: #c4444a33;
+  --accent-violet: #8a6cc8;
+  --accent-violet-dim: #8a6cc833;
+  --accent-rose: #c87a9a;
+  --accent-rose-dim: #c87a9a33;
+  --text-primary: #e8eef4;
+  --text-secondary: #c0d0e0;
+  --text-dim: #7a98b0;
+  --text-ghost: #3a5565;
+  --text-hidden: #060a10;
+  --border: #1a2a3a;
+  --border-light: #243848;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'LXGW WenKai', serif;
+  --font-sans: 'Noto Sans SC', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ambient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, #0a1e3844 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, #0a182e44 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ═══ PARTICLES ═══ */
+.particle-field {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.particle {
+  position: absolute; width: 2px; height: 2px;
+  background: var(--accent-cyan); border-radius: 50%;
+  opacity: 0; animation: particleFloat linear infinite;
+}
+@keyframes particleFloat {
+  0% { opacity: 0; transform: translateY(100vh) scale(0.5); }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1.2); }
+}
+
+/* ═══ TOP BAR ═══ */
+.top-bar {
+  position: sticky; top: 0;
+  background: #060a10dd;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-dim), transparent);
+}
+.bar-back {
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+  transition: all 0.3s;
+}
+.bar-back:hover { color: var(--accent-cyan); border-color: var(--accent-cyan-dim); }
+
+/* ═══ HEADER ═══ */
+.forum-header {
+  text-align: center;
+  padding: 3rem 2rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.forum-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center top, #1a3a5515 0%, transparent 60%);
+  pointer-events: none;
+}
+.forum-title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  color: var(--text-primary);
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 60px var(--accent-cyan-dim);
+  margin-bottom: 0.3rem;
+  position: relative;
+}
+.forum-subtitle {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+}
+
+/* ═══ CATEGORY TABS ═══ */
+.cat-bar {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1.2rem 2rem 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.cat-tab {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.cat-tab:hover {
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+  background: #ffffff04;
+}
+.cat-tab.active {
+  border-color: var(--accent-gold-dim);
+  color: var(--accent-gold);
+  background: var(--accent-gold-glow);
+}
+
+/* Category-specific active colors */
+.cat-tab[data-cat="论道"].active { border-color: var(--accent-cyan-dim); color: var(--accent-cyan); background: var(--accent-cyan-glow); }
+.cat-tab[data-cat="求助"].active { border-color: var(--accent-jade-dim); color: var(--accent-jade); background: #5abf8a18; }
+.cat-tab[data-cat="谁说"].active { border-color: var(--accent-rose-dim); color: var(--accent-rose); background: #c87a9a18; }
+.cat-tab[data-cat="结伴"].active { border-color: var(--accent-violet-dim); color: var(--accent-violet); background: #8a6cc818; }
+.cat-tab[data-cat="市集"].active { border-color: var(--accent-gold-dim); color: var(--accent-gold); background: var(--accent-gold-glow); }
+
+/* ═══ MAIN CONTENT ═══ */
+.content-wrapper {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══ POST FORM ═══ */
+.post-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.post-form::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-dim), var(--accent-cyan-dim), transparent);
+}
+
+.form-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 1.2rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 140px;
+}
+
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.08em;
+}
+
+.form-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.form-input:focus { border-color: var(--accent-cyan-dim); }
+.form-input::placeholder { color: var(--text-ghost); }
+
+.form-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a7a90' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  padding-right: 2rem;
+}
+.form-select:focus { border-color: var(--accent-cyan-dim); }
+
+.form-textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 0.8rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 2;
+  transition: border-color 0.3s;
+  width: 100%;
+}
+.form-textarea:focus { border-color: var(--accent-cyan-dim); }
+.form-textarea::placeholder { color: var(--text-ghost); }
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.form-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+}
+
+.form-submit {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  padding: 0.6rem 2rem;
+  border: 1px solid var(--accent-gold-dim);
+  background: transparent;
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.form-submit:hover {
+  background: var(--accent-gold-glow);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+  box-shadow: 0 0 20px var(--accent-gold-glow);
+}
+.form-submit:active { transform: scale(0.97); }
+
+/* Success flash */
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 1rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--accent-jade);
+  letter-spacing: 0.15em;
+  animation: fadeIn 0.4s ease-out;
+}
+.form-success.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ═══ POSTS LIST ═══ */
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.posts-count {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+}
+.posts-sort {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+}
+
+.post-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.3rem 1.5rem;
+  margin-bottom: 0.8rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  animation: postSlideIn 0.4s ease-out both;
+}
+
+@keyframes postSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.post-card:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+.post-card:hover::before { opacity: 0.6; }
+
+/* Category left-bar colors */
+.post-card[data-cat="论道"]::before { background: var(--accent-cyan); }
+.post-card[data-cat="求助"]::before { background: var(--accent-jade); }
+.post-card[data-cat="谁说"]::before { background: var(--accent-rose); }
+.post-card[data-cat="结伴"]::before { background: var(--accent-violet); }
+.post-card[data-cat="市集"]::before { background: var(--accent-gold); }
+
+.post-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+  gap: 0.8rem;
+}
+
+.post-author-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.post-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+/* Avatar colors by race */
+.av-人族 { background: linear-gradient(135deg, #1a3050, #1a4060); border: 1px solid var(--accent-cyan-dim); }
+.av-妖族 { background: linear-gradient(135deg, #1a1830, #281840); border: 1px solid var(--accent-violet-dim); }
+.av-魔族 { background: linear-gradient(135deg, #2a1528, #381828); border: 1px solid var(--accent-crimson-dim); }
+
+/* Race label colors */
+.race-人族 { color: var(--accent-cyan); }
+.race-妖族 { color: var(--accent-violet); }
+.race-魔族 { color: var(--accent-crimson); }
+
+.post-author-info {
+  display: flex; flex-direction: column; gap: 0.1rem;
+}
+
+.post-name {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.post-identity {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+}
+.id-正道 { color: var(--accent-cyan); }
+.id-魔修 { color: var(--accent-crimson); }
+.id-散修 { color: var(--accent-jade); }
+.id-妖族 { color: var(--accent-violet); }
+.id-匿名 { color: var(--text-ghost); }
+
+.post-meta-right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;
+}
+
+.post-cat-tag {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border);
+  letter-spacing: 0.05em;
+}
+.tag-论道 { border-color: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.tag-求助 { border-color: var(--accent-jade-dim); color: var(--accent-jade); }
+.tag-谁说 { border-color: var(--accent-rose-dim); color: var(--accent-rose); }
+.tag-结伴 { border-color: var(--accent-violet-dim); color: var(--accent-violet); }
+.tag-市集 { border-color: var(--accent-gold-dim); color: var(--accent-gold); }
+
+.post-time {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-ghost);
+}
+
+.post-content {
+  font-size: 0.88rem;
+  line-height: 2.2;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ═══ EMPTY STATE ═══ */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-ghost);
+}
+.empty-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+  margin-bottom: 0.8rem;
+}
+.empty-text {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+}
+.empty-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  margin-top: 0.5rem;
+  opacity: 0.6;
+}
+
+/* ═══ DELETE BTN ═══ */
+.post-delete {
+  position: absolute;
+  top: 0.6rem; right: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-ghost);
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s, color 0.3s;
+  padding: 0.2rem 0.4rem;
+}
+.post-card:hover .post-delete { opacity: 1; }
+.post-delete:hover { color: var(--accent-crimson); }
+
+/* ═══ FOOTER ═══ */
+.forum-footer {
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  border-top: 1px solid var(--border);
+  line-height: 2.2;
+}
+
+/* ═══ HIDDEN TEXT ═══ */
+.hidden-text {
+  color: var(--text-hidden);
+  background: transparent;
+  transition: all 0.6s ease;
+  position: relative;
+  cursor: default;
+  padding: 0 2px;
+}
+.hidden-text::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: var(--accent-cyan);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.hidden-text:hover {
+  color: var(--accent-cyan-bright) !important;
+  text-shadow: 0 0 15px var(--accent-cyan-dim);
+}
+.hidden-text:hover::after { opacity: 0.5; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 600px) {
+  .top-bar { padding: 0.5rem 1rem; }
+  .content-wrapper { padding: 1rem 1rem 2rem; }
+  .cat-bar { padding: 1rem 1rem 0; }
+  .post-form { padding: 1rem 1.2rem; }
+  .form-row { flex-direction: column; gap: 0.6rem; }
+  .post-card { padding: 1rem 1.2rem; }
+  .post-top { flex-direction: column; }
+  .post-meta-right { flex-direction: row; align-items: center; gap: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="particle-field" id="particleField"></div>
+
+<!-- TOP BAR -->
+<nav class="top-bar">
+  <a href="index.html" class="bar-back">← 返回问道山海</a>
+  <span style="color:var(--accent-gold); font-size:0.6rem;">☰ 论道广场</span>
+  <span id="realmTime" style="color:var(--text-ghost)"></span>
+</nav>
+
+<!-- HEADER -->
+<div class="forum-header">
+  <h1 class="forum-title">论道广场</h1>
+  <div class="forum-subtitle">留 下 你 的 道 痕</div>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="cat-bar" id="catBar">
+  <button class="cat-tab active" data-cat="全部">全 部</button>
+  <button class="cat-tab" data-cat="论道">论 道</button>
+  <button class="cat-tab" data-cat="求助">求 助</button>
+  <button class="cat-tab" data-cat="谁说">谁 说</button>
+  <button class="cat-tab" data-cat="结伴">结 伴</button>
+  <button class="cat-tab" data-cat="市集">市 集</button>
+</div>
+
+<!-- MAIN -->
+<div class="content-wrapper">
+
+  <!-- POST FORM -->
+  <div class="post-form" id="postForm">
+    <div class="form-title">☰ 发 布 新 帖</div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <span class="form-label">道号</span>
+        <input type="text" class="form-input" id="inputName" placeholder="你的道号..." maxlength="20" autocomplete="off">
+      </div>
+      <div class="form-field">
+        <span class="form-label">种族</span>
+        <select class="form-select" id="inputRace">
+          <option value="人族">人族</option>
+          <option value="妖族">妖族</option>
+          <option value="魔族">魔族</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <span class="form-label">身份</span>
+        <select class="form-select" id="inputIdentity">
+          <option value="散修">散修</option>
+          <option value="正道">正道修士</option>
+          <option value="魔修">魔修</option>
+          <option value="匿名">匿名</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <span class="form-label">分类</span>
+        <select class="form-select" id="inputCategory">
+          <option value="论道">论道</option>
+          <option value="求助">求助</option>
+          <option value="谁说">谁说</option>
+          <option value="结伴">结伴</option>
+          <option value="市集">市集</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-field" style="margin-bottom:0">
+      <span class="form-label">内容</span>
+      <textarea class="form-textarea" id="inputContent" placeholder="在此留下你的感悟、疑问、或是道听途说..." maxlength="2000"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <span class="form-hint">此处发言将被灵台记录 · 因果自负</span>
+      <button class="form-submit" id="submitBtn">刻 入 灵 台</button>
+    </div>
+
+    <div class="form-success" id="formSuccess">✦ 道痕已刻入灵台</div>
+  </div>
+
+  <!-- POSTS -->
+  <div class="posts-header">
+    <span class="posts-count" id="postsCount"></span>
+    <span class="posts-sort">最新在前</span>
+  </div>
+
+  <div id="postsContainer"></div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="forum-footer">
+  问道山海 · 论道广场<br>
+  所有道痕由灵台自动记录 · 不代表天道立场<br>
+  <span class="hidden-text">有些帖子消失了。不是被删除，是被天道抹去了。</span>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════
+//
+//  ██  论 道 广 场 引 擎  ██
+//
+// ══════════════════════════════════════════════════════════
+
+const STORAGE_KEY = 'wendao_forum_posts';
+const CATEGORIES = ['全部', '论道', '求助', '谁说', '结伴', '市集'];
+let currentCat = '全部';
+
+// --- Storage ---
+function loadPosts() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch (e) { return []; }
+}
+
+function savePosts(posts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+}
+
+// --- Time formatting ---
+function timeAgo(timestamp) {
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '方才';
+  if (mins < 60) return mins + ' 刻前';
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + ' 个时辰前';
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days + ' 日前';
+  return Math.floor(days / 30) + ' 月前';
+}
+
+// --- Render a single post ---
+function createPostElement(post, index) {
+  const el = document.createElement('div');
+  el.className = 'post-card';
+  el.setAttribute('data-cat', post.category);
+  el.style.animationDelay = (index * 0.05) + 's';
+
+  const firstChar = post.name ? post.name.charAt(0) : '？';
+  const race = post.race || '人族';
+  const avClass = 'av-' + race;
+  const idClass = 'id-' + (post.identity || '匿名');
+  const raceClass = 'race-' + race;
+  const tagClass = 'tag-' + (post.category || '论道');
+
+  // Sanitize content
+  const safeContent = (post.content || '')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const safeName = (post.name || '无名氏')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  el.innerHTML = `
+    <button class="post-delete" data-id="${post.id}" title="删除此帖">✕</button>
+    <div class="post-top">
+      <div class="post-author-area">
+        <div class="post-avatar ${avClass}">${firstChar}</div>
+        <div class="post-author-info">
+          <div class="post-name">${safeName}</div>
+          <div class="post-identity"><span class="${raceClass}">${race}</span> · <span class="${idClass}">${post.identity || '匿名'}</span></div>
+        </div>
+      </div>
+      <div class="post-meta-right">
+        <span class="post-cat-tag ${tagClass}">${post.category}</span>
+        <span class="post-time">${timeAgo(post.timestamp)}</span>
+      </div>
+    </div>
+    <div class="post-content">${safeContent}</div>
+  `;
+
+  return el;
+}
+
+// --- Render all posts ---
+function renderPosts() {
+  const container = document.getElementById('postsContainer');
+  const countEl = document.getElementById('postsCount');
+  container.innerHTML = '';
+
+  const allPosts = loadPosts();
+
+  // Filter by category
+  const filtered = currentCat === '全部'
+    ? allPosts
+    : allPosts.filter(p => p.category === currentCat);
+
+  // Sort newest first
+  filtered.sort((a, b) => b.timestamp - a.timestamp);
+
+  countEl.textContent = `共 ${filtered.length} 条道痕` +
+    (currentCat !== '全部' ? ` · 筛选：${currentCat}` : '');
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">◌</div>
+        <div class="empty-text">${currentCat === '全部' ? '灵台空空如也' : '此分类尚无道痕'}</div>
+        <div class="empty-hint">成为第一个在此留痕之人</div>
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach((post, i) => {
+    container.appendChild(createPostElement(post, i));
+  });
+
+  // Bind delete buttons
+  container.querySelectorAll('.post-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      if (confirm('确定要抹去这条道痕？')) {
+        deletePost(id);
+      }
+    });
+  });
+}
+
+// --- Add post ---
+function addPost(name, race, identity, category, content) {
+  const posts = loadPosts();
+  const post = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+    name: name.trim() || '无名氏',
+    race,
+    identity,
+    category,
+    content: content.trim(),
+    timestamp: Date.now()
+  };
+  posts.push(post);
+  savePosts(posts);
+  renderPosts();
+}
+
+// --- Delete post ---
+function deletePost(id) {
+  let posts = loadPosts();
+  posts = posts.filter(p => p.id !== id);
+  savePosts(posts);
+  renderPosts();
+}
+
+// --- Form submission ---
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const name = document.getElementById('inputName').value;
+  const race = document.getElementById('inputRace').value;
+  const identity = document.getElementById('inputIdentity').value;
+  const category = document.getElementById('inputCategory').value;
+  const content = document.getElementById('inputContent').value;
+
+  if (!content.trim()) {
+    document.getElementById('inputContent').style.borderColor = 'var(--accent-crimson)';
+    setTimeout(() => {
+      document.getElementById('inputContent').style.borderColor = '';
+    }, 1500);
+    return;
+  }
+
+  addPost(name, race, identity, category, content);
+
+  // Remember name, race & identity for convenience
+  localStorage.setItem('wendao_last_name', name);
+  localStorage.setItem('wendao_last_race', race);
+  localStorage.setItem('wendao_last_identity', identity);
+
+  // Clear content but keep name/identity
+  document.getElementById('inputContent').value = '';
+
+  // Show success
+  const successEl = document.getElementById('formSuccess');
+  successEl.classList.add('show');
+  setTimeout(() => successEl.classList.remove('show'), 2000);
+});
+
+// Restore last used name & identity
+(function restoreDefaults() {
+  const lastName = localStorage.getItem('wendao_last_name');
+  const lastRace = localStorage.getItem('wendao_last_race');
+  const lastId = localStorage.getItem('wendao_last_identity');
+  if (lastName) document.getElementById('inputName').value = lastName;
+  if (lastRace) document.getElementById('inputRace').value = lastRace;
+  if (lastId) document.getElementById('inputIdentity').value = lastId;
+})();
+
+// --- Category tabs ---
+document.getElementById('catBar').addEventListener('click', (e) => {
+  const tab = e.target.closest('.cat-tab');
+  if (!tab) return;
+
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+
+  currentCat = tab.getAttribute('data-cat');
+  renderPosts();
+});
+
+// --- Init ---
+renderPosts();
+
+// --- Realm Time ---
+function updateRealmTime() {
+  const h = new Date().getHours();
+  const periods = ['子时','子时','丑时','丑时','寅时','寅时','卯时','卯时','辰时','辰时','巳时','巳时','午时','午时','未时','未时','申时','申时','酉时','酉时','戌时','戌时','亥时','亥时'];
+  document.getElementById('realmTime').textContent = periods[h] || '';
+}
+setInterval(updateRealmTime, 60000);
+updateRealmTime();
+
+// --- Particles ---
+(function() {
+  const field = document.getElementById('particleField');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (14 + Math.random() * 16) + 's';
+    p.style.animationDelay = (Math.random() * 12) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    if (Math.random() > 0.7) p.style.background = 'var(--accent-gold)';
+    field.appendChild(p);
+  }
+})();
+</script>
+
+</body>
+</html>
