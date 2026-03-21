@@ -281,7 +281,7 @@ a.guest-card:hover {
   transform: translateY(-2px);
 }
 a.guest-card:hover::before { opacity: 1; }
-a.guest-card:hover .guest-name { color: var(--accent-gold); }
+a.guest-card:hover .guest- { color: var(--accent-gold); }
 
 .guest-card.locked {
   opacity: 0.35;
@@ -577,24 +577,24 @@ const AUDIO_ITEMS = [
  */
 const GUESTS = [
   {
-    name: "参与者 A",
+    name: "萧潇",
     role: "身份待确认",
-    desc: "（在此填写简短描述）{{hidden:（隐藏信息）}}",
+    desc: "（为数不多的村外人呢，怎么卷进来的？）{{hidden:情劫？}}",
     status: "unknown",
     statusText: "状态未知",
-    // link: "qianzishu-guest-a.html",
+    link: "qianzishu-guest-xiaoxiao.html",
     // avatar: "images/guest-a.jpg",
   },
   {
-    name: "参与者 B",
+    name: "林霜枫",
     role: "身份待确认",
     desc: "（在此填写简短描述）",
     status: "unknown",
     statusText: "状态未知",
-    // link: "qianzishu-guest-b.html",
+    // link: "qianzishu-guest-linshuangfeng.html",
   },
   {
-    name: "参与者 C",
+    name: "林尽染",
     role: "身份待确认",
     desc: "（在此填写简短描述）",
     status: "unknown",
@@ -604,7 +604,7 @@ const GUESTS = [
   {
     name: "███",
     role: "{{redacted:数据损坏}}",
-    desc: "该参与者信息已被系统抹除。{{hidden:但她的声音还留在录音里。}}",
+    desc: "该参与者信息已被系统抹除。{{hidden:为了让母亲远离不幸连自己的存在都可以抹去吗？。}}",
     status: "dead",
     statusText: "已离线",
     locked: true,
@@ -623,17 +623,17 @@ const GUESTS = [
 const EASTER_EGGS = [
   {
     label: "系统备注 [权限：内部]",
-    content: "该副本最初设计为单次体验。循环机制并非原始设计的一部分。{{hidden:是树自己开始循环的。我们只是无法关闭它。}}",
+    content: "该副本为单次体验项目。{{hidden:过去无法改变。}}",
     showAfterVisits: 1
   },
   {
     label: "用户反馈摘录",
-    content: "「我明明改变了结局，为什么回来之后一切照旧？」——用户 V-████<br>{{select:系统日志显示该用户的记忆在每次循环后被重置。用户本人对此毫无察觉。}}",
+    content: "「雷电法王啊你！有没有电新花样！」——用户 V-████<br>{{select:该嘉宾在电击惩罚中展现出极其顽强的抗性，建议调整副本参与类型}}",
     showAfterVisits: 2
   },
   {
     label: "{{redacted:已删除的备注}}",
-    content: "{{hidden:如果你能看到这条信息，说明系统权限正在失效。请立即停止浏览并关闭此页面。这不是彩蛋。这是警告。}}",
+    content: "{{hidden:想知道人生的乐趣吗？想真正的..活着吗？}}",
     showAfterVisits: 3
   },
 ];
