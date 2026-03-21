@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>录播回放 | 副本 #5732</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #080808;
+  --bg-card: #0e0e0e;
+  --bg-card-hover: #141010;
+  --accent-red: #8b0000;
+  --accent-red-bright: #cc1111;
+  --accent-red-dim: #8b000033;
+  --accent-gold: #c4a35a;
+  --accent-gold-dim: #c4a35a22;
+  --accent-blue: #4a9ebb;
+  --accent-blue-bright: #6ac0e0;
+  --accent-blue-dim: #4a9ebb33;
+  --accent-green: #2a6e3f;
+  --text-primary: #ede7e0;
+  --text-dim: #a89a8e;
+  --text-ghost: #4a3e3e;
+  --text-hidden: #080808;
+  --border: #1e1a1a;
+  --border-light: #2e2828;
+  --font-title: 'Ma Shan Zheng', cursive;
+  --font-display: 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'Noto Serif SC', serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Noise overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+a { color: inherit; text-decoration: none; }
+
+
+/* ══════════════════════════════════════
+   ═══ PHASE 1: IDENTITY EXTRACTION ═══
+   ══════════════════════════════════════ */
+
+.extract-layer {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity 1s ease;
+  overflow: hidden;
+}
+.extract-layer.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Optional background image */
+.extract-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  filter: brightness(0.25) saturate(0.4) blur(3px);
+}
+.extract-bg.visible { opacity: 1; }
+
+/* Scan lines over extraction */
+.extract-layer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    #4a9ebb04 2px, #4a9ebb04 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  animation: scanDrift 12s linear infinite;
+}
+@keyframes scanDrift {
+  from { background-position: 0 0; }
+  to { background-position: 0 100vh; }
+}
+
+.extract-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+/* System prompt lines */
+.ext-line {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  margin-bottom: 1.2rem;
+}
+.ext-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ext-line.fade-out {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.ext-system {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: var(--accent-blue-bright);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 30px var(--accent-blue-dim), 0 0 60px var(--accent-blue-dim);
+}
+
+.ext-monologue {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+}
+
+.ext-identity {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: var(--accent-blue-bright);
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 30px var(--accent-blue-dim), 0 0 60px var(--accent-blue-dim);
+}
+
+.ext-identity .identity-value {
+  font-family: var(--font-title);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--text-primary);
+  letter-spacing: 0.3em;
+  display: block;
+  margin-top: 0.5rem;
+  text-shadow: 0 0 40px var(--accent-blue-dim);
+}
+
+/* Glitch on identity reveal */
+.ext-identity.glitch .identity-value {
+  animation: idGlitch 0.12s infinite;
+}
+@keyframes idGlitch {
+  0% { text-shadow: 2px 0 var(--accent-red-bright), -2px 0 var(--accent-blue-bright); }
+  25% { text-shadow: -2px 0 var(--accent-red-bright), 2px 0 var(--accent-blue-bright); }
+  50% { text-shadow: 2px 1px var(--accent-red-bright), -2px -1px var(--accent-blue-bright); }
+  75% { text-shadow: -1px -1px var(--accent-red-bright), 1px 1px var(--accent-blue-bright); }
+  100% { text-shadow: 1px 0 var(--accent-red-bright), -1px 0 var(--accent-blue-bright); }
+}
+
+/* Audio indicator */
+.ext-audio-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-top: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ext-audio-hint.visible { opacity: 1; }
+
+
+/* ══════════════════════════════════════
+   ═══ PHASE 2: TEXT BROADCAST ═══
+   ══════════════════════════════════════ */
+
+.broadcast-layer {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+.broadcast-layer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Status bar */
+.status-bar {
+  position: sticky; top: 0;
+  background: #080808ee;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+.status-bar .back-link {
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+  transition: all 0.3s;
+}
+.status-bar .back-link:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+
+/* Broadcast header */
+.bcast-header {
+  padding: 3rem 2rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.bcast-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 60%);
+  pointer-events: none;
+}
+.bcast-name {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  color: var(--text-primary);
+  letter-spacing: 0.25em;
+  position: relative;
+  text-shadow: 0 0 40px var(--accent-red-dim);
+  margin-bottom: 0.3rem;
+}
+.bcast-identity {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.8rem;
+}
+.bcast-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  line-height: 2;
+}
+
+/* Content area */
+.bcast-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Section heads */
+.section-head {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 2.5rem 0 1.5rem;
+}
+.section-head::before, .section-head::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.25em;
+  white-space: nowrap;
+}
+
+
+/* ═══ TEXT BLOCKS WITH VERTICAL LINE ═══ */
+
+.block-timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+/* The thin connecting line */
+.block-timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom,
+    transparent,
+    var(--border) 3%,
+    var(--border) 97%,
+    transparent
+  );
+}
+
+.text-block {
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: blockFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes blockFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Small dot on the line */
+.text-block::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.65rem;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--border-light);
+  border: 1px solid var(--border);
+}
+
+/* Dot color variants */
+.text-block.dot-gold::before { background: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.text-block.dot-red::before { background: var(--accent-red-bright); border-color: var(--accent-red); animation: dotPulse 1.5s infinite; }
+.text-block.dot-blue::before { background: var(--accent-blue); border-color: var(--accent-blue-dim); }
+.text-block.dot-green::before { background: var(--accent-green); border-color: #2a6e3f44; }
+.text-block.dot-ghost::before { background: var(--text-ghost); border-color: var(--text-ghost); }
+
+@keyframes dotPulse { 0%, 100% { box-shadow: 0 0 0 0 var(--accent-red-dim); } 50% { box-shadow: 0 0 8px 3px var(--accent-red-dim); } }
+
+/* Block label (optional, small text above content) */
+.block-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+
+/* Block content */
+.block-body {
+  font-size: 0.9rem;
+  line-height: 2.2;
+  color: var(--text-dim);
+}
+.block-body p { margin-bottom: 0.8rem; }
+.block-body p:last-child { margin-bottom: 0; }
+
+/* System-style block */
+.text-block.style-system .block-body {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-ghost);
+  border-left: 2px solid var(--border);
+  padding: 0.5rem 0.8rem;
+  background: #0a0a0a;
+  line-height: 2;
+}
+
+/* Anomaly-style block */
+.text-block.style-anomaly .block-body {
+  color: var(--accent-red-bright);
+  border-left: 2px solid var(--accent-red);
+  padding: 0.5rem 0.8rem;
+  background: #0d0808;
+}
+
+/* Dialogue-style block */
+.text-block.style-dialogue .block-speaker {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+
+/* Block image */
+.block-image {
+  margin-top: 0.8rem;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.block-image img {
+  width: 100%; display: block;
+  filter: grayscale(0.3) brightness(0.85);
+  transition: filter 0.4s;
+}
+.block-image:hover img { filter: grayscale(0) brightness(1); }
+.block-image-caption {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+/* Block audio */
+.block-audio {
+  margin-top: 0.8rem;
+}
+.block-audio-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.3rem;
+}
+.block-audio audio {
+  width: 100%;
+  height: 36px;
+  opacity: 0.7;
+  filter: sepia(0.3) saturate(0.6);
+}
+.block-audio audio:hover { opacity: 1; }
+
+/* Divider between blocks */
+.block-divider {
+  text-align: center;
+  padding: 1rem 0;
+  margin-left: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  position: relative;
+}
+.block-divider::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: var(--border);
+  z-index: -1;
+}
+.block-divider span {
+  background: var(--bg);
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ══════════════════════════════════════
+   ═══ FRAGMENT MODE (full-screen pieces) ═══
+   ══════════════════════════════════════ */
+
+.fragment-layer {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 2rem;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.fragment-layer.visible { opacity: 1; }
+.fragment-layer.fade-out { opacity: 0; }
+
+.frag-line {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  margin-bottom: 1.2rem;
+  max-width: 550px;
+  text-align: center;
+}
+.frag-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.frag-line.fade-out {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.frag-text {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 2;
+}
+
+.frag-text.frag-large {
+  font-family: var(--font-title);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: var(--text-primary);
+  letter-spacing: 0.15em;
+}
+
+.frag-text.frag-system {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.1em;
+}
+
+.frag-text.frag-red {
+  color: var(--accent-red-bright);
+  text-shadow: 0 0 20px var(--accent-red-dim);
+}
+
+.frag-text.frag-whisper {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--text-ghost);
+}
+
+/* Signal lost ending */
+.frag-end {
+  margin-top: 2rem;
+  text-align: center;
+}
+.frag-end-icon {
+  font-size: 2.5rem;
+  opacity: 0.15;
+  margin-bottom: 1rem;
+  animation: iconFlicker 4s infinite;
+}
+@keyframes iconFlicker {
+  0%, 88%, 100% { opacity: 0.15; }
+  90% { opacity: 0.3; }
+  92% { opacity: 0.05; }
+}
+.frag-end-text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-ghost);
+  line-height: 2.2;
+}
+.frag-back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  margin-top: 1.5rem;
+  text-decoration: none;
+  transition: all 0.3s;
+  opacity: 0;
+  transition: opacity 0.5s, color 0.3s, border-color 0.3s;
+}
+.frag-back.visible { opacity: 1; }
+.frag-back:hover { color: var(--text-dim); border-color: var(--text-dim); }
+
+
+/* ═══ HIDDEN TEXT SYSTEM ═══ */
+.hidden-text { color: var(--text-hidden); background: transparent; transition: all 0.6s ease; position: relative; cursor: default; padding: 0 2px; text-shadow: 0 0 2px #8b000008; }
+.hidden-text::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--accent-red); opacity: 0; transition: opacity 0.6s; }
+.hidden-text:hover { color: var(--accent-red-bright) !important; text-shadow: 0 0 20px var(--accent-red-dim); }
+.hidden-text:hover::after { opacity: 0.5; }
+.select-reveal { color: var(--bg); background: var(--bg); transition: none; user-select: text; }
+.select-reveal::selection { background: var(--accent-red); color: white; }
+.redacted { background: var(--text-dim); color: var(--text-dim); padding: 0 4px; cursor: default; user-select: none; transition: all 0.4s; }
+.redacted:hover { background: var(--accent-red-dim); color: var(--accent-red-bright); }
+
+
+/* ═══ FOOTER ═══ */
+.page-footer {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  line-height: 2.2;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 600px) {
+  .extract-content { padding: 1rem; }
+  .bcast-header { padding: 2rem 1rem 1.5rem; }
+  .bcast-content { padding: 0 1rem 2rem; }
+  .text-block { padding-left: 2rem; }
+}
+</style>
+</head>
+<body>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 1: IDENTITY EXTRACTION (full screen)
+     ══════════════════════════════════════════ -->
+
+<div class="extract-layer" id="extractLayer">
+  <div class="extract-bg" id="extractBg"></div>
+  <div class="extract-content" id="extractContent">
+    <!-- Lines injected by JS -->
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FRAGMENT MODE (full-screen text pieces, used when PAGE_MODE = "fragment")
+     ══════════════════════════════════════════ -->
+
+<div class="fragment-layer" id="fragmentLayer">
+  <div id="fragmentContent"></div>
+  <div class="frag-end" id="fragEnd" style="display:none">
+    <div class="frag-end-icon">◌</div>
+    <div class="frag-end-text" id="fragEndText">信号中断 — 录播数据不完整</div>
+    <a href="qianzishu-intro.html" class="frag-back" id="fragBack">← 返回</a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 2: TEXT BROADCAST (hidden initially, used when PAGE_MODE = "full")
+     ══════════════════════════════════════════ -->
+
+<div class="broadcast-layer" id="broadcastLayer">
+
+  <div class="status-bar">
+    <a href="qianzishu-intro.html" class="back-link" id="backLink">← 返回副本简介</a>
+    <span style="color:var(--accent-gold);font-size:0.6rem;">◈ 文字转播</span>
+    <span style="color:var(--text-ghost);" id="barInfo">INSTANCE #5732</span>
+  </div>
+
+  <div class="bcast-header" id="bcastHeader"></div>
+
+  <div class="bcast-content">
+    <div class="section-head"><h2>录 播 记 录</h2></div>
+    <div class="block-timeline" id="blockTimeline"></div>
+  </div>
+
+  <div class="page-footer" id="pageFooter">
+    祈殃娱乐 — 副本录播系统<br>
+    本记录由系统自动生成 // 部分内容因权限限制已截断<br>
+    <span class="hidden-text">你在看她的故事。但谁在看你的？</span>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     OPTIONAL: hidden audio element for extraction phase
+     ══════════════════════════════════════════ -->
+<audio id="extractAudio" preload="auto" style="display:none"></audio>
+
+
+<script>
+// ══════════════════════════════════════════════════════════
+//
+//  ██  数 据 配 置 区  ██
+//
+//  修改以下数据即可定制页面内容
+//  所有文本字段支持 {{hidden:}} {{redacted:}} {{select:}} 标记
+//
+// ══════════════════════════════════════════════════════════
+
+
+// ═══ 页面模式 ═══
+/*
+ *  PAGE_MODE: 决定身份抽取之后的内容呈现方式
+ *
+ *  "full"     — 完整模式：身份抽取 → 淡出 → 正文录播页面（长页面，自由文字块）
+ *  "fragment" — 片段模式：身份抽取 → 继续全屏 → 碎片文字逐行浮现 → 信号中断 → 结束
+ *
+ *  内容少的嘉宾用 "fragment"，内容多的用 "full"
+ */
+const PAGE_MODE = "fragment";
+
+
+// ═══ 片段模式数据（仅 PAGE_MODE = "fragment" 时使用）═══
+/*
+ *  FRAGMENT_LINES: 碎片文字，按顺序逐行浮现
+ *
+ *  text:      显示的文字（支持 {{hidden:}} {{redacted:}} {{select:}} 标记）
+ *  style:     文字样式（可选）
+ *             "normal"  — 默认正文（灰色宋体）
+ *             "large"   — 大字（白色书法体，用于关键句）
+ *             "system"  — 系统消息（灰色小 mono 字）
+ *             "red"     — 红色异常文字
+ *             "whisper" — 低语（灰色斜体，较小）
+ *  delay:     该行出现前等待时间（毫秒，相对于上一行出现后）
+ *  duration:  该行显示多久后开始淡出（毫秒，不填 = 不单独淡出，等下一行出现时仍在）
+ *  clearBefore: 设为 true 则该行出现前先清除所有已显示的行（换场效果）
+ *  onReturn:  二次访问时替换 text（可选）
+ */
+const FRAGMENT_LINES = [
+  // ——— 示例内容，请替换为实际文字 ———
+  { text: "……", style: "whisper", delay: 1000 },
+  { text: "（第一段碎片文字）", delay: 1500 },
+  { text: "（第二段碎片，可以是一句对话、一个场景描写）", delay: 2000 },
+  { text: "（关键的一句话）", style: "large", delay: 2500 },
+  { text: "{{hidden:（隐藏的真相）}}", delay: 2000 },
+  { text: "信号中断——", style: "red", delay: 2000 },
+];
+
+/*
+ *  FRAGMENT_END: 片段结束后的提示
+ */
+const FRAGMENT_END = {
+  text: "信号中断 — 录播数据不完整",                // 结束提示文字
+  hidden: "{{hidden:数据并非不完整。是有人不让你看完。}}",  // 隐藏文字（可选）
+  holdBeforeEnd: 2000,                              // 最后一行显示完后等多久显示结束界面
+  backLink: "qianzishu-intro.html",                 // 返回按钮链接
+  backText: "← 返回副本简介",                        // 返回按钮文字
+};
+
+
+// ═══ 页面基本设置 ═══
+
+const PAGE_CONFIG = {
+  backLink: "qianzishu-intro.html",     // 返回按钮链接
+  backText: "← 返回副本简介",            // 返回按钮文字
+  barInfo: "INSTANCE #5732",             // 右上角信息
+  instanceId: "#5732",                   // 副本编号
+  instanceName: "千子树下",               // 副本名称
+};
+
+
+// ═══ 身份抽取动画 ═══
+/*
+ *  EXTRACTION_STEPS: 抽取过程中依次出现的内容
+ *
+ *  type:      行的类型
+ *             "system"    — 系统提示（蓝色 mono 字体）
+ *             "monologue" — 嘉宾自言自语（灰色斜体，较小）
+ *             "identity"  — 身份揭示（大字）
+ *
+ *  text:      显示的文字
+ *             identity 类型中，用 \n 分隔提示语和身份名
+ *             例如: "您此次的身份是：\学徒"
+ *
+ *  delay:     该行出现前的等待时间（毫秒，相对于上一行出现后）
+ *  duration:  该行显示多久后开始淡出（毫秒）
+ *             设为 0 或不填 = 不单独淡出，等整体淡出
+ *  glitch:    设为 true 则显示时附带短暂故障效果（仅 identity 类型）
+ *
+ *  bgImage:   背景图片路径（可选，填在任意一步上，该步出现时背景淡入）
+ *  audio:     音频文件路径（可选，该步出现时开始播放）
+ */
+const EXTRACTION_STEPS = [
+  {
+    type: "system",
+    text: "正在抽取身份牌——",
+    delay: 800,
+    // bgImage: "images/qianzishu-bg.jpg",
+  },
+  {
+    type: "monologue",
+    text: "尽染？听得到吗？",
+    delay: 1200,
+    // audio: "audio/xiaoxiao-monologue.mp3",
+  },
+  {
+    type: "identity",
+    text: "您此次的身份是：\n学徒",
+    delay: 1500,
+    glitch: true,
+  },
+];
+
+/*
+ *  EXTRACTION_TIMINGS: 抽取动画的时间控制
+ */
+const EXTRACTION_TIMINGS = {
+  holdAfterLast: 2000,    // 最后一步显示完后停留多久
+  fadeOutDuration: 1000,   // 整个抽取层淡出时长（CSS transition控制，这里是等待时间）
+  broadcastFadeIn: 300,    // 正文层淡入的延迟（相对于抽取层开始淡出）
+};
+
+
+// ═══ 嘉宾信息（显示在正文顶部） ═══
+
+const GUEST = {
+  name: "林霜枫",                          // 嘉宾名字
+  identity: "身份：学徒",                   // 副本内身份
+  meta: "副本 #5732「千子树下」 // 参与者录播记录",  // 小字信息
+};
+
+
+// ═══ 正文文字块 ═══
+/*
+ *  TEXT_BLOCKS: 录播正文内容，按顺序排列
+ *
+ *  每个文字块是一个 {} 对象：
+ *
+ *  content:   文字内容（支持 HTML 和标记，用 <p> 分段）
+ *  label:     顶部小字标签（可选，如 "循环 #01" "系统记录" 等）
+ *  speaker:   说话人名字（可选，仅 style:"dialogue" 时显示）
+ *  style:     文字块样式（可选）
+ *             "normal"   — 默认（正文叙述）
+ *             "system"   — 系统消息（灰色框）
+ *             "anomaly"  — 异常消息（红色框）
+ *             "dialogue" — 对话（显示说话人名字）
+ *  dot:       竖线上圆点的颜色（可选）
+ *             "gold" / "red" / "blue" / "green" / "ghost"
+ *             不填 = 默认灰色
+ *  image:     图片路径（可选）
+ *  imageCaption: 图片说明（可选）
+ *  audio:     音频路径（可选）
+ *  audioLabel: 音频标签（可选）
+ *  onReturn:  二次访问时替换 content（可选）
+ *
+ * ————————————————————————
+ * 特殊条目：分隔线
+ * 只需写 { divider: "分隔线文字" }
+ * ————————————————————————
+ */
+const TEXT_BLOCKS = [
+
+  {
+    label: "录播开始",
+    style: "system",
+    dot: "blue",
+    content: "信号接入完成。正在回放参与者「萧潇」的录播记录。<br>⚠ 部分内容因权限限制已被截断或替换。",
+  },
+
+  {
+    content: `<p>（在此填写第一段叙述——描写嘉宾进入副本时的场景、感受。）</p>
+    <p>（可以写很长，也可以很短。自由发挥。）</p>`,
+    dot: "gold",
+  },
+
+  {
+    style: "dialogue",
+    speaker: "林霜枫",
+    dot: "gold",
+    content: "<p>（嘉宾说的第一句话。）</p>",
+  },
+
+  {
+    content: "<p>（继续叙述。描写环境、动作、心理活动...）</p><p>{{hidden:（这里藏一句只有悬停才能看到的信息）}}</p>",
+  },
+
+  { divider: "—— 时间线波动 ——" },
+
+  {
+    label: "异常记录",
+    style: "anomaly",
+    dot: "red",
+    content: "{{hidden:数据异常}}——本段录播与原始时间线存在偏差。<br>系统建议：忽略此段内容。{{select:但它可能是唯一真实的部分。}}",
+    onReturn: "{{hidden:第二次了。}}——本段录播内容已发生变化。<br>系统无法解释原因。",
+  },
+
+  {
+    content: "<p>（我知道改变过去的代价了）</p>",
+    dot: "gold",
+  },
+
+  {
+    style: "dialogue",
+    speaker: "???",
+    dot: "red",
+    content: "<p>（神秘角色的对话。）</p>",
+  },
+
+  { divider: "—— 信号不稳定 ——" },
+
+  {
+    content: "<p>（最后一段叙述。）</p><p>{{select:然后一切归于沉默。}}</p>",
+  },
+
+  {
+    style: "system",
+    dot: "ghost",
+    content: "录播结束。信号已断开。<br>{{hidden:但录播文件的时间戳仍在更新。}}",
+  },
+
+];
+
+
+// ═══ 页脚隐藏文字 ═══
+const FOOTER_HIDDEN = "你在看她的故事。但谁在看你的？";
+
+
+// ══════════════════════════════════════════════════════════
+//
+//  以下为渲染引擎，一般不需要修改
+//
+// ══════════════════════════════════════════════════════════
+
+// --- Visit Tracking ---
+const pageName = window.location.pathname.split('/').pop().replace('.html', '');
+const VK = 'qiyang_' + pageName + '_visits';
+function getVisits() { return parseInt(localStorage.getItem(VK) || '0'); }
+function recordVisit() { const c = getVisits() + 1; localStorage.setItem(VK, c.toString()); return c; }
+const visitCount = recordVisit();
+const isReturn = visitCount > 1;
+
+// --- Parse Markup ---
+function parseMarkup(text) {
+  if (!text) return '';
+  return text
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
+}
+
+// --- Utility ---
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+
+// ══════════════════════════════════════════
+// ═══ PHASE 1: EXTRACTION ANIMATION ═══
+// ══════════════════════════════════════════
+
+async function runExtraction() {
+  const layer = document.getElementById('extractLayer');
+  const container = document.getElementById('extractContent');
+  const bg = document.getElementById('extractBg');
+  const audioEl = document.getElementById('extractAudio');
+
+  for (const step of EXTRACTION_STEPS) {
+    await sleep(step.delay || 500);
+
+    // Background image
+    if (step.bgImage) {
+      bg.style.backgroundImage = `url('${step.bgImage}')`;
+      bg.classList.add('visible');
+    }
+
+    // Audio
+    if (step.audio) {
+      audioEl.src = step.audio;
+      audioEl.play().catch(() => {});
+    }
+
+    // Create line element
+    const line = document.createElement('div');
+    line.className = 'ext-line';
+
+    if (step.type === 'system') {
+      line.innerHTML = `<div class="ext-system">${step.text}</div>`;
+    } else if (step.type === 'monologue') {
+      line.innerHTML = `<div class="ext-monologue">${step.text}</div>`;
+    } else if (step.type === 'identity') {
+      const parts = step.text.split('\n');
+      const prompt = parts[0] || '';
+      const value = parts[1] || '';
+      line.innerHTML = `<div class="ext-identity">
+        ${prompt}
+        <span class="identity-value">${value}</span>
+      </div>`;
+    }
+
+    container.appendChild(line);
+
+    // Trigger fade-in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        line.classList.add('visible');
+      });
+    });
+
+    // Glitch effect for identity
+    if (step.type === 'identity' && step.glitch) {
+      const idEl = line.querySelector('.ext-identity');
+      idEl.classList.add('glitch');
+      await sleep(400);
+      idEl.classList.remove('glitch');
+    }
+
+    // Individual line fade-out
+    if (step.duration && step.duration > 0) {
+      await sleep(step.duration);
+      line.classList.remove('visible');
+      line.classList.add('fade-out');
+    }
+  }
+
+  // Hold, then fade out entire extraction layer
+  await sleep(EXTRACTION_TIMINGS.holdAfterLast);
+
+  // Start fading out
+  layer.classList.add('fade-out');
+
+  // Only fade in broadcast layer in full mode
+  if (PAGE_MODE === 'full') {
+    await sleep(EXTRACTION_TIMINGS.broadcastFadeIn);
+    document.getElementById('broadcastLayer').classList.add('visible');
+  }
+
+  // Wait for extraction fade to complete, then remove from DOM
+  await sleep(EXTRACTION_TIMINGS.fadeOutDuration);
+  layer.style.display = 'none';
+  document.body.style.overflow = (PAGE_MODE === 'full') ? '' : 'hidden';
+}
+
+
+// ══════════════════════════════════════════
+// ═══ PHASE 2: RENDER BROADCAST ═══
+// ══════════════════════════════════════════
+
+function renderBroadcast() {
+  // Back link
+  const backEl = document.getElementById('backLink');
+  backEl.href = PAGE_CONFIG.backLink;
+  backEl.textContent = PAGE_CONFIG.backText;
+  document.getElementById('barInfo').textContent = PAGE_CONFIG.barInfo;
+
+  // Header
+  const header = document.getElementById('bcastHeader');
+  header.innerHTML = `
+    <h1 class="bcast-name">${GUEST.name}</h1>
+    <div class="bcast-identity">${GUEST.identity}</div>
+    <div class="bcast-meta">${GUEST.meta}</div>
+  `;
+
+  // Text blocks
+  const timeline = document.getElementById('blockTimeline');
+
+  TEXT_BLOCKS.forEach((block, i) => {
+    // Divider
+    if (block.divider) {
+      const div = document.createElement('div');
+      div.className = 'block-divider';
+      div.innerHTML = `<span>${block.divider}</span>`;
+      timeline.appendChild(div);
+      return;
+    }
+
+    const el = document.createElement('div');
+    const dotClass = block.dot ? ' dot-' + block.dot : '';
+    const styleClass = block.style ? ' style-' + block.style : '';
+    el.className = 'text-block' + dotClass + styleClass;
+    el.style.animationDelay = (i * 0.08) + 's';
+
+    let content = block.content;
+    if (isReturn && block.onReturn) content = block.onReturn;
+
+    let html = '';
+
+    // Label
+    if (block.label) {
+      html += `<div class="block-label">${block.label}</div>`;
+    }
+
+    // Speaker (dialogue style)
+    if (block.style === 'dialogue' && block.speaker) {
+      html += `<div class="block-speaker">${block.speaker}</div>`;
+    }
+
+    // Body
+    html += `<div class="block-body">${parseMarkup(content)}</div>`;
+
+    // Image
+    if (block.image) {
+      html += `<div class="block-image">`;
+      html += `<img src="${block.image}" alt="" loading="lazy">`;
+      if (block.imageCaption) {
+        html += `<div class="block-image-caption">${parseMarkup(block.imageCaption)}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Audio
+    if (block.audio) {
+      html += `<div class="block-audio">`;
+      if (block.audioLabel) {
+        html += `<div class="block-audio-label">${block.audioLabel}</div>`;
+      }
+      html += `<audio controls preload="none"><source src="${block.audio}">浏览器不支持音频播放</audio>`;
+      html += `</div>`;
+    }
+
+    el.innerHTML = html;
+    timeline.appendChild(el);
+  });
+
+  // Footer hidden text
+  const footer = document.getElementById('pageFooter');
+  footer.innerHTML = `
+    祈殃娱乐 — 副本录播系统<br>
+    本记录由系统自动生成 // 部分内容因权限限制已截断<br>
+    <span class="hidden-text">${FOOTER_HIDDEN}</span>
+  `;
+}
+
+
+// ══════════════════════════════════════════
+// ═══ FRAGMENT MODE ENGINE ═══
+// ══════════════════════════════════════════
+
+async function runFragments() {
+  const layer = document.getElementById('fragmentLayer');
+  const container = document.getElementById('fragmentContent');
+  const fragEnd = document.getElementById('fragEnd');
+
+  // Show fragment layer
+  layer.classList.add('visible');
+
+  let currentLines = [];
+
+  for (const frag of FRAGMENT_LINES) {
+    await sleep(frag.delay || 1000);
+
+    // Clear previous lines if requested
+    if (frag.clearBefore) {
+      currentLines.forEach(el => {
+        el.classList.remove('visible');
+        el.classList.add('fade-out');
+      });
+      await sleep(600);
+      currentLines.forEach(el => el.remove());
+      currentLines = [];
+    }
+
+    // Determine text
+    let text = frag.text;
+    if (isReturn && frag.onReturn) text = frag.onReturn;
+
+    // Create line
+    const line = document.createElement('div');
+    line.className = 'frag-line';
+
+    const styleClass = frag.style ? ' frag-' + frag.style : '';
+    line.innerHTML = `<div class="frag-text${styleClass}">${parseMarkup(text)}</div>`;
+
+    container.appendChild(line);
+    currentLines.push(line);
+
+    // Fade in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        line.classList.add('visible');
+      });
+    });
+
+    // Individual line fade-out after duration
+    if (frag.duration && frag.duration > 0) {
+      setTimeout(() => {
+        line.classList.remove('visible');
+        line.classList.add('fade-out');
+      }, frag.duration);
+    }
+  }
+
+  // Wait, then show ending
+  await sleep(FRAGMENT_END.holdBeforeEnd || 2000);
+
+  // Fade out remaining lines
+  currentLines.forEach(el => {
+    el.classList.remove('visible');
+    el.classList.add('fade-out');
+  });
+  await sleep(800);
+
+  // Show end block
+  fragEnd.style.display = 'block';
+  const endText = document.getElementById('fragEndText');
+  endText.innerHTML = FRAGMENT_END.text +
+    (FRAGMENT_END.hidden ? '<br>' + parseMarkup(FRAGMENT_END.hidden) : '');
+
+  const backBtn = document.getElementById('fragBack');
+  backBtn.href = FRAGMENT_END.backLink;
+  backBtn.textContent = FRAGMENT_END.backText;
+
+  // Fade in end block
+  await sleep(300);
+  fragEnd.style.opacity = '0';
+  fragEnd.style.transition = 'opacity 0.8s ease';
+  requestAnimationFrame(() => { fragEnd.style.opacity = '1'; });
+
+  await sleep(800);
+  backBtn.classList.add('visible');
+}
+
+
+// ═══ INIT ═══
+
+// Prevent scroll during extraction
+document.body.style.overflow = 'hidden';
+
+if (PAGE_MODE === 'full') {
+  // Pre-render broadcast content (hidden)
+  renderBroadcast();
+}
+
+// Run extraction, then branch based on mode
+async function main() {
+  await runExtraction();
+
+  if (PAGE_MODE === 'fragment') {
+    // Keep full-screen, run fragment sequence
+    await runFragments();
+  }
+  // "full" mode is handled inside runExtraction — it fades in broadcastLayer
+}
+
+main();
+</script>
+
+</body>
+</html>
