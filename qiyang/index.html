@@ -11,16 +11,21 @@
 
 :root {
   --bg: #0c0a0a;
+  --bg-soft: #110d0d;
   --bg-card: #141010;
   --bg-card-hover: #1a1414;
+  --bg-elevated: #181313;
   --accent-red: #8b0000;
   --accent-red-bright: #cc1111;
   --accent-red-dim: #8b000033;
   --accent-gold: #c4a35a;
   --accent-gold-dim: #c4a35a22;
-  --text-primary: #d4ccc4;
-  --text-dim: #6a5a50;
-  --text-ghost: #2a2222;
+  --accent-green: #315d43;
+  --accent-green-bright: #52a16e;
+  --accent-blue: #6880a6;
+  --text-primary: #d9d1ca;
+  --text-dim: #86766b;
+  --text-ghost: #463a35;
   --text-hidden: #0c0a0a;
   --border: #2a1e1e;
   --border-light: #3a2e2e;
@@ -30,6 +35,7 @@
   --font-mono: 'Share Tech Mono', monospace;
 }
 
+html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text-primary);
@@ -41,762 +47,1861 @@ body {
 body::before {
   content: '';
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, #1a000044 0%, transparent 70%),
-    radial-gradient(ellipse at 80% 20%, #0a000044 0%, transparent 70%);
+    radial-gradient(ellipse at 20% 45%, #25000033 0%, transparent 70%),
+    radial-gradient(ellipse at 78% 15%, #12000033 0%, transparent 70%);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 body::after {
   content: '';
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
 
-/* ═══ NAV BAR ═══ */
+.hidden-text {
+  color: var(--text-hidden);
+  text-shadow: 0 0 2px #8b000012;
+  transition: color 0.5s ease, text-shadow 0.5s ease;
+  position: relative;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.hidden-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--accent-red);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.hidden-text:hover,
+.hidden-text.revealed {
+  color: var(--accent-red-bright);
+  text-shadow: 0 0 18px var(--accent-red-dim);
+}
+.hidden-text:hover::after,
+.hidden-text.revealed::after { opacity: 0.5; }
+
+.redacted {
+  background: var(--text-dim);
+  color: var(--text-dim);
+  padding: 0 4px;
+  transition: all 0.4s ease;
+  cursor: default;
+  user-select: none;
+}
+.redacted:hover {
+  background: var(--accent-red-dim);
+  color: var(--accent-red-bright);
+}
+
+.select-reveal {
+  color: var(--bg);
+  background: var(--bg);
+  user-select: text;
+}
+.select-reveal::selection {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.screen-flash {
+  position: fixed;
+  inset: 0;
+  background: var(--accent-red);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transition: opacity 0.15s;
+}
+.screen-flash.active { opacity: 0.12; }
+
+.toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: 340px;
+  background: #0e0b0b;
+  border: 1px solid var(--border-light);
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.8;
+  color: var(--text-dim);
+  transform: translateY(24px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast strong { color: var(--accent-gold); font-weight: 400; }
+
 .nav {
-  position: sticky; top: 0;
-  background: #0c0a0aee;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: rgba(12, 10, 10, 0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
-  padding: 0.8rem 2rem;
-  display: flex; align-items: center; justify-content: space-between;
-  z-index: 100;
 }
-.nav-brand { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent-red-bright); letter-spacing: 0.2em; }
-.nav-back { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); border: 1px solid var(--border); padding: 0.3rem 0.8rem; transition: all 0.3s; }
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.nav-back {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.8rem;
+  transition: all 0.3s ease;
+}
 .nav-back:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
-.nav-status { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); }
+.nav-brand {
+  font-family: var(--font-title);
+  font-size: 1.45rem;
+  color: var(--accent-red-bright);
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+.nav-mini {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text-ghost);
+  line-height: 1.6;
+  text-align: right;
+}
+.nav-mini b { color: var(--text-dim); font-weight: 400; }
 
-/* ═══ HERO ═══ */
-.hero { position: relative; padding: 5rem 2rem 4rem; text-align: center; border-bottom: 1px solid var(--border); overflow: hidden; }
-.hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 60%); pointer-events: none; }
-.hero-title { font-family: var(--font-title); font-size: clamp(2.5rem, 8vw, 5rem); color: var(--accent-red-bright); text-shadow: 0 0 60px var(--accent-red-dim); letter-spacing: 0.3em; margin-bottom: 1rem; position: relative; }
-.hero-slogan { font-family: var(--font-body); font-size: 1rem; color: var(--text-dim); max-width: 500px; margin: 0 auto; line-height: 2; letter-spacing: 0.1em; }
-.hero-notice { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-ghost); padding: 0.5rem 1rem; border: 1px dashed var(--text-ghost); display: inline-block; }
+.hero {
+  position: relative;
+  padding: 4.7rem 1.5rem 3.2rem;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 64%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  gap: 2rem;
+  align-items: start;
+}
+.hero-copy { min-width: 0; }
+.hero-title {
+  font-family: var(--font-title);
+  font-size: clamp(2.7rem, 8vw, 5.6rem);
+  line-height: 1;
+  color: var(--accent-red-bright);
+  letter-spacing: 0.26em;
+  text-shadow: 0 0 50px var(--accent-red-dim);
+  margin-bottom: 1rem;
+}
+.hero-slogan {
+  max-width: 640px;
+  font-size: 1rem;
+  line-height: 2;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+.hero-notice {
+  margin-top: 1.5rem;
+  display: inline-block;
+  border: 1px dashed var(--text-ghost);
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-ghost);
+}
+.hero-side {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1rem 1rem;
+}
+.hero-side-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-ghost);
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.9rem;
+}
+.hero-side-head b { color: var(--accent-gold); font-weight: 400; }
+.identity-lines {
+  display: grid;
+  gap: 0.65rem;
+}
+.identity-row {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 0.9rem;
+  font-size: 0.83rem;
+  line-height: 1.85;
+}
+.identity-label {
+  font-family: var(--font-mono);
+  color: var(--text-ghost);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.identity-value {
+  color: var(--text-dim);
+}
+.identity-value strong {
+  font-weight: 400;
+  color: var(--text-primary);
+}
+.identity-warning {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  color: var(--text-ghost);
+  line-height: 1.9;
+}
 
-/* ═══ RETURN BANNER ═══ */
-.return-banner { display: none; background: linear-gradient(90deg, transparent, var(--accent-red-dim), transparent); border: 1px solid var(--accent-red-dim); padding: 1rem 2rem; margin: 1.5rem 2rem 0; text-align: center; font-family: var(--font-body); font-size: 0.85rem; color: var(--accent-red-bright); animation: returnFadeIn 2s ease-out; }
-.return-banner.show { display: block; }
-@keyframes returnFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.system-banner {
+  display: none;
+  max-width: 1120px;
+  margin: 1.4rem auto 0;
+  padding: 0 1.5rem;
+}
+.system-banner.show { display: block; }
+.system-banner-inner {
+  background: linear-gradient(90deg, transparent, var(--accent-red-dim), transparent);
+  border: 1px solid var(--accent-red-dim);
+  padding: 0.95rem 1.1rem;
+  color: var(--accent-red-bright);
+  font-size: 0.84rem;
+  line-height: 1.9;
+  animation: fadeInDown 0.8s ease-out;
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-/* ═══ CONTENT ═══ */
-.content-wrapper { max-width: 800px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+.page {
+  position: relative;
+  z-index: 2;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.7rem 1.5rem 3.2rem;
+}
 
-.section-head { display: flex; align-items: center; gap: 1rem; margin: 3rem 0 1.5rem; }
-.section-head::before, .section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.section-head h2 { font-family: var(--font-display); font-size: 1.1rem; color: var(--accent-gold); letter-spacing: 0.3em; white-space: nowrap; }
+.system-strip {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent-red);
+  opacity: 0.2;
+}
+.panel-pad { padding: 1rem 1.1rem; }
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-gold);
+}
+.panel-meta {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+}
 
-/* ═══ CARDS ═══ */
-.bulletin-card { background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 1.5rem; position: relative; transition: all 0.4s; }
-.bulletin-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent-red); opacity: 0; transition: opacity 0.4s; }
-.bulletin-card:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
-.bulletin-card:hover::before { opacity: 1; }
-.card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.8rem; }
-.card-title { font-family: var(--font-display); font-size: 1.05rem; color: var(--text-primary); letter-spacing: 0.1em; }
-.card-date { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); }
-.card-body { font-size: 0.9rem; line-height: 2; color: var(--text-dim); }
-.card-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.6rem; padding: 0.2rem 0.6rem; margin-top: 0.8rem; border: 1px solid var(--border); color: var(--text-dim); }
-.card-tag.tag-urgent { border-color: var(--accent-red-dim); color: var(--accent-red-bright); }
-.card-tag.tag-secret { border-color: var(--accent-gold-dim); color: var(--accent-gold); }
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.metric-box {
+  background: rgba(255,255,255,0.01);
+  border: 1px solid var(--border);
+  padding: 0.8rem 0.8rem 0.75rem;
+}
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--text-ghost);
+  margin-bottom: 0.4rem;
+}
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+.metric-sub {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+.bar-row {
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.7rem;
+}
+.bar-item { display: grid; gap: 0.3rem; }
+.bar-line {
+  height: 8px;
+  border: 1px solid var(--border);
+  background: #0d0a0a;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-red), var(--accent-gold));
+  width: 0;
+  transition: width 0.5s ease;
+}
+.bar-fill.green {
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-green-bright));
+}
+.bar-fill.blue {
+  background: linear-gradient(90deg, #57687f, #91a4c5);
+}
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+}
 
-/* ═══ CLICKABLE CARDS ═══ */
-a.card-linked { display: block; text-decoration: none; color: inherit; cursor: pointer; }
-a.card-linked:hover { border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold-dim); }
-a.card-linked:hover .card-title { color: var(--accent-gold); }
+.view-toggle {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.view-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  padding: 0.55rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.view-btn.active {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold-dim);
+  background: rgba(196, 163, 90, 0.06);
+}
+.view-btn:hover { border-color: var(--border-light); }
+.strip-note {
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+.strip-note strong {
+  font-weight: 400;
+  color: var(--text-primary);
+}
 
-/* ═══ HIDDEN TEXT ═══ */
-.hidden-text { color: var(--text-hidden); background: transparent; transition: all 0.6s ease; position: relative; cursor: default; padding: 0 2px; text-shadow: 0 0 2px #8b000008; }
-.hidden-text::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--accent-red); opacity: 0; transition: opacity 0.6s; }
-.hidden-text:hover { color: var(--accent-red-bright) !important; text-shadow: 0 0 20px var(--accent-red-dim); }
-.hidden-text:hover::after { opacity: 0.5; }
-
-.select-reveal { color: var(--bg); background: var(--bg); transition: none; user-select: text; }
-.select-reveal::selection { background: var(--accent-red); color: white; }
-
-.redacted { background: var(--text-dim); color: var(--text-dim); padding: 0 4px; cursor: default; user-select: none; transition: all 0.4s; }
-.redacted:hover { background: var(--accent-red-dim); color: var(--accent-red-bright); }
-
-/* ═══ VISIT COUNTER ═══ */
-.visit-counter { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-ghost); text-align: center; padding: 1rem; border-top: 1px solid var(--border); margin-top: 3rem; }
-
-/* ═══ FOOTER ═══ */
-.site-footer { text-align: center; padding: 3rem 2rem; font-size: 0.75rem; color: var(--text-ghost); line-height: 2.2; border-top: 1px solid var(--border); margin-top: 2rem; }
-.site-footer .hidden-text { font-size: 0.7rem; }
-
-/* ═══ TIME NOTICE ═══ */
-.time-notice { display: none; background: #0a0808; border: 1px solid var(--accent-gold-dim); padding: 1rem 1.5rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-gold); text-align: center; animation: gentlePulse 4s infinite; }
-.time-notice.show { display: block; }
-@keyframes gentlePulse { 0%, 100% { border-color: var(--accent-gold-dim); } 50% { border-color: var(--accent-gold); } }
-
-/* ═══ ANIMATIONS ═══ */
-.fade-in { opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s ease-out forwards; }
-@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-.fade-in:nth-child(1) { animation-delay: 0.1s; }
-.fade-in:nth-child(2) { animation-delay: 0.2s; }
-.fade-in:nth-child(3) { animation-delay: 0.3s; }
-.fade-in:nth-child(4) { animation-delay: 0.4s; }
-.fade-in:nth-child(5) { animation-delay: 0.5s; }
-
-.visit-variation { display: none; }
-.visit-variation.show { display: inline; }
-.first-visit-only { display: inline; }
-.first-visit-only.hide { display: none; }
-
-
-/* ══════════════════════════════════════
-   ═══ SEARCH BOX ═══
-   ══════════════════════════════════════ */
-.search-section { margin: 2rem 0; }
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0 1.2rem;
+}
+.section-head::before,
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.06rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+}
 
 .search-box {
-  display: flex; gap: 0;
+  display: flex;
+  align-items: stretch;
   border: 1px solid var(--border);
   background: var(--bg-card);
-  transition: border-color 0.4s;
+  transition: border-color 0.3s ease;
 }
 .search-box:focus-within { border-color: var(--accent-red-dim); }
-
 .search-box input {
-  flex: 1; background: transparent; border: none;
-  padding: 0.8rem 1.2rem; color: var(--text-primary);
-  font-family: var(--font-body); font-size: 0.9rem; outline: none;
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.95rem 1rem;
+  color: var(--text-primary);
+  outline: none;
 }
-.search-box input::placeholder { color: var(--text-ghost); font-style: italic; }
-
+.search-box input::placeholder { color: var(--text-ghost); }
 .search-box button {
-  background: var(--accent-red); border: none;
-  padding: 0.8rem 1.5rem; color: var(--text-primary);
-  font-family: var(--font-display); font-size: 0.85rem;
-  letter-spacing: 0.15em; cursor: pointer; transition: all 0.3s;
+  border: none;
+  background: var(--accent-red);
+  color: var(--text-primary);
+  padding: 0 1.35rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+  letter-spacing: 0.16em;
+  transition: background 0.3s ease;
 }
 .search-box button:hover { background: var(--accent-red-bright); }
-
+.search-hint {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text-ghost);
+  line-height: 1.8;
+}
 .search-result {
-  margin-top: 1rem; overflow: hidden;
-  max-height: 0; opacity: 0;
-  transition: max-height 0.6s ease, opacity 0.6s ease;
+  margin-top: 1rem;
+  display: none;
 }
-.search-result.show { max-height: 600px; opacity: 1; }
-
-.search-result-inner {
-  background: var(--bg-card); border: 1px solid var(--border);
-  padding: 1.2rem 1.5rem; font-size: 0.85rem;
-  line-height: 2; color: var(--text-dim); position: relative;
+.search-result.show { display: block; }
+.search-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr 0.95fr;
+  gap: 0.9rem;
 }
-.search-result-inner::before {
-  content: '◈ 查询结果'; display: block;
-  font-family: var(--font-mono); font-size: 0.65rem;
-  color: var(--text-ghost); margin-bottom: 0.8rem;
-  padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
-}
-
-.typing-cursor::after { content: '█'; animation: cursorBlink 0.8s infinite; color: var(--accent-red); font-size: 0.8em; }
-@keyframes cursorBlink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-
-.result-glitch { animation: resultGlitch 0.15s infinite; }
-@keyframes resultGlitch { 0% { transform: translate(0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(1px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(0); } }
-
-
-/* ══════════════════════════════════════
-   ═══ EMPLOYEE LOGIN ═══
-   ══════════════════════════════════════ */
-.login-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px dashed var(--border); }
-.login-header { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-ghost); text-align: center; margin-bottom: 1rem; letter-spacing: 0.1em; }
-
-.login-box {
-  display: flex; gap: 0;
-  border: 1px solid var(--border);
+.result-card {
   background: var(--bg-card);
-  max-width: 400px; margin: 0 auto;
-  transition: border-color 0.4s;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  min-height: 100%;
 }
-.login-box:focus-within { border-color: var(--accent-gold-dim); }
-
-.login-box input {
-  flex: 1; background: transparent; border: none;
-  padding: 0.7rem 1rem; color: var(--text-primary);
-  font-family: var(--font-mono); font-size: 0.8rem;
-  outline: none; letter-spacing: 0.15em;
+.result-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
 }
-.login-box input::placeholder { color: var(--text-ghost); letter-spacing: 0.1em; }
-
-.login-box button {
-  background: transparent; border: none;
-  border-left: 1px solid var(--border);
-  padding: 0.7rem 1.2rem; color: var(--text-dim);
-  font-family: var(--font-mono); font-size: 0.7rem;
-  cursor: pointer; transition: all 0.3s; letter-spacing: 0.1em;
+.result-card-body {
+  font-size: 0.82rem;
+  line-height: 1.95;
+  color: var(--text-dim);
 }
-.login-box button:hover { color: var(--accent-gold); background: #ffffff05; }
+.result-card-body strong { color: var(--text-primary); font-weight: 400; }
+.result-card.warning { border-color: var(--accent-red-dim); }
+.result-card.warning .result-card-title { color: var(--accent-red-bright); }
 
-.login-result {
-  max-width: 400px; margin: 0.8rem auto 0;
-  overflow: hidden; max-height: 0; opacity: 0;
-  transition: max-height 0.6s ease, opacity 0.6s ease;
+.bulletin-list,
+.instance-grid,
+.ops-grid,
+.trace-grid {
+  display: grid;
+  gap: 1rem;
 }
-.login-result.show { max-height: 500px; opacity: 1; }
+.instance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ops-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trace-grid { grid-template-columns: 1fr 1fr; }
 
-.login-result-inner {
-  background: #0a0808; border: 1px solid var(--border);
-  padding: 1rem 1.2rem; font-family: var(--font-mono);
-  font-size: 0.75rem; line-height: 2;
-  color: var(--text-dim); text-align: center;
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.15rem 1.2rem;
+  position: relative;
+  transition: all 0.35s ease;
 }
-.login-denied { color: var(--accent-red-bright); }
-.login-granted { color: var(--accent-gold); }
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-red);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.card:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+.card:hover::before { opacity: 1; }
+.card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+}
+.card-date {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+  white-space: nowrap;
+}
+.card-body {
+  font-size: 0.84rem;
+  line-height: 2;
+  color: var(--text-dim);
+}
+.card-subnote {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  line-height: 1.9;
+  color: var(--text-ghost);
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+.card-tag {
+  display: inline-block;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-dim);
+  padding: 0.18rem 0.55rem;
+}
+.card-tag.urgent { color: var(--accent-red-bright); border-color: var(--accent-red-dim); }
+.card-tag.secret { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.card-tag.green { color: var(--accent-green-bright); border-color: rgba(82, 161, 110, 0.25); }
 
-.login-attempts { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-ghost); text-align: center; margin-top: 0.5rem; }
+.card-link {
+  display: block;
+  cursor: pointer;
+}
+.card-link:hover { box-shadow: 0 0 24px rgba(196, 163, 90, 0.08); }
+.card-link:hover .card-title { color: var(--accent-gold); }
+.locked-card { opacity: 0.88; }
+.locked-card .card-title { color: #a89a8e; }
 
-@keyframes screenShake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); } 20%, 40%, 60%, 80% { transform: translateX(3px); } }
-.shake { animation: screenShake 0.4s ease-out; }
+.live-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1rem;
+}
+.live-status {
+  font-size: 0.84rem;
+  color: var(--text-dim);
+  line-height: 1.95;
+}
+.live-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--accent-red-dim);
+  color: var(--accent-red-bright);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  padding: 0.24rem 0.55rem;
+  margin-bottom: 0.8rem;
+}
+.ticker-wrap {
+  margin-top: 0.8rem;
+  padding: 0.75rem 0.8rem;
+  background: rgba(255,255,255,0.01);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  min-height: 48px;
+}
+.ticker-track {
+  display: flex;
+  gap: 2rem;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  animation: tickerMove 22s linear infinite;
+}
+@keyframes tickerMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.live-log {
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+.live-log-entry {
+  padding: 0.75rem 0 0.75rem 1.15rem;
+  border-left: 1px dashed var(--border);
+  position: relative;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  line-height: 1.9;
+}
+.live-log-entry::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 1.02rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-ghost);
+}
+.live-log-entry.warning::before { background: var(--accent-red-bright); }
+.live-log-entry.leak::before { background: var(--accent-gold); }
+.live-log-time {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.2rem;
+}
+.live-log-entry b { color: var(--text-primary); font-weight: 400; }
 
-.screen-flash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent-red); z-index: 9998; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
-.screen-flash.active { opacity: 0.15; transition: opacity 0s; }
+.ops-block,
+.trace-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1rem;
+}
+.ops-line,
+.trace-line,
+.viewer-line {
+  padding: 0.72rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+.ops-line:last-child,
+.trace-line:last-child,
+.viewer-line:last-child { border-bottom: none; }
+.ops-line strong,
+.trace-line strong,
+.viewer-line strong {
+  font-weight: 400;
+  color: var(--text-primary);
+}
+.ops-mini,
+.trace-mini {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+}
+.viewer-type {
+  display: inline-block;
+  min-width: 78px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-ghost);
+}
+.viewer-line.trapped strong { color: var(--accent-red-bright); }
+.viewer-line.employee strong { color: var(--accent-gold); }
 
-/* ═══ RESPONSIVE ═══ */
-@media (max-width: 600px) {
-  .content-wrapper { padding: 1rem; }
-  .bulletin-card { padding: 1rem 1.2rem; }
-  .hero { padding: 3rem 1rem 2rem; }
-  .card-header { flex-direction: column; gap: 0.3rem; }
+.empty-ops {
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: var(--text-ghost);
+  border: 1px dashed var(--border);
+  padding: 0.95rem 1rem;
+}
+
+.site-footer {
+  margin-top: 2.4rem;
+  padding: 2.4rem 0 0.6rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.74rem;
+  line-height: 2.1;
+  color: var(--text-ghost);
+}
+.site-footer .hidden-text { font-size: 0.7rem; }
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.7s ease-out forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title-alert {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--accent-red-bright);
+}
+
+@media (max-width: 980px) {
+  .hero-inner,
+  .system-strip,
+  .live-grid,
+  .trace-grid,
+  .ops-grid,
+  .search-result-grid,
+  .instance-grid {
+    grid-template-columns: 1fr;
+  }
+  .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .nav { padding: 0.75rem 0.9rem; }
+  .nav-brand { font-size: 1.2rem; letter-spacing: 0.12em; }
+  .nav-mini { display: none; }
+  .hero { padding: 3.2rem 1rem 2.4rem; }
+  .page { padding: 1.2rem 1rem 2.5rem; }
+  .metric-grid { grid-template-columns: 1fr; }
+  .card-header { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
   .search-box { flex-direction: column; }
-  .search-box button { border-top: 1px solid var(--border); }
+  .search-box button { padding: 0.85rem 1rem; }
+  .identity-row { grid-template-columns: 1fr; gap: 0.2rem; }
+  .view-toggle { flex-direction: column; }
 }
 </style>
 </head>
 <body>
-
 <div class="screen-flash" id="screenFlash"></div>
+<div class="toast" id="toast"></div>
 
-<!-- NAV -->
 <nav class="nav">
-  <a href="../index.html" class="nav-back">← 返回交界面</a>
-  <div class="nav-brand">祈殃娱乐</div>
-  <div class="nav-status">访问编号: <span id="visitorId">----</span></div>
+  <div class="nav-left">
+    <a href="../index.html" class="nav-back">← 返回交界面</a>
+    <div class="nav-brand">祈殃娱乐</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-mini" id="navMini">NODE: --<br><b>VISITOR</b>: ----</div>
+  </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
-  <h1 class="hero-title">祈殃娱乐</h1>
-  <p class="hero-slogan">
-    「为您甄选最优质的娱乐体验」<br>
-    <span class="first-visit-only" data-visit="first">安全・可控・满意率 99.7%</span>
-    <span class="visit-variation" data-visit="return">安全・可控・<span class="hidden-text">存活</span>率 99.7%</span>
-  </p>
-  <div class="hero-notice">本平台内容仅面向已签署免责协议之用户 // 未授权访问已被记录</div>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy fade-in">
+      <h1 class="hero-title">祈殃娱乐</h1>
+      <div class="hero-slogan" id="heroSlogan"></div>
+      <div class="hero-notice" id="heroNotice"></div>
+      <div class="title-alert" id="titleAlert"></div>
+    </div>
+
+    <div class="hero-side fade-in" style="animation-delay:0.15s">
+      <div class="hero-side-head">
+        <span>ACCESS CHANNEL // <b>EMPLOYEE SESSION</b></span>
+        <span id="heroSideStamp">QY-SYS // ONLINE</span>
+      </div>
+      <div class="identity-lines" id="identityLines"></div>
+      <div class="identity-warning" id="identityWarning"></div>
+    </div>
+  </div>
+</header>
+
+<div class="system-banner" id="systemBanner">
+  <div class="system-banner-inner" id="systemBannerInner"></div>
 </div>
 
-<div class="return-banner" id="returnBanner">
-  ⚠ 系统检测到您曾访问过同系列文字转播系统。部分内容已根据您的<span class="redacted">风险等级</span>进行调整。
-</div>
+<main class="page">
+  <section class="system-strip">
+    <div class="panel fade-in">
+      <div class="panel-pad">
+        <div class="panel-head">
+          <div class="panel-title">终 端 状 态</div>
+          <div class="panel-meta" id="stateMeta">QY-STATE // ACTIVE</div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">VISITS</div>
+            <div class="metric-value" id="metricVisits">0</div>
+            <div class="metric-sub" id="metricFirstVisit">首次访问：--</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">CLEARANCE</div>
+            <div class="metric-value" id="metricClearance">L1</div>
+            <div class="metric-sub" id="metricRole">身份：--</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">CONTAMINATION</div>
+            <div class="metric-value" id="metricContamination">00</div>
+            <div class="metric-sub">内容越界接触累计值</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">SUSPICION</div>
+            <div class="metric-value" id="metricSuspicion">00</div>
+            <div class="metric-sub">风控关注指数</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-item">
+            <div class="bar-label"><span>污染阈值</span><span id="contaminationText">0 / 100</span></div>
+            <div class="bar-line"><div class="bar-fill" id="contaminationBar"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label"><span>风控关注</span><span id="suspicionText">0 / 100</span></div>
+            <div class="bar-line"><div class="bar-fill blue" id="suspicionBar"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label"><span>员工会话稳定度</span><span id="stabilityText">0 / 100</span></div>
+            <div class="bar-line"><div class="bar-fill green" id="stabilityBar"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div class="time-notice" id="timeNotice"></div>
+    <div class="panel fade-in" style="animation-delay:0.1s">
+      <div class="panel-pad">
+        <div class="panel-head">
+          <div class="panel-title">视 图 层 级</div>
+          <div class="panel-meta" id="viewMeta">PUBLIC / OPS</div>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn" id="publicViewBtn" data-mode="public">公开层视图</button>
+          <button class="view-btn" id="opsViewBtn" data-mode="ops">运营层视图</button>
+        </div>
+        <div class="strip-note" id="viewDescription"></div>
+      </div>
+    </div>
+  </section>
 
-<!-- MAIN CONTENT -->
-<div class="content-wrapper">
-
-  <!-- ═══ SEARCH BOX ═══ -->
-  <div class="search-section">
+  <section class="fade-in" style="animation-delay:0.18s">
+    <div class="section-head"><h2>检 索 接 口</h2></div>
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="输入副本名称、关键词或编号查询..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="输入副本名称、关键词、事故编号或角色代号..." autocomplete="off">
       <button id="searchBtn">查 询</button>
     </div>
+    <div class="search-hint" id="searchHint"></div>
     <div class="search-result" id="searchResult">
-      <div class="search-result-inner" id="searchResultInner"></div>
+      <div class="search-result-grid">
+        <div class="result-card">
+          <div class="result-card-title">表 面 记 录</div>
+          <div class="result-card-body" id="surfaceResult"></div>
+        </div>
+        <div class="result-card">
+          <div class="result-card-title">关 联 条 目</div>
+          <div class="result-card-body" id="relatedResult"></div>
+        </div>
+        <div class="result-card warning">
+          <div class="result-card-title">异 常 附 注</div>
+          <div class="result-card-body" id="anomalyResult"></div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- 公告 -->
-  <div class="section-head"><h2>公 告</h2></div>
-  <div id="bulletinContainer"></div>
+  <section class="fade-in" style="animation-delay:0.22s">
+    <div class="section-head"><h2>公 告 / 通 知</h2></div>
+    <div class="bulletin-list" id="bulletinContainer"></div>
+  </section>
 
-  <!-- 副本列表 -->
-  <div class="section-head"><h2>副 本 一 览</h2></div>
-  <div id="instanceContainer"></div>
+  <section class="fade-in" style="animation-delay:0.26s">
+    <div class="section-head"><h2>转 播 异 常</h2></div>
+    <div class="live-grid">
+      <div class="panel">
+        <div class="panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">当 前 在 线 副 本</div>
+            <div class="panel-meta">LIVE ACCESS // DEGRADED</div>
+          </div>
+          <div class="live-lock">⚠ 权限异常，实时转播接口暂不可接入</div>
+          <div class="live-status" id="liveStatus"></div>
+          <div class="ticker-wrap">
+            <div class="ticker-track" id="tickerTrack"></div>
+          </div>
+        </div>
+      </div>
 
-  <!-- ═══ EMPLOYEE LOGIN ═══ -->
-  <div class="login-section">
-    <div class="login-header">
-      ——— 内部通道 ———<br>
-      仅限祈殃娱乐授权员工使用
+      <div class="panel">
+        <div class="panel-pad">
+          <div class="panel-head">
+            <div class="panel-title">观 测 摘 要</div>
+            <div class="panel-meta" id="logMeta">RELAY // BUFFERED</div>
+          </div>
+          <div class="live-log" id="liveLog"></div>
+        </div>
+      </div>
     </div>
-    <div class="login-box">
-      <input type="password" id="loginInput" placeholder="请输入员工识别码..." autocomplete="off">
-      <button id="loginBtn">验 证</button>
+  </section>
+
+  <section class="fade-in" style="animation-delay:0.3s">
+    <div class="section-head"><h2>副 本 一 览</h2></div>
+    <div class="instance-grid" id="instanceContainer"></div>
+  </section>
+
+  <section class="fade-in" style="animation-delay:0.34s">
+    <div class="section-head"><h2>运 营 摘 录</h2></div>
+    <div class="ops-grid">
+      <div class="ops-block" id="opsBlock"></div>
+      <div class="ops-block" id="opsNotes"></div>
     </div>
-    <div class="login-result" id="loginResult">
-      <div class="login-result-inner" id="loginResultInner"></div>
+  </section>
+
+  <section class="fade-in" style="animation-delay:0.38s">
+    <div class="section-head"><h2>观 众 / 终 端 痕 迹</h2></div>
+    <div class="trace-grid">
+      <div class="trace-block" id="viewerTrace"></div>
+      <div class="trace-block" id="terminalTrace"></div>
     </div>
-    <div class="login-attempts" id="loginAttempts"></div>
-  </div>
+  </section>
 
-  <div class="visit-counter" id="visitCounter"></div>
-</div>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  祈殃娱乐 — 隶属于 ████ 交互集团<br>
-  本平台发布之所有信息均为事实 <span class="hidden-text">（以上为要求公开的声明）</span><br>
-  <span style="opacity:0.2">如果你能看到这行字，说明你还是你。</span>
-</footer>
-
+  <footer class="site-footer">
+    祈殃娱乐 — 隶属于 ████ 交互集团<br>
+    本平台发布之所有信息均为事实 <span class="hidden-text">（以上为要求公开的声明）</span><br>
+    <span style="opacity:0.2">如果你能看到这行字，说明你还是你。</span>
+  </footer>
+</main>
 
 <script>
 // ══════════════════════════════════════════════════════════
+//  祈殃娱乐主页重构版
 //
-//  ██  内 容 数 据 区  ██
+//  这份代码可以直接替换 qiyang/index.html
+//  当前已做：
+//  1) 统一状态中心
+//  2) 公开层 / 运营层切换
+//  3) 假实时转播异常区
+//  4) 观众痕迹 / 终端痕迹
+//  5) 进入副本前写入跨页上下文（供后续子页接入）
 //
-//  添加新内容只需修改以下数组，不需要改其他代码！
-//
+//  下一步如果你要我继续接子页，我就让 qianzishu-enter / intro / guest / timeline
+//  读取同一套 qy_system_state_v2 和 qy_route_context_v2
 // ══════════════════════════════════════════════════════════
 
-/*
- * 特殊标记语法（可用于所有文本字段）：
- *
- *  {{hidden:文字}}   → 鼠标悬停显示
- *  {{redacted:文字}} → 涂黑遮挡，悬停可见
- *  {{select:文字}}   → 需鼠标拖选才能看
- *
- * 公告/副本的 tag 类型: normal / urgent / secret
- * 公告的 onReturn: 二次访问时替换 body 内容
- */
+const SYSTEM_KEY = 'qy_system_state_v2';
+const ROUTE_KEY = 'qy_route_context_v2';
+const RESET_PARAM = new URLSearchParams(location.search).get('reset');
 
+if (RESET_PARAM === '1') {
+  localStorage.removeItem(SYSTEM_KEY);
+  localStorage.removeItem(ROUTE_KEY);
+}
 
-// ═══ 公告数据 ═══
+const EMPLOYEE_ARCHETYPES = [
+  { dept: '内容审查', role: '转播审校员', level: 1, clearanceLabel: 'L1' },
+  { dept: '运营观察', role: '副本观察员', level: 1, clearanceLabel: 'L1' },
+  { dept: '节点维护', role: '中继节点维护员', level: 2, clearanceLabel: 'L2' },
+  { dept: '风控复核', role: '风险复核专员', level: 2, clearanceLabel: 'L2' }
+];
+
+const HERO_COPY = {
+  first: '「为您甄选最优质的娱乐体验」<br>当前接入身份：<span class="hidden-text">已登记员工</span> // 默认开放内容已加载。',
+  return: '「为您甄选最优质的娱乐体验」<br>系统已识别到重复接入记录。当前显示内容将根据您的<span class="hidden-text">接触史</span>自动调整。'
+};
+
+const VIEW_DESCRIPTIONS = {
+  public: '当前为 <strong>公开层</strong>。你看到的是员工账号也能浏览的常规平台内容：公告、可公开副本、经审查的转播摘要。泄露信息只会以残片形式混入。',
+  ops: '当前为 <strong>运营层</strong>。你看到的是该员工后台可访问的运营摘录、风控摘要与内部注记。进入副本页后，系统将额外写入“运营来源”标记，供后续页面调用。'
+};
+
+const LIVE_INSTANCE_POOL = [
+  '镜中回廊', '拍花戏', '下楼', '千子树下', '深海旅馆', '白烛病房', '无名站台', '第七码头', '祝祷教室', '百疫', '夜班屠宰场'
+];
+
 const BULLETINS = [
   {
-    title: "关于近期副本异常的说明",
-    date: "公告编号 QY-2024-0312",
-    body: "近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经核实，该副本所有指标均在安全范围内。{{hidden:第七层走廊尽头的门不属于原始设计。请勿开启。}}请各位用户放心继续参与。",
-    tag: "官方公告",
-    tagType: "normal",
-    onReturn: "近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经核实，该副本{{hidden:已无法}}正常运行。{{hidden:我们失去了三名员工。}}请各位用户暂停参与该副本。"
+    title: '关于近期副本异常的说明',
+    date: '公告编号 QY-2024-0312',
+    tag: '官方公告',
+    tagType: 'normal',
+    publicBody: '近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经核实，该副本所有指标均在安全范围内。{{hidden:第七层走廊尽头的门不属于原始设计。请勿开启。}}请各位用户放心继续参与。',
+    opsBody: '近期有用户反映在「镜中回廊」副本中遭遇了超出预期的体验。经复核，公开版本措辞保持不变；内部建议暂停第七层相关镜头的回传。{{hidden:门体结构变化已超出布景偏移解释范围。}}',
+    leakBody: '内部记录补注：{{hidden:我们失去了三名员工。}}该副本未能按原计划关闭。'
   },
   {
-    title: "新副本上线预告",
-    date: "公告编号 QY-2024-0287",
-    body: "「深海旅馆」副本将于下月正式开放。本副本主打沉浸式深海探索体验。{{hidden:请安排测试人员。}}。",
-    tag: "新副本",
-    tagType: "normal"
+    title: '新副本上线预告',
+    date: '公告编号 QY-2024-0287',
+    tag: '新副本',
+    tagType: 'normal',
+    publicBody: '「深海旅馆」副本将于下月正式开放。本副本主打沉浸式深海探索体验。{{hidden:请安排测试人员。}}',
+    opsBody: '「深海旅馆」副本仍处于上线前校验阶段。公开宣发已先行投放，正式开放时间待定。{{hidden:溺亡反馈与沉浸体验不应出现在同一份报告里。}}',
+    leakBody: '风控补注：首轮测试者中有{{redacted:两名}}至今未通过线下回访。'
   },
   {
-    title: "⚠ 紧急通知",
-    date: "公告编号 QY-2024-0301",
-    body: "请所有用户立即停止尝试与副本内NPC进行\"超出剧本范围的对话\"。{{hidden:不要让牠们发觉异常。}}此类行为可能导致系统不稳定，违者将被{{redacted:永久移除}}暂停使用资格。",
-    tag: "紧急",
-    tagType: "urgent",
-    onReturn: "请所有用户立即停止尝试与副本内NPC进行\"超出剧本范围的对话\"。{{hidden:他们不是NPC。}}此类行为{{hidden:可能导致您被捕获}}可能导致系统不稳定。——此条公告已被{{redacted:它们}}管理层要求修改措辞。"
+    title: '⚠ 紧急通知',
+    date: '公告编号 QY-2024-0301',
+    tag: '紧急',
+    tagType: 'urgent',
+    publicBody: '请所有用户立即停止尝试与副本内 NPC 进行“超出剧本范围的对话”。{{hidden:不要让牠们发觉异常。}}此类行为可能导致系统不稳定，违者将被{{redacted:永久移除}}暂停使用资格。',
+    opsBody: '请所有用户立即停止尝试与副本内 NPC 进行“超出剧本范围的对话”。该公告文案已按管理要求弱化。{{hidden:他们不是 NPC。}}请在运营页继续使用“高仿真AI”口径。',
+    leakBody: '审查批注：{{hidden:如果用户先意识到它们有自我，那管理口径就守不住了。}}'
   },
   {
-    title: "用户满意度调查结果公示",
-    date: "公告编号 QY-2024-0256",
-    body: "本季度用户满意度达到 98.3%，续约率 97.1%。感谢各位的信任与支持。{{select:}}{{hidden:勿听、勿询}}",
-    tag: "数据公示",
-    tagType: "normal"
+    title: '用户满意度调查结果公示',
+    date: '公告编号 QY-2024-0256',
+    tag: '数据公示',
+    tagType: 'normal',
+    publicBody: '本季度用户满意度达到 98.3%，续约率 97.1%。感谢各位的信任与支持。{{select:}}{{hidden:勿听、勿询}}',
+    opsBody: '本季度满意度仍维持在公开可发布区间。异常样本已从统计口径中剔除。{{hidden:不愿离开的那部分不计入“续约”。}}',
+    leakBody: '系统备注：{{select:截至本轮统计，永久离线用户数据仍在后台持续产生“观看时长”。}}'
   }
 ];
 
-
-// ═══ 副本数据 ═══
-/*
- *  link 字段（可选）：填写后，点击该副本卡片会跳转到对应页面
- *  例如: link: "paihuaxi.html"    → 跳转到 qiyang 文件夹下的 paihuaxi.html
- *  例如: link: "../other.html"    → 跳转到上级目录的文件
- *  不填 link 则卡片不可点击
- */
 const INSTANCES = [
-    {
-    title: "拍花戏",
-    date: "副本编号 #3211",
-    body: "类型：案件还原 | 收视评分：★★★☆☆<br>简介：看门的黑犬、摘月的猴儿、褪鳞的美人..哪个是你的孩子？{{hidden:嘘..不要开门，是羊在吃草。}}回放：部分权限",
-    tag: "经典副本",
-    tagType: "normal",
-    // link: "paihuaxi.html",
+  {
+    id: 'paihuaxi',
+    title: '拍花戏',
+    date: '副本编号 #3211',
+    tag: '经典副本',
+    tagType: 'normal',
+    score: '★★★☆☆',
+    publicBody: '类型：案件还原 | 收视评分：★★★☆☆<br>简介：看门的黑犬、摘月的猴儿、褪鳞的美人..哪个是你的孩子？{{hidden:嘘..不要开门，是羊在吃草。}}回放：部分权限',
+    opsBody: '类型：案件还原 | 收视评分：★★★☆☆<br>简介：村落型回放副本，情绪拉扯稳定。{{hidden:羊群场景重复出现的时间点需要再校验。}}回放：部分权限',
+    opsNote: '运营批注：前半段留存率一般，但母题识别度高。适合在首页保留，暂不建议深挖泄露线。'
   },
   {
-    title: "下楼",
-    date: "副本编号 #3241",
-    body: "类型：密室逃脱 | 收视评分：★★★☆☆<br>简介：我在下楼，下一座忘记如何而来，又该如何离去的楼。{{hidden:污染..重生。}}回放：部分权限",
-    tag: "单人副本",
-    tagType: "normal",
-    // link: "xialou.html",
+    id: 'xialou',
+    title: '下楼',
+    date: '副本编号 #3241',
+    tag: '单人副本',
+    tagType: 'normal',
+    score: '★★★☆☆',
+    publicBody: '类型：密室逃脱 | 收视评分：★★★☆☆<br>简介：我在下楼，下一座忘记如何而来，又该如何离去的楼。{{hidden:污染..重生。}}回放：部分权限',
+    opsBody: '类型：密室逃脱 | 收视评分：★★★☆☆<br>简介：单人视角沉浸度较高。{{hidden:307号房间在删改后仍会残留“海面”相关表述。}}回放：部分权限',
+    opsNote: '风控批注：与“方向感丢失”类用户会产生高共鸣，搜索“出口”者不建议优先推送。'
   },
   {
-    title: "千子树下",
-    date: "副本编号 #5732",
-    body: "类型：溯源 | 收视评分：★★★★☆<br>简介：回到悲剧发生之前{{hidden:假的假的假的假的假的！！！！}}回放：部分权限",
-    tag: "请勿违抗系统任务",
-    tagType: "secret",
-    link: "qianzishu-enter.html",
-  },
-    {
-    title: "百疫",
-    date: "副本编号 #6786",
-    body: "类型：规则| 收视评分：★★★★☆<br>简介：████████████████████。{{hidden:请勿探究}}回放权限已关闭",
-    tag: "█████",
-    tagType: "secret",
-    // link: "baiyi.html",
+    id: 'qianzishu',
+    title: '千子树下',
+    date: '副本编号 #5732',
+    tag: '请勿违抗系统任务',
+    tagType: 'secret',
+    score: '★★★★☆',
+    link: 'qianzishu-enter.html',
+    publicBody: '类型：溯源 | 收视评分：★★★★☆<br>简介：回到悲剧发生之前。{{hidden:假的假的假的假的假的！！！！}}回放：部分权限',
+    opsBody: '类型：溯源 | 收视评分：★★★★☆<br>简介：循环型回放项目。公开口径为“追溯源头”，内部口径为“确保命运未偏离预设轨迹”。{{hidden:每一次循环都只是在逼近同一个结局。}}',
+    opsNote: '运营批注：该副本可从公开层进入，也可从运营层进入。后者应附加“隐形批注可见”标记。'
   },
   {
-    title: "█████",
-    date: "副本编号 #???",
-    body: "类型：{{redacted:已删除}} | 收视评分：<span style='color:var(--accent-red-bright)'>数据溢出</span><br>简介：{{redacted:该副本从未存在。}}{{hidden:该副本无法关闭。}}",
-    tag: "???",
-    tagType: "urgent",
-    // link: "unknown.html",
+    id: 'baiyi',
+    title: '百疫',
+    date: '副本编号 #6786',
+    tag: '█████',
+    tagType: 'secret',
+    score: '★★★★☆',
+    publicBody: '类型：规则 | 收视评分：★★★★☆<br>简介：████████████████████。{{hidden:请勿探究}}回放权限已关闭',
+    opsBody: '类型：规则 | 收视评分：★★★★☆<br>简介：条款密度过高，观众理解门槛偏高。{{hidden:但对“已经知道规则会变”的人来说，这才是入口。}}回放权限已关闭',
+    opsNote: '内部注记：目前不开放入口，仅保留名称悬挂。'
+  },
+  {
+    id: 'unknown',
+    title: '█████',
+    date: '副本编号 #???',
+    tag: '???',
+    tagType: 'urgent',
+    score: '数据溢出',
+    publicBody: '类型：{{redacted:已删除}} | 收视评分：<span style="color:var(--accent-red-bright)">数据溢出</span><br>简介：{{redacted:该副本从未存在。}}{{hidden:该副本无法关闭。}}',
+    opsBody: '类型：{{redacted:已删除}} | 收视评分：<span style="color:var(--accent-red-bright)">数据溢出</span><br>简介：已从排期中移除。{{hidden:但所有“从未存在”的记录都还在后台占着节点资源。}}',
+    opsNote: '风控批注：不要给出入口。它会自己找到出口。'
   }
 ];
 
+const OPS_SUMMARY_POOL = [
+  '镜中回廊第七层相关片段仍在人工压制，公开说明维持“布景偏移”。',
+  '深海旅馆上线节点延后。测试记录中“失压”与“沉浸”两套标签尚未统一。',
+  '千子树下回放热度上涨。请注意从运营层进入的用户更容易察觉循环痕迹。',
+  '近期检索“出口”“真相”的用户被自动归入弱观察名单。',
+  '百疫继续保持悬挂状态，不要在公开层新增解释。'
+];
 
-// ══════════════════════════════════════════════════════════
-// ═══ 搜索关键词数据 ═══
-// ══════════════════════════════════════════════════════════
-/*
- *  添加新关键词：在数组里加一个 { } 对象即可
- *
- *  keywords:  触发词数组，输入包含其中任何一个就触发
- *  response:  显示的回复（支持 {{hidden:}} 等标记和 <br> 换行）
- *  effect:    特效（可选）
- *             "normal"  — 正常显示（默认）
- *             "glitch"  — 文字抖动故障
- *             "flash"   — 全屏红色闪烁
- *             "delayed" — 逐字打出效果
- *             "deny"    — 红色拒绝风格
- */
+const OPS_NOTE_POOL = [
+  '审查备注：尽量保持“平台运营”口吻，不要让公开层出现过早崩塌。',
+  '内部提醒：真正有效的泄露不该是全屏红字，而该藏在正常后台里。',
+  '节点日志：同一终端重复进入后，公告差异比强惊吓更有说服力。',
+  '值班须知：对外仍使用“回放”“录播”“AI驱动”措辞。',
+  '异常项：部分用户会把自己当成观众，但系统会先把他们写进剧本。'
+];
 
-const SEARCH_TRIGGERS = [
+const VIEWER_COMMENT_POOLS = {
+  normal: [
+    '这个副本前面铺垫有点慢，后面会发力吗？',
+    '第七层是不是又出现了，我记得上次没有。',
+    '这段转播是不是删过，衔接有点怪。',
+    '主播怎么还不跑，她已经听见门外了吧。'
+  ],
+  veteran: [
+    '这条规则和旧版本不一样。',
+    '别让她看见窗户。',
+    '我记得这个副本以前没有第七层。',
+    '镜头切得太快了，不正常。'
+  ],
+  employee: [
+    '建议切备用观察角度。',
+    '该片段应进入延迟审查。',
+    '用户状态回传异常。',
+    '当前投放阈值偏高。'
+  ],
+  trapped: [
+    '能听见吗。',
+    '不要点进来。',
+    '这不是录播。',
+    '我还在里面。'
+  ],
+  system: [
+    '该条弹幕因违反平台规范已折叠。',
+    '检测到高危词汇，已转入人工审核。',
+    '当前片段处于延迟播出状态。',
+    '非授权术语已屏蔽。'
+  ]
+};
+
+const LIVE_LOG_TEMPLATES = {
+  normal: [
+    '副本《{instance}》转播延迟已校正至 <b>{delay}s</b>。',
+    '观察员 <b>{observer}</b> 已接入《{instance}》侧视角。',
+    '用户 <b>{visitor}</b> 正在观看《{instance}》公开流。'
+  ],
+  warning: [
+    '《{instance}》出现未登记路径，已提交复核。',
+    '《{instance}》第 <b>{floor}</b> 层镜头短暂丢失。',
+    '检测到观众对《{instance}》发送高危关键词。'
+  ],
+  leak: [
+    '《{instance}》实际在线人数与公开人数不一致。',
+    '《{instance}》回传片段存在人工删改痕迹。',
+    '《{instance}》当前画面不建议长时间观看。'
+  ]
+};
+
+const SEARCH_DATABASE = [
   {
-    keywords: ["拍花戏", "拍花", "花戏", "花"],
-    response: "副本 #「拍花戏」<br>状态：运营中<br>安全等级：B<br><br>提示：请勿在第七层停留超过3分钟。{{hidden:第七层没有镜子。那些是窗户。窗户另一边有东西在看你。}}",
-    effect: "normal"
+    keywords: ['拍花戏', '拍花', '花戏'],
+    surface: '副本 #3211「拍花戏」<br>状态：运营中<br>公开提示：请勿在深夜时段单独停留于祠堂门外。',
+    related: '关联条目：<br>・羊群意象 / 村落型副本<br>・儿童失踪 / 门外敲击声<br>・相似副本：下楼（低相关）',
+    anomaly: '异常附注：{{hidden:那不是羊。}}公开资料中未记录“门外啃食声”来源。'
   },
   {
-    keywords: ["下楼"],
-    response: "副本 #「下楼」<br>状态：运营中<br>安全等级：A<br><br>{{hidden:最后一批测试员在307号房间集体失去了对「上」和「下」的概念。他们现在认为海面才是深渊。}}",
-    effect: "normal"
+    keywords: ['下楼'],
+    surface: '副本 #3241「下楼」<br>状态：运营中<br>公开提示：请勿在 307 号房门前长时间停留。',
+    related: '关联条目：<br>・方向感丢失 / 单人副本<br>・楼层循环 / 失重幻觉<br>・关键词：海面 / 深渊 / 楼梯',
+    anomaly: '异常附注：{{hidden:最后一批测试员失去了对“上”和“下”的概念。}}'
   },
   {
-    keywords: ["救命", "help", "救我", "出不去"],
-    response: "检测到求助信号...<br><br>正在定位您的位置...<br><br>{{hidden:我们找到了您的位置。但那里没有人。请确认自己真实存在}}<br><br><span style='color:var(--accent-red-bright)'>错误：用户身份与终端记录不符。</span>",
-    effect: "glitch"
+    keywords: ['千子树下', '千子树', '树下'],
+    surface: '副本 #5732「千子树下」<br>状态：回放中（权限限制）<br>公开提示：请勿违抗系统任务。',
+    related: '关联条目：<br>・循环型副本 / 溯源<br>・葬铃村 / 古树 / 村外人<br>・可进入：简介页 / 时间线页 / 嘉宾页',
+    anomaly: '异常附注：{{hidden:这不是回溯，是重演。}}{{select:截至当前内部统计，该副本至少已循环 37 次。}}'
   },
   {
-    keywords: ["真相", "真实", "谎言", "骗"],
-    response: "<span style='color:var(--accent-red-bright)'>⚠ 该关键词已被列入监控名单。</span><br><br>友情提醒：本平台所有信息均为事实。质疑本平台等同于质疑现实本身。<br>{{hidden:你是对的。但知道真相的人最后都选择了遗忘。不是自愿的那种。}}",
-    effect: "flash"
+    keywords: ['深海旅馆', '深海', '旅馆'],
+    surface: '副本「深海旅馆」<br>状态：待上线<br>公开描述：沉浸式深海探索体验。',
+    related: '关联条目：<br>・测试组 / 失压 / 密闭环境<br>・上线计划：延后<br>・节点：QY-NODE-09',
+    anomaly: '异常附注：{{hidden:第一批测试人员中有人在岸上溺亡。}}'
   },
   {
-    keywords: ["出口", "退出", "离开", "逃"],
-    response: "正在为您查询退出通道...<br><br>查询完成。结果：0 条。<br><br>{{hidden:请纵情享受欢愉。}}<br>如需帮助，请联系您的专属顾问（编号：NULL）。",
-    effect: "normal"
+    keywords: ['出口', '退出', '离开', '逃'],
+    surface: '查询完成。结果：0 条。<br>如需帮助，请联系您的专属顾问（编号：NULL）。',
+    related: '关联条目：<br>・常见误搜：返回、终止、撤回<br>・推荐替代：副本列表 / 继续观看',
+    anomaly: '异常附注：{{hidden:请纵情享受欢愉。}}'
   },
   {
-    keywords: ["NPC", "npc", "角色", "人物"],
-    response: "本公司所有副本内人物均为高仿真AI驱动。请放心互动。<br><br>{{hidden:请不要在意牠们的感情，您的快乐是我们服务的第一要务}}",
-    effect: "normal"
+    keywords: ['真相', '真实', '谎言', '骗'],
+    surface: '<span style="color:var(--accent-red-bright)">⚠ 该关键词已被列入监控名单。</span><br>本平台所有信息均为事实。',
+    related: '关联条目：<br>・监控名单：已触发<br>・风控策略：提高关注等级<br>・建议：改用副本编号检索',
+    anomaly: '异常附注：{{hidden:你是对的。但知道真相的人最后都选择了遗忘。不是自愿的那种。}}'
   },
   {
-    keywords: ["死", "死亡", "死了", "杀"],
-    response: "<span style='color:var(--accent-red-bright)'>⚠ 敏感词汇已触发安全协议。</span><br><br>祈殃娱乐郑重声明：本公司运营期间未发生任何安全事故。<br>{{select:截至目前共计 ██ 人在副本内永久离线。他们的数据仍在运行。}}",
-    effect: "flash"
+    keywords: ['员工', '工作', '招聘', '入职'],
+    surface: '祈殃娱乐长期招聘以下岗位：<br>・副本维护员（夜班）<br>・用户体验观察员<br>・{{redacted:遗体整理}}现场清洁员',
+    related: '关联条目：<br>・员工入口 / 内部通道<br>・离职率 / 值班制度 / 配对制度',
+    anomaly: '异常附注：{{hidden:离职率 0%。因为没有人离职。}}'
   },
   {
-    keywords: ["员工", "工作", "招聘", "入职"],
-    response: "祈殃娱乐长期招聘以下岗位：<br>・副本维护员（夜班）<br>・用户体验观察员<br>・{{redacted:遗体整理}}现场清洁员<br><br>福利待遇优厚。{{hidden:离职率 0%。因为没有人离职。也没有人确认还活着。}}",
-    effect: "normal"
+    keywords: ['npc', 'NPC', '角色', '人物'],
+    surface: '本公司所有副本内人物均为高仿真 AI 驱动。请放心互动。',
+    related: '关联条目：<br>・交互边界 / 超出剧本范围对话<br>・审查口径：高仿真AI',
+    anomaly: '异常附注：{{hidden:请不要在意牠们的感情。}}'
   },
   {
-    keywords: ["我是谁", "你是谁", "这是哪"],
-    response: "用户身份核实中...<br><br>结果：未在本系统用户数据库中找到匹配记录。<br><br>{{hidden:但你的生物信息已存在于副本 #??? 的角色数据库中。为了您的安全，请勿探究}}",
-    effect: "delayed"
+    keywords: ['救命', 'help', '救我', '出不去'],
+    surface: '检测到求助信号...<br>正在定位您的位置...',
+    related: '关联条目：<br>・求助模式 / 非正常输入<br>・响应部门：待确认',
+    anomaly: '异常附注：{{hidden:我们找到了您的位置。但那里没有人。}}<br><span style="color:var(--accent-red-bright)">错误：用户身份与终端记录不符。</span>'
   }
 ];
 
-// 无匹配时的随机回复
 const SEARCH_FALLBACKS = [
-  "未找到相关信息。<br>{{hidden:或者说，相关信息不希望被你找到。}}",
-  "查询失败。该条目可能已被删除，或从未存在。<br>{{hidden:两者之间的区别在这里并不重要。}}",
-  "无结果。<br><br><span style='opacity:0.3'>...但在你搜索的瞬间，有什么注意到了你。</span>",
-  "数据库返回结果：0 条。<br>{{hidden:您无权查阅相关信息。}}",
-  "你确定它存在吗？<br>{{hidden:你确定「你」存在吗？}}"
-];
-
-
-// ══════════════════════════════════════════════════════════
-// ═══ 密码/员工识别码数据 ═══
-// ══════════════════════════════════════════════════════════
-/*
- *  添加新密码：在数组里加一个 { } 对象即可
- *
- *  passwords: 触发密码数组（精确匹配，区分大小写）
- *  response:  回复内容（支持标记和HTML）
- *  type:      样式类型
- *             "denied"  — 红色拒绝（默认）
- *             "granted" — 金色通过
- *             "warning" — 红色 + 屏幕震动
- *             "special" — 金色 + 全屏闪烁（最高秘密）
- */
-
-const PASSWORD_TRIGGERS = [
   {
-    passwords: ["admin", "Admin", "ADMIN", "管理员"],
-    response: "身份验证失败。<br>「admin」不是有效的员工识别码。<br>{{hidden:但如果你知道这个词，说明你见过内部文档。谁给你的？}}",
-    type: "denied"
+    surface: '未找到相关信息。',
+    related: '关联条目：<br>・无<br>・或当前账户权限不足',
+    anomaly: '异常附注：{{hidden:或者说，相关信息不希望被你找到。}}'
   },
   {
-    passwords: ["000000", "123456", "password", "666666"],
-    response: "身份验证失败。<br><br>安全提示：简单密码已于三年前被全面禁用。<br>原因：{{redacted:某位前员工使用弱密码导致副本 #003 的边界被突破，至今尚未修复。}}",
-    type: "denied"
+    surface: '查询失败。该条目可能已被删除，或从未存在。',
+    related: '关联条目：<br>・冲突版本：1<br>・建议：使用副本编号重试',
+    anomaly: '异常附注：{{hidden:两者之间的区别在这里并不重要。}}'
   },
   {
-    passwords: ["qiyang", "祈殃", "祈殃娱乐"],
-    response: "检测到公司名称作为识别码输入。<br><br>这不是密码。但系统已记录您知道这个名字。<br>{{hidden:知道这个名字的人分为两类：员工和猎物。你是哪一类？}}",
-    type: "warning"
-  },
-  {
-    passwords: ["7777777"],
-    response: "▓▓▓ 识别码验证中 ▓▓▓<br><br>权限等级：<span style='color:var(--accent-gold)'>Ω-7</span><br>欢迎回来。<br><br>待处理事项：<br>・副本 #001 第七层异常未闭合<br>・用户 V-████ 已连续 72 小时在线，确认是否仍为本人操作<br>・{{hidden:地下三层的声音越来越大了。请不要派人去查看。我们没有足够的测试人员。}}<br><br><span style='opacity:0.4'>如感疲惫，请联系您的搭档。</span>",
-    type: "special"
-  },
-  {
-    passwords: ["help", "救命", "放我出去", "let me out"],
-    response: "<span style='color:var(--accent-red-bright)'>⚠ 检测到非正常输入</span><br><br>该输入模式与副本内被困用户特征匹配。<br><br>{{hidden:如果你真的被困住了——这个输入框不会救你。但至少现在有人知道你还在。}}<br><br>系统已通知相关部门。请保持冷静。{{select:5min。}}",
-    type: "warning"
+    surface: '数据库返回结果：0 条。',
+    related: '关联条目：<br>・权限校验：通过<br>・内容完整性：未确认',
+    anomaly: '异常附注：{{hidden:您无权查阅相关信息。}}'
   }
 ];
 
-// 密码无匹配时的回复（按尝试次数逐步升级）
-const PASSWORD_FALLBACKS = [
-  "身份验证失败。请确认您的员工识别码。",
-  "身份验证失败。剩余尝试次数有限。",
-  "身份验证失败。{{hidden:系统已开始追踪您的操作。}}",
-  "身份验证失败。您的访问行为已被标记为可疑。",
-  "⚠ 多次验证失败。安全协议已激活。{{hidden:你为什么这么执着于进入？里面的东西比外面的更危险。}}",
-  "<span style='color:var(--accent-red-bright)'>⚠ 终端即将被锁定。</span><br><br>{{hidden:请及时收手。}}<br>{{select:或者你想加入我们？}}"
-];
-
-
-// ══════════════════════════════════════════════════════════
-//
-//  以下为渲染引擎，一般不需要修改
-//
-// ══════════════════════════════════════════════════════════
-
-// --- Visit Tracking ---
-const VISIT_KEY = 'qiyang_visits';
-const FIRST_VISIT_KEY = 'qiyang_first_visit';
-function getVisitCount() { return parseInt(localStorage.getItem(VISIT_KEY) || '0'); }
-function recordVisit() {
-  const count = getVisitCount() + 1;
-  localStorage.setItem(VISIT_KEY, count.toString());
-  if (!localStorage.getItem(FIRST_VISIT_KEY)) localStorage.setItem(FIRST_VISIT_KEY, new Date().toISOString());
-  return count;
-}
-const visitCount = recordVisit();
-const isReturn = visitCount > 1;
-
-// --- Visitor ID ---
-function genVisitorId() {
-  let id = localStorage.getItem('qiyang_vid');
-  if (!id) { id = 'V-' + Math.random().toString(36).substr(2, 8).toUpperCase(); localStorage.setItem('qiyang_vid', id); }
-  return id;
-}
-document.getElementById('visitorId').textContent = genVisitorId();
-
-// --- Parse Markup ---
 function parseMarkup(text) {
-  return text
+  return String(text || '')
     .replace(/\{\{hidden:(.*?)\}\}/g, '<span class="hidden-text">$1</span>')
     .replace(/\{\{redacted:(.*?)\}\}/g, '<span class="redacted">$1</span>')
     .replace(/\{\{select:(.*?)\}\}/g, '<span class="select-reveal">$1</span>');
 }
 
-// --- Render Cards ---
-function renderCards(data, containerId, showReturnVariant) {
-  const container = document.getElementById(containerId);
-  data.forEach((item, i) => {
-    let card;
-    if (item.link) {
-      card = document.createElement('a');
-      card.href = item.link;
-      card.className = 'bulletin-card fade-in card-linked';
-    } else {
-      card = document.createElement('div');
-      card.className = 'bulletin-card fade-in';
-    }
-    card.style.animationDelay = (i * 0.15) + 's';
-    let bodyContent = (showReturnVariant && item.onReturn) ? item.onReturn : item.body;
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+function randomFromSeed(seed) {
+  let h = 2166136261 >>> 0;
+  const str = String(seed);
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return function() {
+    h += 0x6D2B79F5;
+    let t = h;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function pick(arr, rand) {
+  return arr[Math.floor(rand() * arr.length)];
+}
+
+function uniquePicks(arr, count, rand) {
+  const copy = [...arr];
+  const out = [];
+  while (copy.length && out.length < count) {
+    const idx = Math.floor(rand() * copy.length);
+    out.push(copy.splice(idx, 1)[0]);
+  }
+  return out;
+}
+
+function genId(prefix, length = 6) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let out = prefix + '-';
+  for (let i = 0; i < length; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
+function defaultState() {
+  const arch = EMPLOYEE_ARCHETYPES[Math.floor(Math.random() * EMPLOYEE_ARCHETYPES.length)];
+  const now = new Date().toISOString();
+  return {
+    schema: 2,
+    createdAt: now,
+    firstVisitAt: now,
+    lastAccessAt: now,
+    visits: 0,
+    visitorId: genId('V', 8),
+    employeeId: genId('EMP', 5),
+    employeeDept: arch.dept,
+    employeeRole: arch.role,
+    clearance: arch.level,
+    clearanceLabel: arch.clearanceLabel,
+    mode: 'public',
+    contamination: 4,
+    suspicion: 2,
+    attention: 0,
+    sessionStability: 91,
+    searchHistory: [],
+    viewedPages: ['index'],
+    unlockedFlags: [],
+    routeLog: [],
+    loginAttempts: 0,
+    noticesSeen: 0,
+    searchCount: 0,
+    lastQuery: '',
+    titleAlertSeen: false,
+    forcedOpsHint: false
+  };
+}
+
+function loadState() {
+  let state = null;
+  try {
+    state = JSON.parse(localStorage.getItem(SYSTEM_KEY));
+  } catch (err) { state = null; }
+  if (!state || state.schema !== 2) state = defaultState();
+  return state;
+}
+
+function saveState() {
+  localStorage.setItem(SYSTEM_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+state.visits += 1;
+state.lastAccessAt = new Date().toISOString();
+state.contamination = clamp(state.contamination + (state.visits > 1 ? 1 : 0), 0, 100);
+state.sessionStability = clamp(state.sessionStability - (state.visits > 3 ? 1 : 0), 0, 100);
+if (!state.viewedPages.includes('index')) state.viewedPages.push('index');
+saveState();
+
+window.qiyangReset = function() {
+  localStorage.removeItem(SYSTEM_KEY);
+  localStorage.removeItem(ROUTE_KEY);
+  location.href = location.pathname;
+};
+
+const els = {
+  navMini: document.getElementById('navMini'),
+  heroSlogan: document.getElementById('heroSlogan'),
+  heroNotice: document.getElementById('heroNotice'),
+  titleAlert: document.getElementById('titleAlert'),
+  identityLines: document.getElementById('identityLines'),
+  identityWarning: document.getElementById('identityWarning'),
+  heroSideStamp: document.getElementById('heroSideStamp'),
+  systemBanner: document.getElementById('systemBanner'),
+  systemBannerInner: document.getElementById('systemBannerInner'),
+  stateMeta: document.getElementById('stateMeta'),
+  metricVisits: document.getElementById('metricVisits'),
+  metricFirstVisit: document.getElementById('metricFirstVisit'),
+  metricClearance: document.getElementById('metricClearance'),
+  metricRole: document.getElementById('metricRole'),
+  metricContamination: document.getElementById('metricContamination'),
+  metricSuspicion: document.getElementById('metricSuspicion'),
+  contaminationBar: document.getElementById('contaminationBar'),
+  suspicionBar: document.getElementById('suspicionBar'),
+  stabilityBar: document.getElementById('stabilityBar'),
+  contaminationText: document.getElementById('contaminationText'),
+  suspicionText: document.getElementById('suspicionText'),
+  stabilityText: document.getElementById('stabilityText'),
+  publicViewBtn: document.getElementById('publicViewBtn'),
+  opsViewBtn: document.getElementById('opsViewBtn'),
+  viewDescription: document.getElementById('viewDescription'),
+  searchInput: document.getElementById('searchInput'),
+  searchBtn: document.getElementById('searchBtn'),
+  searchHint: document.getElementById('searchHint'),
+  searchResult: document.getElementById('searchResult'),
+  surfaceResult: document.getElementById('surfaceResult'),
+  relatedResult: document.getElementById('relatedResult'),
+  anomalyResult: document.getElementById('anomalyResult'),
+  bulletinContainer: document.getElementById('bulletinContainer'),
+  liveStatus: document.getElementById('liveStatus'),
+  tickerTrack: document.getElementById('tickerTrack'),
+  liveLog: document.getElementById('liveLog'),
+  logMeta: document.getElementById('logMeta'),
+  instanceContainer: document.getElementById('instanceContainer'),
+  opsBlock: document.getElementById('opsBlock'),
+  opsNotes: document.getElementById('opsNotes'),
+  viewerTrace: document.getElementById('viewerTrace'),
+  terminalTrace: document.getElementById('terminalTrace'),
+  toast: document.getElementById('toast'),
+  screenFlash: document.getElementById('screenFlash')
+};
+
+function showToast(html) {
+  els.toast.innerHTML = html;
+  els.toast.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => els.toast.classList.remove('show'), 2600);
+}
+
+function triggerFlash() {
+  els.screenFlash.classList.add('active');
+  setTimeout(() => els.screenFlash.classList.remove('active'), 160);
+}
+
+function getTimeSlice(minutes = 8) {
+  const now = new Date();
+  const total = now.getFullYear().toString() + (now.getMonth() + 1) + now.getDate() + '-' + now.getHours() + '-' + Math.floor(now.getMinutes() / minutes);
+  return total;
+}
+
+function renderIdentity() {
+  els.navMini.innerHTML = `NODE: QY-NODE-17<br><b>VISITOR</b>: ${state.visitorId}`;
+  els.heroSlogan.innerHTML = state.visits > 1 ? HERO_COPY.return : HERO_COPY.first;
+  els.heroNotice.textContent = state.mode === 'ops'
+    ? '当前会话已映射至员工后台入口 // 默认开放内容与运营摘要将同时加载'
+    : '本平台内容仅面向已签署免责协议之用户 // 当前内容为默认公开视图';
+
+  const lines = [
+    ['账户', `<strong>${state.employeeId}</strong> / ${state.employeeDept}`],
+    ['职位', `<strong>${state.employeeRole}</strong>`],
+    ['权限', `<strong>${state.clearanceLabel}</strong> / ${state.mode === 'ops' ? '运营层' : '公开层'}`],
+    ['终端', `<strong>${state.visitorId}</strong>`],
+    ['最近行为', `<strong>${state.lastQuery ? state.lastQuery : '无异常检索'}</strong>`]
+  ];
+  els.identityLines.innerHTML = lines.map(([label, value]) => `
+    <div class="identity-row">
+      <div class="identity-label">${label}</div>
+      <div class="identity-value">${value}</div>
+    </div>
+  `).join('');
+
+  els.identityWarning.innerHTML = parseMarkup(
+    state.mode === 'ops'
+      ? '内部提醒：该员工会话允许接触运营摘要，但不保证所有异常批注都经过人工清洗。{{hidden:真正危险的内容通常不会单独放在“泄露区”。}}'
+      : '系统说明：你现在看到的是员工账号也可浏览的公开内容。{{hidden:如果你切进运营层，系统会记住这一点。}}'
+  );
+
+  els.heroSideStamp.textContent = state.mode === 'ops' ? 'QY-SYS // OPS VIEW' : 'QY-SYS // PUBLIC VIEW';
+
+  if (state.visits > 1 || state.searchCount > 2 || state.mode === 'ops') {
+    els.systemBanner.classList.add('show');
+    const bannerBits = [];
+    if (state.visits > 1) bannerBits.push(`系统检测到重复接入记录（${state.visits} 次）`);
+    if (state.mode === 'ops') bannerBits.push('当前已切入运营层视图');
+    if (state.searchCount > 2) bannerBits.push('本终端近期检索行为已归档');
+    if (state.unlockedFlags.includes('truth-monitor')) bannerBits.push('“真相”相关关键词已被特别标注');
+    els.systemBannerInner.innerHTML = bannerBits.join(' // ') + '。';
+  } else {
+    els.systemBanner.classList.remove('show');
+  }
+
+  if (!state.titleAlertSeen && state.visits >= 3) {
+    els.titleAlert.textContent = '⚠ 你不是第一次从这个入口回来。';
+    state.titleAlertSeen = true;
+    saveState();
+  } else if (state.visits >= 5) {
+    els.titleAlert.textContent = '⚠ 系统已建立稳定行为画像。';
+  } else {
+    els.titleAlert.textContent = '';
+  }
+}
+
+function renderMetrics() {
+  els.stateMeta.textContent = `QY-STATE // ${state.mode === 'ops' ? 'OPS-LAYER' : 'PUBLIC-LAYER'}`;
+  els.metricVisits.textContent = state.visits;
+  els.metricFirstVisit.textContent = `首次访问：${new Date(state.firstVisitAt).toLocaleDateString('zh-CN')}`;
+  els.metricClearance.textContent = state.clearanceLabel;
+  els.metricRole.textContent = `身份：${state.employeeRole}`;
+  els.metricContamination.textContent = String(state.contamination).padStart(2, '0');
+  els.metricSuspicion.textContent = String(state.suspicion).padStart(2, '0');
+  els.contaminationBar.style.width = state.contamination + '%';
+  els.suspicionBar.style.width = state.suspicion + '%';
+  els.stabilityBar.style.width = state.sessionStability + '%';
+  els.contaminationText.textContent = `${state.contamination} / 100`;
+  els.suspicionText.textContent = `${state.suspicion} / 100`;
+  els.stabilityText.textContent = `${state.sessionStability} / 100`;
+}
+
+function renderViewToggle() {
+  [els.publicViewBtn, els.opsViewBtn].forEach(btn => btn.classList.toggle('active', btn.dataset.mode === state.mode));
+  els.viewDescription.innerHTML = VIEW_DESCRIPTIONS[state.mode];
+}
+
+function setMode(mode) {
+  if (mode === state.mode) return;
+  state.mode = mode;
+  state.suspicion = clamp(state.suspicion + (mode === 'ops' ? 4 : 1), 0, 100);
+  state.contamination = clamp(state.contamination + (mode === 'ops' ? 3 : 0), 0, 100);
+  if (mode === 'ops' && !state.unlockedFlags.includes('ops-switch')) state.unlockedFlags.push('ops-switch');
+  saveState();
+  rerenderAll();
+  showToast(mode === 'ops'
+    ? '<strong>运营层已接入</strong><br>后续进入副本时将写入运营来源标记。'
+    : '<strong>已返回公开层</strong><br>界面恢复为默认可公开视图。');
+}
+
+els.publicViewBtn.addEventListener('click', () => setMode('public'));
+els.opsViewBtn.addEventListener('click', () => setMode('ops'));
+
+function renderBulletins() {
+  els.bulletinContainer.innerHTML = BULLETINS.map((item, i) => {
+    const body = state.mode === 'ops' ? item.opsBody : item.publicBody;
+    const leak = (state.contamination >= 12 || state.mode === 'ops' || state.visits >= 3) ? item.leakBody : '';
+    return `
+      <article class="card fade-in" style="animation-delay:${0.08 * (i + 1)}s">
+        <div class="card-header">
+          <div class="card-title">${item.title}</div>
+          <div class="card-date">${item.date}</div>
+        </div>
+        <div class="card-body">${parseMarkup(body)}</div>
+        ${leak ? `<div class="card-subnote">${parseMarkup(leak)}</div>` : ''}
+        <div class="card-tags">
+          <span class="card-tag ${item.tagType === 'urgent' ? 'urgent' : item.tagType === 'secret' ? 'secret' : ''}">${item.tag}</span>
+          ${state.mode === 'ops' ? '<span class="card-tag green">运营层可见</span>' : ''}
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function recordRoute(instance, entryMode) {
+  const routeContext = {
+    instanceId: instance.id,
+    instanceTitle: instance.title,
+    entryMode,
+    employeeId: state.employeeId,
+    employeeRole: state.employeeRole,
+    clearance: state.clearance,
+    clearanceLabel: state.clearanceLabel,
+    visitorId: state.visitorId,
+    contamination: state.contamination,
+    suspicion: state.suspicion,
+    unlockedFlags: state.unlockedFlags,
+    timestamp: new Date().toISOString(),
+    routeTag: entryMode === 'ops' ? 'ops-entry' : 'public-entry'
+  };
+  localStorage.setItem(ROUTE_KEY, JSON.stringify(routeContext));
+  state.routeLog.unshift(routeContext);
+  state.routeLog = state.routeLog.slice(0, 12);
+  if (!state.viewedPages.includes(instance.id)) state.viewedPages.push(instance.id);
+  state.contamination = clamp(state.contamination + (entryMode === 'ops' ? 2 : 1), 0, 100);
+  saveState();
+}
+
+function renderInstances() {
+  els.instanceContainer.innerHTML = '';
+  INSTANCES.forEach((item, i) => {
+    const hasLink = !!item.link;
+    const card = document.createElement(hasLink ? 'a' : 'div');
+    card.className = `card ${hasLink ? 'card-link' : 'locked-card'} fade-in`;
+    card.style.animationDelay = `${0.07 * (i + 1)}s`;
+    if (hasLink) card.href = item.link;
+    const body = state.mode === 'ops' ? item.opsBody : item.publicBody;
+    const showOpsNote = state.mode === 'ops' && item.opsNote;
     card.innerHTML = `
       <div class="card-header">
-        <div class="card-title">${item.title}${item.link ? ' <span style="font-size:0.6rem;opacity:0.4">▸ 进入</span>' : ''}</div>
+        <div class="card-title">${item.title}${hasLink ? ' <span style="font-size:0.6rem;opacity:0.45">▸ 进入</span>' : ''}</div>
         <div class="card-date">${item.date}</div>
       </div>
-      <div class="card-body">${parseMarkup(bodyContent)}</div>
-      <span class="card-tag tag-${item.tagType}">${item.tag}</span>
+      <div class="card-body">${parseMarkup(body)}</div>
+      ${showOpsNote ? `<div class="card-subnote">${parseMarkup(item.opsNote)}</div>` : ''}
+      <div class="card-tags">
+        <span class="card-tag ${item.tagType === 'urgent' ? 'urgent' : item.tagType === 'secret' ? 'secret' : ''}">${item.tag}</span>
+        <span class="card-tag">评分：${item.score}</span>
+        ${hasLink && state.mode === 'ops' ? '<span class="card-tag green">将写入运营来源</span>' : ''}
+      </div>
     `;
-    container.appendChild(card);
+
+    if (hasLink) {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        recordRoute(item, state.mode);
+        location.href = item.link;
+      });
+    } else {
+      card.addEventListener('click', () => {
+        state.suspicion = clamp(state.suspicion + 2, 0, 100);
+        saveState();
+        showToast('<strong>无可用入口</strong><br>该副本当前不提供接入路径。');
+        rerenderAll();
+      });
+    }
+    els.instanceContainer.appendChild(card);
   });
 }
-renderCards(BULLETINS, 'bulletinContainer', isReturn);
-renderCards(INSTANCES, 'instanceContainer', false);
 
-// --- Return Visit ---
-if (isReturn) {
-  document.getElementById('returnBanner').classList.add('show');
-  document.querySelectorAll('.first-visit-only').forEach(el => el.classList.add('hide'));
-  document.querySelectorAll('.visit-variation').forEach(el => el.classList.add('show'));
+function buildTickerData() {
+  const rand = randomFromSeed(state.visitorId + '-' + getTimeSlice(10) + '-' + state.contamination);
+  const list = uniquePicks(LIVE_INSTANCE_POOL, 6, rand);
+  return [...list, ...list].map(name => `◈ ${name} // 在线`).join('<span style="opacity:0.25">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
 }
 
-// --- Visit Counter ---
-document.getElementById('visitCounter').innerHTML =
-  `本终端已被访问 ${visitCount} 次` +
-  (isReturn ? ` // 首次访问: ${new Date(localStorage.getItem(FIRST_VISIT_KEY)).toLocaleDateString('zh-CN')}` : '') +
-  (visitCount >= 5 ? '<br><span style="color:var(--accent-red-bright)">⚠ 频繁访问已触发安全协议</span>' : '');
-
-// --- Time Notice ---
-(function checkTimeNotice() {
-  const hour = new Date().getHours();
-  const el = document.getElementById('timeNotice');
-  if (hour >= 0 && hour < 5) {
-    el.innerHTML = '⚠ 当前为非工作时段。您所看到的内容可能尚未经过审查。<br><span style="opacity:0.4">凌晨的信息最接近真相。</span>';
-    el.classList.add('show');
-  } else if (hour >= 23) {
-    el.innerHTML = parseMarkup('系统维护即将开始。此时段产生的浏览记录将{{hidden:被特别标注}}正常保存。');
-    el.classList.add('show');
-  }
-})();
-
-
-// ══════════════════════════════════════════
-// ═══ SEARCH ENGINE ═══
-// ══════════════════════════════════════════
-
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const searchResult = document.getElementById('searchResult');
-const searchResultInner = document.getElementById('searchResultInner');
-
-function triggerScreenFlash() {
-  const flash = document.getElementById('screenFlash');
-  flash.classList.add('active');
-  setTimeout(() => flash.classList.remove('active'), 150);
-  setTimeout(() => { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 100); }, 300);
-}
-
-function typewriterEffect(element, html, speed) {
-  speed = speed || 30;
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
-  const plainText = tempDiv.textContent;
-  element.innerHTML = '<span class="typing-cursor"></span>';
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i < plainText.length) {
-      element.innerHTML = plainText.substring(0, i + 1) + '<span class="typing-cursor"></span>';
-      i++;
+function buildLiveLogs() {
+  const rand = randomFromSeed('log-' + state.visitorId + '-' + getTimeSlice(6) + '-' + state.mode + '-' + state.contamination);
+  const entries = [];
+  const count = 6;
+  const contamination = state.contamination;
+  for (let i = 0; i < count; i++) {
+    const roll = rand();
+    let tier = 'normal';
+    if (contamination >= 14) {
+      tier = roll < 0.3 ? 'normal' : roll < 0.65 ? 'warning' : 'leak';
+    } else if (contamination >= 8) {
+      tier = roll < 0.55 ? 'normal' : roll < 0.85 ? 'warning' : 'leak';
     } else {
-      clearInterval(interval);
-      setTimeout(() => { element.innerHTML = html; }, 500);
+      tier = roll < 0.78 ? 'normal' : roll < 0.95 ? 'warning' : 'leak';
     }
-  }, speed);
+    if (state.mode === 'ops' && tier === 'normal' && rand() > 0.55) tier = 'warning';
+    if (state.mode === 'ops' && tier === 'warning' && rand() > 0.72) tier = 'leak';
+
+    const template = pick(LIVE_LOG_TEMPLATES[tier], rand);
+    const text = template
+      .replace(/\{instance\}/g, pick(LIVE_INSTANCE_POOL, rand))
+      .replace(/\{delay\}/g, (2.4 + rand() * 7.8).toFixed(1))
+      .replace(/\{observer\}/g, 'OBS-' + Math.floor(rand() * 80 + 10))
+      .replace(/\{visitor\}/g, state.visitorId)
+      .replace(/\{floor\}/g, String(Math.floor(rand() * 7 + 1)));
+
+    const d = new Date(Date.now() - (count - i) * 60000 - Math.floor(rand() * 180000));
+    entries.push({
+      tier,
+      time: d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      text
+    });
+  }
+  return entries;
+}
+
+function renderLivePanel() {
+  els.liveStatus.innerHTML = parseMarkup(
+    state.mode === 'ops'
+      ? '实时转播主接口当前显示为“权限异常”。员工后台只能读取转播缓冲区与延迟审查摘要。{{hidden:你看不到直播，不代表直播没有在看你。}}'
+      : '当前会话仅能读取公开层转播摘要。实时画面被标记为暂不可接入，系统仅返回在线副本名称与缓冲日志。'
+  );
+  els.tickerTrack.innerHTML = buildTickerData();
+  const logs = buildLiveLogs();
+  els.liveLog.innerHTML = logs.map(log => `
+    <div class="live-log-entry ${log.tier}">
+      <div class="live-log-time">[${log.time}]</div>
+      <div>${log.text}</div>
+    </div>
+  `).join('');
+  els.logMeta.textContent = state.mode === 'ops' ? 'RELAY // OPS BUFFER' : 'RELAY // PUBLIC BUFFER';
+}
+
+function renderOps() {
+  if (state.mode !== 'ops') {
+    els.opsBlock.innerHTML = '<div class="empty-ops">当前为公开层。运营摘录已自动折叠。切入运营层后，这里会显示工单摘要、风控复核与内部运营措辞。</div>';
+    els.opsNotes.innerHTML = '<div class="empty-ops">公开层不会主动展示内部注记。{{hidden:但有些注记会自己浮出来。}}</div>';
+    return;
+  }
+
+  const rand = randomFromSeed('ops-' + state.visitorId + '-' + getTimeSlice(15) + '-' + state.searchCount);
+  const summary = uniquePicks(OPS_SUMMARY_POOL, 4, rand);
+  const notes = uniquePicks(OPS_NOTE_POOL, 4, rand);
+  els.opsBlock.innerHTML = summary.map((line, i) => `
+    <div class="ops-line">
+      <strong>工单 #${Math.floor(rand() * 9000 + 1000)}</strong> ${parseMarkup(line)}
+      <span class="ops-mini">状态：${i === 0 ? '处理中' : i === 1 ? '待复核' : '已归档'} // 来源：${pick(['风控', '运营', '审查', '节点维护'], rand)}</span>
+    </div>
+  `).join('');
+
+  els.opsNotes.innerHTML = notes.map((line, i) => `
+    <div class="ops-line">
+      <strong>内部注记</strong> ${parseMarkup(line)}
+      <span class="ops-mini">备注层级：${i < 2 ? '低可见' : '隐形批注'} // 当前来源：${state.employeeId}</span>
+    </div>
+  `).join('');
+}
+
+function buildViewerTraces() {
+  const rand = randomFromSeed('viewer-' + state.visitorId + '-' + getTimeSlice(7) + '-' + state.contamination + '-' + state.mode);
+  const comments = [];
+  const buckets = ['normal', 'veteran', 'employee', 'system'];
+  if (state.contamination >= 14 || state.mode === 'ops') buckets.push('trapped');
+  for (let i = 0; i < 6; i++) {
+    const bucket = pick(buckets, rand);
+    const line = pick(VIEWER_COMMENT_POOLS[bucket], rand);
+    comments.push({ bucket, line });
+  }
+  return comments;
+}
+
+function renderTraces() {
+  const viewerTraces = buildViewerTraces();
+  els.viewerTrace.innerHTML = viewerTraces.map((item, i) => `
+    <div class="viewer-line ${item.bucket === 'trapped' ? 'trapped' : item.bucket === 'employee' ? 'employee' : ''}">
+      <span class="viewer-type">${item.bucket === 'normal' ? '普通观众' : item.bucket === 'veteran' ? '老用户' : item.bucket === 'employee' ? '员工小号' : item.bucket === 'system' ? '系统审查' : '异常发言'}</span>
+      <strong>${parseMarkup(item.line)}</strong>
+      <span class="trace-mini">来源：${item.bucket === 'system' ? '自动审查模块' : '转播侧弹幕池'} // 序号：${String(i + 1).padStart(2, '0')}</span>
+    </div>
+  `).join('');
+
+  const recentRoutes = state.routeLog.slice(0, 4);
+  const lastQueryText = state.lastQuery ? `最近检索：<strong>${state.lastQuery}</strong>` : '最近检索：<strong>无</strong>';
+  const flags = state.unlockedFlags.length ? state.unlockedFlags.join(' / ') : '无';
+  const traceItems = [
+    `${lastQueryText}<span class="trace-mini">累计检索次数：${state.searchCount}</span>`,
+    `当前视图：<strong>${state.mode === 'ops' ? '运营层' : '公开层'}</strong><span class="trace-mini">切层行为会被路由记录引用</span>`,
+    `已记录标记：<strong>${flags}</strong><span class="trace-mini">这些标记将供后续副本页读取</span>`,
+    `访问路径：<strong>${state.viewedPages.join(' → ')}</strong><span class="trace-mini">当前终端正在形成稳定画像</span>`
+  ];
+
+  if (recentRoutes.length) {
+    recentRoutes.forEach(route => {
+      traceItems.push(`最近路由：<strong>${route.instanceTitle}</strong> / ${route.entryMode === 'ops' ? '运营来源' : '公开来源'}<span class="trace-mini">时间：${new Date(route.timestamp).toLocaleString('zh-CN')}</span>`);
+    });
+  }
+
+  els.terminalTrace.innerHTML = traceItems.map(item => `<div class="trace-line">${item}</div>`).join('');
+}
+
+function normalizeQuery(q) {
+  return q.trim().toLowerCase();
+}
+
+function findSearchEntry(query) {
+  const exact = SEARCH_DATABASE.find(entry => entry.keywords.some(k => normalizeQuery(query).includes(k.toLowerCase())));
+  return exact || null;
 }
 
 function doSearch() {
-  const query = searchInput.value.trim();
-  if (!query) return;
+  const raw = els.searchInput.value.trim();
+  if (!raw) return;
+  const q = raw.toLowerCase();
+  const entry = findSearchEntry(raw) || SEARCH_FALLBACKS[Math.floor(Math.random() * SEARCH_FALLBACKS.length)];
 
-  let matched = null;
-  for (const trigger of SEARCH_TRIGGERS) {
-    if (trigger.keywords.some(kw => query.includes(kw))) { matched = trigger; break; }
-  }
+  const repeated = state.searchHistory.some(item => item.query === raw);
+  state.searchHistory.push({ query: raw, time: new Date().toISOString() });
+  state.searchHistory = state.searchHistory.slice(-20);
+  state.searchCount += 1;
+  state.lastQuery = raw;
 
-  let responseHTML, effect = 'normal';
-  if (matched) {
-    responseHTML = parseMarkup(matched.response);
-    effect = matched.effect || 'normal';
+  const riskTerms = ['真相', '真实', '谎言', '骗', '出口', '退出', '离开', '逃', '救命', 'help', '员工', 'npc'];
+  if (riskTerms.some(term => q.includes(term.toLowerCase()))) {
+    state.suspicion = clamp(state.suspicion + 6, 0, 100);
+    state.contamination = clamp(state.contamination + 5, 0, 100);
   } else {
-    responseHTML = parseMarkup(SEARCH_FALLBACKS[Math.floor(Math.random() * SEARCH_FALLBACKS.length)]);
+    state.suspicion = clamp(state.suspicion + 2, 0, 100);
+    state.contamination = clamp(state.contamination + 2, 0, 100);
   }
 
-  searchResultInner.className = 'search-result-inner';
-  if (effect === 'flash') triggerScreenFlash();
-  if (effect === 'glitch') { searchResultInner.classList.add('result-glitch'); setTimeout(() => searchResultInner.classList.remove('result-glitch'), 2000); }
-  if (effect === 'delayed') { typewriterEffect(searchResultInner, responseHTML); } else { searchResultInner.innerHTML = responseHTML; }
+  if (q.includes('真相') || q.includes('真实') || q.includes('谎言')) {
+    if (!state.unlockedFlags.includes('truth-monitor')) state.unlockedFlags.push('truth-monitor');
+    triggerFlash();
+  }
+  if ((q.includes('出口') || q.includes('退出') || q.includes('离开') || q.includes('逃')) && !state.unlockedFlags.includes('exit-query')) {
+    state.unlockedFlags.push('exit-query');
+  }
+  if (state.mode === 'ops' && !state.unlockedFlags.includes('ops-searched')) state.unlockedFlags.push('ops-searched');
 
-  searchResult.classList.add('show');
+  saveState();
 
-  // 记录搜索历史
-  const searches = JSON.parse(localStorage.getItem('qiyang_searches') || '[]');
-  searches.push({ query, time: new Date().toISOString() });
-  localStorage.setItem('qiyang_searches', JSON.stringify(searches));
-}
-
-searchBtn.addEventListener('click', doSearch);
-searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-
-// ══════════════════════════════════════════
-// ═══ PASSWORD / LOGIN ENGINE ═══
-// ══════════════════════════════════════════
-
-const loginInput = document.getElementById('loginInput');
-const loginBtn = document.getElementById('loginBtn');
-const loginResult = document.getElementById('loginResult');
-const loginResultInner = document.getElementById('loginResultInner');
-const loginAttemptsEl = document.getElementById('loginAttempts');
-
-let loginAttemptCount = parseInt(localStorage.getItem('qiyang_login_attempts') || '0');
-
-function updateAttemptDisplay() {
-  if (loginAttemptCount > 0) loginAttemptsEl.textContent = `累计尝试: ${loginAttemptCount} 次`;
-}
-updateAttemptDisplay();
-
-function doLogin() {
-  const input = loginInput.value.trim();
-  if (!input) return;
-
-  loginAttemptCount++;
-  localStorage.setItem('qiyang_login_attempts', loginAttemptCount.toString());
-  updateAttemptDisplay();
-
-  let matched = null;
-  for (const trigger of PASSWORD_TRIGGERS) {
-    if (trigger.passwords.includes(input)) { matched = trigger; break; }
+  let anomalyText = entry.anomaly;
+  if (repeated) {
+    anomalyText += '<br><br><span style="color:var(--accent-red-bright)">系统提示：</span>该关键词已出现过。终端行为已并入当前画像。';
+  }
+  if (state.mode === 'ops') {
+    anomalyText += '<br><br><span style="color:var(--accent-gold)">运营补注：</span>本次检索来源已登记为员工后台。';
   }
 
-  let responseHTML, resultType = 'denied';
-  if (matched) {
-    responseHTML = parseMarkup(matched.response);
-    resultType = matched.type || 'denied';
+  els.surfaceResult.innerHTML = parseMarkup(entry.surface);
+  els.relatedResult.innerHTML = parseMarkup(entry.related);
+  els.anomalyResult.innerHTML = parseMarkup(anomalyText);
+  els.searchResult.classList.add('show');
+  els.searchHint.innerHTML = repeated
+    ? '该关键词在当前终端的检索记录中已存在。'
+    : '检索已写入终端记录。部分异常附注会随着检索行为累积而变化。';
+
+  rerenderAll(false);
+}
+
+els.searchBtn.addEventListener('click', doSearch);
+els.searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+function renderSearchHintOnly() {
+  const base = state.mode === 'ops'
+    ? '当前为运营层检索。系统将优先返回后台口径，再叠加异常附注。'
+    : '当前为公开层检索。系统将优先返回可公开口径，再混入少量残缺信息。';
+  const extra = state.searchCount > 0 ? ` // 本终端累计检索 ${state.searchCount} 次` : '';
+  els.searchHint.textContent = base + extra;
+}
+
+function updateDocumentTitle() {
+  const base = '祈殃娱乐 | 公告平台';
+  const warned = state.suspicion >= 18 || state.contamination >= 18;
+  document.title = warned ? '【1】祈殃娱乐 | 系统注意到你了' : base;
+}
+
+let titleTimer = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    clearTimeout(titleTimer);
+    titleTimer = setTimeout(() => {
+      document.title = state.mode === 'ops' ? '不要把运营层长时间留在后台' : '我们看到你离开了';
+    }, 400);
   } else {
-    const idx = Math.min(loginAttemptCount - 1, PASSWORD_FALLBACKS.length - 1);
-    responseHTML = parseMarkup(PASSWORD_FALLBACKS[idx]);
+    clearTimeout(titleTimer);
+    updateDocumentTitle();
   }
+});
 
-  loginResultInner.className = 'login-result-inner';
-  if (resultType === 'granted' || resultType === 'special') { loginResultInner.classList.add('login-granted'); }
-  else { loginResultInner.classList.add('login-denied'); }
-  if (resultType === 'warning') { document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 400); }
-  if (resultType === 'special') { triggerScreenFlash(); loginResultInner.classList.add('login-granted'); }
-
-  loginResultInner.innerHTML = responseHTML;
-  loginResult.classList.add('show');
-  loginInput.value = '';
+function rerenderAll(updateTitle = true) {
+  renderIdentity();
+  renderMetrics();
+  renderViewToggle();
+  renderBulletins();
+  renderLivePanel();
+  renderInstances();
+  renderOps();
+  renderTraces();
+  renderSearchHintOnly();
+  if (updateTitle) updateDocumentTitle();
 }
 
-loginBtn.addEventListener('click', doLogin);
-loginInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+rerenderAll();
+
+setInterval(() => {
+  renderLivePanel();
+}, 12000);
+
+setInterval(() => {
+  const minutePulse = new Date().getMinutes();
+  if (minutePulse % 9 === 0 && state.mode === 'ops' && state.sessionStability > 40) {
+    state.sessionStability = clamp(state.sessionStability - 1, 0, 100);
+    saveState();
+    renderMetrics();
+  }
+}, 60000);
+
+function handleHiddenTextClick(e) {
+  const target = e.target.closest('.hidden-text');
+  if (!target) return;
+  target.classList.toggle('revealed');
+}
+document.addEventListener('click', handleHiddenTextClick);
+
+window.addEventListener('copy', () => {
+  state.suspicion = clamp(state.suspicion + 2, 0, 100);
+  saveState();
+  showToast('<strong>已记录外传行为</strong><br>本次复制动作已写入终端日志。');
+  renderMetrics();
+});
 </script>
-
 </body>
 </html>
