@@ -11,10 +11,10 @@
 
 :root {
   --bg: #0c0a0a;
-  --bg-soft: #110d0d;
-  --bg-card: #141010;
-  --bg-card-hover: #1a1414;
-  --bg-elevated: #181313;
+  --bg-soft: #120e0e;
+  --bg-card: #171212;
+  --bg-card-hover: #201818;
+  --bg-elevated: #1c1616;
   --accent-red: #8b0000;
   --accent-red-bright: #cc1111;
   --accent-red-dim: #8b000033;
@@ -23,12 +23,12 @@
   --accent-green: #315d43;
   --accent-green-bright: #52a16e;
   --accent-blue: #6880a6;
-  --text-primary: #d9d1ca;
-  --text-dim: #86766b;
-  --text-ghost: #463a35;
+  --text-primary: #eee6df;
+  --text-dim: #b5a69a;
+  --text-ghost: #7c6e66;
   --text-hidden: #0c0a0a;
-  --border: #2a1e1e;
-  --border-light: #3a2e2e;
+  --border: #3b2a2a;
+  --border-light: #5a4343;
   --font-title: 'Ma Shan Zheng', cursive;
   --font-display: 'ZCOOL QingKe HuangYou', cursive;
   --font-body: 'Noto Serif SC', serif;
@@ -59,7 +59,7 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  opacity: 0.03;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
@@ -767,6 +767,305 @@ button, input { font: inherit; }
   padding: 0.95rem 1rem;
 }
 
+
+.follow-head-note {
+  margin-bottom: 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--text-ghost);
+}
+.follow-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.follow-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1rem 0.95rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+.follow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent-gold);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.follow-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  box-shadow: 0 0 22px rgba(196, 163, 90, 0.08);
+}
+.follow-card:hover::before { opacity: 1; }
+.follow-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.follow-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+.follow-sub {
+  margin-top: 0.28rem;
+  font-size: 0.76rem;
+  color: var(--text-ghost);
+  line-height: 1.8;
+}
+.follow-state {
+  display: inline-block;
+  padding: 0.16rem 0.5rem;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.follow-state.online { color: var(--accent-green-bright); border-color: rgba(82, 161, 110, 0.25); }
+.follow-state.unstable { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.follow-state.lost { color: var(--accent-red-bright); border-color: var(--accent-red-dim); }
+.follow-summary {
+  margin-top: 0.8rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.9;
+}
+.follow-meta {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.follow-meta span {
+  display: inline-block;
+  padding: 0.16rem 0.5rem;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  color: var(--text-ghost);
+}
+.follow-meta span.ops-mark { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.follow-tip {
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+}
+.follow-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 5, 5, 0.76);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  z-index: 9997;
+}
+.follow-modal.show { display: flex; }
+.follow-modal-card {
+  width: min(940px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--bg-soft);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 0 40px rgba(0,0,0,0.35);
+}
+.follow-modal-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(17, 13, 13, 0.96);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1rem 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.follow-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+.follow-modal-sub {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--text-ghost);
+  line-height: 1.8;
+}
+.follow-close {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.42rem 0.72rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.follow-close:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.follow-modal-body {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 1rem;
+}
+.dossier-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.95rem 1rem;
+}
+.dossier-title {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.72rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.dossier-status-line {
+  font-size: 0.84rem;
+  line-height: 1.95;
+  color: var(--text-dim);
+}
+.dossier-status-line strong { color: var(--text-primary); font-weight: 400; }
+.dossier-pills {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.dossier-pills span {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-dim);
+}
+.dossier-pills .gold { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.dossier-pills .green { color: var(--accent-green-bright); border-color: rgba(82, 161, 110, 0.25); }
+.profile-rows {
+  display: grid;
+  gap: 0.55rem;
+}
+.profile-row {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 0.8rem;
+  align-items: start;
+  font-size: 0.79rem;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+.profile-row b {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--text-ghost);
+  letter-spacing: 0.06em;
+}
+.chat-log {
+  display: grid;
+  gap: 0.7rem;
+}
+.chat-entry {
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.012);
+  padding: 0.72rem 0.8rem;
+}
+.chat-entry.me { border-color: rgba(196, 163, 90, 0.16); }
+.chat-entry.system { border-color: rgba(204, 17, 17, 0.18); }
+.chat-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-ghost);
+  margin-bottom: 0.35rem;
+}
+.chat-text {
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+.chat-text strong { color: var(--text-primary); font-weight: 400; }
+.dossier-note {
+  margin-top: 0.8rem;
+  padding-top: 0.72rem;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  line-height: 1.85;
+  color: var(--text-ghost);
+}
+.dossier-note.gold { color: var(--accent-gold); }
+.dossier-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.dossier-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  background: transparent;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.dossier-action:hover { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.dossier-action.primary { color: var(--accent-gold); border-color: var(--accent-gold-dim); }
+.dossier-action.external { color: #d8c6a0; border-color: rgba(196,163,90,0.18); }
+.dossier-action.disabled { opacity: 0.45; pointer-events: none; }
+
+@media (max-width: 980px) {
+  .follow-grid,
+  .follow-modal-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .follow-top {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .follow-modal {
+    padding: 0.5rem;
+  }
+  .follow-modal-head {
+    padding: 0.85rem 0.85rem 0.8rem;
+  }
+  .follow-modal-body {
+    padding: 0.85rem;
+  }
+  .profile-row {
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+  }
+}
+
 .site-footer {
   margin-top: 2.4rem;
   padding: 2.4rem 0 0.6rem;
@@ -983,6 +1282,12 @@ button, input { font: inherit; }
   </section>
 
   <section class="fade-in" style="animation-delay:0.3s">
+    <div class="section-head"><h2>关 注 列 表</h2></div>
+    <div class="follow-head-note" id="followHeadNote"></div>
+    <div class="follow-grid" id="followContainer"></div>
+  </section>
+
+  <section class="fade-in" style="animation-delay:0.32s">
     <div class="section-head"><h2>副 本 一 览</h2></div>
     <div class="instance-grid" id="instanceContainer"></div>
   </section>
@@ -1002,6 +1307,40 @@ button, input { font: inherit; }
       <div class="trace-block" id="terminalTrace"></div>
     </div>
   </section>
+
+
+  <div class="follow-modal" id="followModal" aria-hidden="true">
+    <div class="follow-modal-card">
+      <div class="follow-modal-head">
+        <div>
+          <div class="follow-modal-title" id="followModalTitle">嘉宾档案</div>
+          <div class="follow-modal-sub" id="followModalSub"></div>
+        </div>
+        <button class="follow-close" id="followCloseBtn">关 闭</button>
+      </div>
+      <div class="follow-modal-body">
+        <div class="dossier-block">
+          <div class="dossier-title">当 前 状 态</div>
+          <div class="dossier-status-line" id="guestStatusLine"></div>
+          <div class="dossier-pills" id="guestPills"></div>
+          <div class="dossier-note" id="guestOpsNote"></div>
+          <div class="dossier-actions" id="guestActions"></div>
+        </div>
+        <div class="dossier-block">
+          <div class="dossier-title">个 人 档 案</div>
+          <div class="profile-rows" id="guestProfileRows"></div>
+        </div>
+        <div class="dossier-block">
+          <div class="dossier-title">最 近 动 态</div>
+          <div class="dossier-status-line" id="guestRecentNotes"></div>
+        </div>
+        <div class="dossier-block">
+          <div class="dossier-title">聊 天 记 录</div>
+          <div class="chat-log" id="guestChatLog"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     祈殃娱乐 — 隶属于 ████ 交互集团<br>
@@ -1151,6 +1490,147 @@ const INSTANCES = [
     publicBody: '类型：{{redacted:已删除}} | 收视评分：<span style="color:var(--accent-red-bright)">数据溢出</span><br>简介：{{redacted:该副本从未存在。}}{{hidden:该副本无法关闭。}}',
     opsBody: '类型：{{redacted:已删除}} | 收视评分：<span style="color:var(--accent-red-bright)">数据溢出</span><br>简介：已从排期中移除。{{hidden:但所有“从未存在”的记录都还在后台占着节点资源。}}',
     opsNote: '风控批注：不要给出入口。它会自己找到出口。'
+  }
+];
+
+
+const FOLLOWED_GUESTS = [
+  // 可选字段：
+  // textReplayUrl: 'https://www.jjwxc.net/...',
+  // textReplayLabel: '转入文字版录播',
+  {
+    id: 'xiaoxiao',
+    name: '萧潇',
+    handle: '@guest-xiaoxiao',
+    title: '常驻嘉宾 / 个人频道可见',
+    moodTag: '高危静默',
+    statePublic: { text: '在线记录存在，但个人频道更新间隔异常拉长。', className: 'unstable' },
+    stateOps: { text: '后台判定为“持续在线”。终端行为与生理回传已分离。', className: 'lost' },
+    summaryPublic: '该嘉宾仍维持较高关注度。最近一次公开露面与「千子树下」回放高度重叠。',
+    summaryOps: '该嘉宾被原号主设置为高优先关注对象。{{hidden:对方明明还在回应，但聊天回执里已经没有“已读”这一步了。}}',
+    lastSeen: '最近活跃：03:12 // 信号回传断续',
+    tags: ['千子树下', '个人频道', '高留存'],
+    profile: [
+      ['代号', 'QY-GUEST-07'],
+      ['定位', '温和型主视角 / 高情绪张力'],
+      ['常驻副本', '千子树下'],
+      ['风险评级', 'A-'],
+      ['对外备注', '互动反馈稳定，观众黏性高']
+    ],
+    recentPublic: '最近三次直播标题均被平台回收，仅保留片段编号。',
+    recentOps: '最近动态补注：{{hidden:原号主在停用前最后一次打开的就是她的频道。}}',
+    opsNote: '隐形批注：她的回放越完整，现实侧记录就越少。不要在公开层解释这一点。',
+    link: 'qianzishu-guest-xiaoxiao.html',
+    linkLabel: '打开个人直播档案',
+    textReplayUrl: 'https://www.jjwxc.net/onebook.php?novelid=9460949&chapterid=1',
+    textReplayLabel: '转入文字版录播',
+    chatsPublic: [
+      { speaker: '原号主', time: '02:14', text: '你今天的状态看起来不太对，系统是不是又改规则了？', kind: 'me' },
+      { speaker: '萧潇', time: '02:16', text: '规则没改，只是你们终于开始看见原来就有的东西了。', kind: 'guest' },
+      { speaker: '原号主', time: '02:18', text: '别在公频里这么说。', kind: 'me' }
+    ],
+    chatsOps: [
+      { speaker: '系统', time: '02:18', text: '该段对话已从公开回放中剔除。', kind: 'system' },
+      { speaker: '萧潇', time: '02:21', text: '你要是真想帮我，下次就别让她一个人进去。', kind: 'guest' }
+    ]
+  },
+  {
+    id: 'linshuangfeng',
+    name: '林霜枫',
+    handle: '@guest-linshuangfeng',
+    title: '嘉宾 / 碎片回放权限',
+    moodTag: '过度清醒',
+    statePublic: { text: '频道片段仍可访问，完整档案暂未开放。', className: 'online' },
+    stateOps: { text: '可读取片段，但人物状态与剧情状态存在轻微错位。', className: 'unstable' },
+    summaryPublic: '该嘉宾的碎片回放在老用户中讨论度较高，尤其集中在异常冷静的应对片段。',
+    summaryOps: '原号主曾反复回看她的单人片段。{{hidden:不是因为欣赏，是因为她有时会提前看见不该看见的东西。}}',
+    lastSeen: '最近活跃：昨日 23:48 // 片段存档 4 条',
+    tags: ['碎片回放', '冷静判断', '老用户讨论'],
+    profile: [
+      ['代号', 'QY-GUEST-11'],
+      ['定位', '观察型嘉宾 / 支线承压'],
+      ['常驻副本', '千子树下（片段）'],
+      ['风险评级', 'B+'],
+      ['对外备注', '遇险时稳定度高，观众评价两极']
+    ],
+    recentPublic: '最近新增片段为“庙门前停顿 17 秒”。评论区被批量折叠。',
+    recentOps: '最近动态补注：{{hidden:她意识到直播里有剪辑点后，反而更像在顺着剪辑给系统看。}}',
+    opsNote: '隐形批注：如果从运营层点进她的个人页，建议额外显示“剪辑残差”类注释。',
+    link: 'qianzishu-guest-linshuangfeng.html',
+    linkLabel: '打开个人直播档案',
+    chatsPublic: [
+      { speaker: '原号主', time: '00:42', text: '你在庙门前为什么不继续走？', kind: 'me' },
+      { speaker: '林霜枫', time: '00:43', text: '因为门后站着的东西比镜头里多一个。', kind: 'guest' },
+      { speaker: '原号主', time: '00:44', text: '回放里没有。', kind: 'me' }
+    ],
+    chatsOps: [
+      { speaker: '林霜枫', time: '00:45', text: '嗯，所以我才没进去。', kind: 'guest' },
+      { speaker: '系统', time: '00:46', text: '该用户言论已标记为“可能扰乱节目沉浸感”。', kind: 'system' }
+    ]
+  },
+  {
+    id: 'yuezhao',
+    name: '越昭',
+    handle: '@guest-yuezhao',
+    title: '停更嘉宾 / 资料保留',
+    moodTag: '失联保留',
+    statePublic: { text: '个人频道暂停更新，平台仅保留基础信息。', className: 'lost' },
+    stateOps: { text: '账号未注销，关注关系仍被原号主保留。', className: 'lost' },
+    summaryPublic: '历史上曾是高讨论度嘉宾，但近阶段无新增公开内容。',
+    summaryOps: '这条关注关系不是后来加的，而是一直没被删。{{hidden:有人离场后，系统比人更不愿意承认。}}',
+    lastSeen: '最近活跃：记录缺失',
+    tags: ['停更', '历史高热', '资料保留'],
+    profile: [
+      ['代号', 'QY-GUEST-03'],
+      ['定位', '剧情推进型嘉宾'],
+      ['常驻副本', '记录缺失'],
+      ['风险评级', '未知'],
+      ['对外备注', '档案保留，回放冻结']
+    ],
+    recentPublic: '最近动态：无。平台以“档案整理中”为由暂不开放更多说明。',
+    recentOps: '最近动态补注：{{hidden:真正的问题不是她停更，而是系统仍把她算在“在线嘉宾”名单里。}}',
+    opsNote: '隐形批注：这类账号不建议在公开层展示过深的时间信息。',
+    link: '',
+    linkLabel: '',
+    chatsPublic: [
+      { speaker: '原号主', time: '更早以前', text: '你不是说这次回放结束后就休息吗？', kind: 'me' },
+      { speaker: '越昭', time: '更早以前', text: '如果它肯让我结束的话。', kind: 'guest' }
+    ],
+    chatsOps: [
+      { speaker: '系统', time: '记录缺失', text: '该聊天记录的后续段落已不可读取。', kind: 'system' }
+    ]
+  },
+  {
+    id: 'chengguiye',
+    name: '程归野',
+    handle: '@guest-chengguiye',
+    title: '边缘嘉宾 / 低频更新',
+    moodTag: '伪稳定',
+    statePublic: { text: '频道仍在，但最近更新只剩系统自动剪辑。', className: 'unstable' },
+    stateOps: { text: '该账号可能长期处于“频道存在 / 本人不在线”的混合状态。', className: 'unstable' },
+    summaryPublic: '属于原号主长期挂在列表里、却很少点开的那一类嘉宾。',
+    summaryOps: '关注记录显示原号主曾多次把他移出又重新关注。{{hidden:像是在确认这个人到底还算不算“同一位”。}}',
+    lastSeen: '最近活跃：前日 19:07 // 自动剪辑',
+    tags: ['低频更新', '自动剪辑', '边缘频道'],
+    profile: [
+      ['代号', 'QY-GUEST-19'],
+      ['定位', '支线补全型嘉宾'],
+      ['常驻副本', '未公开'],
+      ['风险评级', 'B'],
+      ['对外备注', '存在感弱，但回访率异常']
+    ],
+    recentPublic: '最近动态：系统自动为他生成了三条“精彩片段”，但原始直播源不可见。',
+    recentOps: '最近动态补注：{{hidden:只有直播源消失了，弹幕和打赏记录还在继续增长。}}',
+    opsNote: '隐形批注：这类账号最适合放在关注列表里，它们看起来最不像异常。',
+    link: '',
+    linkLabel: '',
+    chatsPublic: [
+      { speaker: '原号主', time: '19:11', text: '你最近是不是又把直播权限关了？', kind: 'me' },
+      { speaker: '程归野', time: '19:13', text: '我没关。可能只是你看到的是剪好的。', kind: 'guest' }
+    ],
+    chatsOps: [
+      { speaker: '系统', time: '19:13', text: '该频道当前仅返回自动剪辑层。原始流：不可读取。', kind: 'system' }
+    ]
   }
 ];
 
@@ -1389,6 +1869,9 @@ function saveState() {
 }
 
 let state = loadState();
+if (!Array.isArray(state.followHistory)) state.followHistory = [];
+if (!state.lastViewedGuestId) state.lastViewedGuestId = '';
+if (!state.lastViewedGuestName) state.lastViewedGuestName = '';
 state.visits += 1;
 state.lastAccessAt = new Date().toISOString();
 state.contamination = clamp(state.contamination + (state.visits > 1 ? 1 : 0), 0, 100);
@@ -1441,6 +1924,19 @@ const els = {
   liveLog: document.getElementById('liveLog'),
   logMeta: document.getElementById('logMeta'),
   instanceContainer: document.getElementById('instanceContainer'),
+  followHeadNote: document.getElementById('followHeadNote'),
+  followContainer: document.getElementById('followContainer'),
+  followModal: document.getElementById('followModal'),
+  followModalTitle: document.getElementById('followModalTitle'),
+  followModalSub: document.getElementById('followModalSub'),
+  guestStatusLine: document.getElementById('guestStatusLine'),
+  guestPills: document.getElementById('guestPills'),
+  guestOpsNote: document.getElementById('guestOpsNote'),
+  guestActions: document.getElementById('guestActions'),
+  guestProfileRows: document.getElementById('guestProfileRows'),
+  guestRecentNotes: document.getElementById('guestRecentNotes'),
+  guestChatLog: document.getElementById('guestChatLog'),
+  followCloseBtn: document.getElementById('followCloseBtn'),
   opsBlock: document.getElementById('opsBlock'),
   opsNotes: document.getElementById('opsNotes'),
   viewerTrace: document.getElementById('viewerTrace'),
@@ -1702,6 +2198,111 @@ function renderLivePanel() {
   els.logMeta.textContent = state.mode === 'ops' ? 'RELAY // OPS BUFFER' : 'RELAY // PUBLIC BUFFER';
 }
 
+
+function getGuestById(id) {
+  return FOLLOWED_GUESTS.find(item => item.id === id) || null;
+}
+
+function renderFollowList() {
+  els.followHeadNote.innerHTML = state.mode === 'ops'
+    ? '以下列表来自当前员工会话残留的关注关系。你看到的不只是公开资料，还包括原号主未清理的备注与聊天摘录。'
+    : '以下为当前员工账号曾长期保留的嘉宾关注列表。公开层只展示可对外说明的状态摘要。';
+  els.followContainer.innerHTML = '';
+  FOLLOWED_GUESTS.forEach((guest, i) => {
+    const card = document.createElement('div');
+    card.className = 'follow-card fade-in';
+    card.style.animationDelay = `${0.05 * (i + 1)}s`;
+    const stateInfo = state.mode === 'ops' ? guest.stateOps : guest.statePublic;
+    const summary = state.mode === 'ops' ? guest.summaryOps : guest.summaryPublic;
+    card.innerHTML = `
+      <div class="follow-top">
+        <div>
+          <div class="follow-name">${guest.name}</div>
+          <div class="follow-sub">${guest.title}<br>${guest.handle}</div>
+        </div>
+        <span class="follow-state ${stateInfo.className}">${stateInfo.text}</span>
+      </div>
+      <div class="follow-summary">${parseMarkup(summary)}</div>
+      <div class="follow-meta">
+        ${guest.tags.map(tag => `<span>${tag}</span>`).join('')}
+        <span>${guest.lastSeen}</span>
+        ${state.mode === 'ops' ? '<span class="ops-mark">可见隐形批注</span>' : ''}
+      </div>
+      <div class="follow-tip">点击展开档案、近期状态与聊天摘录。</div>
+    `;
+    card.addEventListener('click', () => openGuestDossier(guest.id));
+    els.followContainer.appendChild(card);
+  });
+}
+
+function buildGuestActions(guest) {
+  const actions = [];
+  if (guest.link) {
+    actions.push(`<a class="dossier-action primary" href="${guest.link}" data-guest-link="${guest.id}">${guest.linkLabel || '打开档案'}</a>`);
+  } else {
+    actions.push('<span class="dossier-action disabled">当前无可用个人页面</span>');
+  }
+
+  if (guest.textReplayUrl) {
+    actions.push(`<a class="dossier-action external" href="${guest.textReplayUrl}" target="_blank" rel="noopener noreferrer" data-text-replay="${guest.id}">${guest.textReplayLabel || '转入文字版录播'}</a>`);
+  } else {
+    actions.push(`<button class="dossier-action external" type="button" data-text-replay-pending="${guest.id}">${guest.textReplayLabelPending || '转入文字版录播'}</button>`);
+  }
+
+  actions.push(`<button class="dossier-action" type="button" data-copy-guest="${guest.id}">记录本次查看</button>`);
+  return actions.join('');
+}
+
+function openGuestDossier(guestId) {
+  const guest = getGuestById(guestId);
+  if (!guest) return;
+  const stateInfo = state.mode === 'ops' ? guest.stateOps : guest.statePublic;
+  const recentNotes = state.mode === 'ops' ? `${guest.recentPublic}<br><br>${parseMarkup(guest.recentOps || '')}` : guest.recentPublic;
+  const chats = [...guest.chatsPublic, ...(state.mode === 'ops' ? guest.chatsOps : [])];
+
+  els.followModalTitle.textContent = guest.name;
+  els.followModalSub.innerHTML = `${guest.title} // ${guest.handle}<br>${guest.lastSeen}`;
+  els.guestStatusLine.innerHTML = `<strong>当前状态：</strong>${stateInfo.text}<br><strong>关注摘要：</strong>${parseMarkup(state.mode === 'ops' ? guest.summaryOps : guest.summaryPublic)}`;
+  els.guestPills.innerHTML = `
+    <span class="${stateInfo.className === 'online' ? 'green' : stateInfo.className === 'unstable' ? 'gold' : ''}">${guest.moodTag}</span>
+    <span>${state.mode === 'ops' ? '运营层展开' : '公开层展开'}</span>
+    ${guest.tags.map(tag => `<span>${tag}</span>`).join('')}
+  `;
+  els.guestOpsNote.className = `dossier-note${state.mode === 'ops' ? ' gold' : ''}`;
+  els.guestOpsNote.innerHTML = state.mode === 'ops'
+    ? parseMarkup(guest.opsNote || '当前无额外批注。')
+    : '公开层不会直接展示隐形批注。切入运营层后，这里会出现原号主残留备注与更完整的状态说明。';
+  els.guestActions.innerHTML = buildGuestActions(guest);
+  els.guestProfileRows.innerHTML = guest.profile.map(([k, v]) => `<div class="profile-row"><b>${k}</b><div>${v}</div></div>`).join('');
+  els.guestRecentNotes.innerHTML = parseMarkup(recentNotes);
+  els.guestChatLog.innerHTML = chats.map(item => `
+    <div class="chat-entry ${item.kind === 'me' ? 'me' : item.kind === 'system' ? 'system' : ''}">
+      <div class="chat-meta"><span>${item.speaker}</span><span>${item.time}</span></div>
+      <div class="chat-text">${parseMarkup(item.text)}</div>
+    </div>
+  `).join('');
+
+  state.lastViewedGuestId = guest.id;
+  state.lastViewedGuestName = guest.name;
+  state.followHistory.unshift({ guestId: guest.id, guestName: guest.name, mode: state.mode, time: new Date().toISOString() });
+  state.followHistory = state.followHistory.slice(0, 8);
+  state.contamination = clamp(state.contamination + (state.mode === 'ops' ? 2 : 1), 0, 100);
+  if (state.mode === 'ops' && !state.unlockedFlags.includes('follow-dossier-opened')) state.unlockedFlags.push('follow-dossier-opened');
+  saveState();
+
+  els.followModal.classList.add('show');
+  els.followModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  renderMetrics();
+  renderTraces();
+}
+
+function closeGuestDossier() {
+  els.followModal.classList.remove('show');
+  els.followModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
 function renderOps() {
   if (state.mode !== 'ops') {
     els.opsBlock.innerHTML = '<div class="empty-ops">当前为公开层。运营摘录已自动折叠。切入运营层后，这里会显示工单摘要、风控复核与内部运营措辞。</div>';
@@ -1753,12 +2354,16 @@ function renderTraces() {
   const recentRoutes = state.routeLog.slice(0, 4);
   const lastQueryText = state.lastQuery ? `最近检索：<strong>${state.lastQuery}</strong>` : '最近检索：<strong>无</strong>';
   const flags = state.unlockedFlags.length ? state.unlockedFlags.join(' / ') : '无';
+  const recentGuestText = state.lastViewedGuestName
+    ? `最近展开档案：<strong>${state.lastViewedGuestName}</strong><span class="trace-mini">来源：关注列表 / ${state.mode === 'ops' ? '运营层' : '公开层'}</span>`
+    : '';
   const traceItems = [
     `${lastQueryText}<span class="trace-mini">累计检索次数：${state.searchCount}</span>`,
     `当前视图：<strong>${state.mode === 'ops' ? '运营层' : '公开层'}</strong><span class="trace-mini">切层行为会被路由记录引用</span>`,
     `已记录标记：<strong>${flags}</strong><span class="trace-mini">这些标记将供后续副本页读取</span>`,
     `访问路径：<strong>${state.viewedPages.join(' → ')}</strong><span class="trace-mini">当前终端正在形成稳定画像</span>`
   ];
+  if (recentGuestText) traceItems.splice(3, 0, recentGuestText);
 
   if (recentRoutes.length) {
     recentRoutes.forEach(route => {
@@ -1868,6 +2473,7 @@ function rerenderAll(updateTitle = true) {
   renderBulletins();
   renderLivePanel();
   renderInstances();
+  renderFollowList();
   renderOps();
   renderTraces();
   renderSearchHintOnly();
@@ -1895,6 +2501,76 @@ function handleHiddenTextClick(e) {
   target.classList.toggle('revealed');
 }
 document.addEventListener('click', handleHiddenTextClick);
+
+
+els.followCloseBtn.addEventListener('click', closeGuestDossier);
+els.followModal.addEventListener('click', (e) => {
+  if (e.target === els.followModal) closeGuestDossier();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && els.followModal.classList.contains('show')) closeGuestDossier();
+});
+document.addEventListener('click', (e) => {
+  const textReplayLink = e.target.closest('[data-text-replay]');
+  if (textReplayLink) {
+    const guest = getGuestById(textReplayLink.getAttribute('data-text-replay'));
+    if (guest) {
+      state.routeLog.unshift({
+        sourceType: 'follow-dossier-text-replay',
+        guestId: guest.id,
+        guestName: guest.name,
+        entryMode: state.mode,
+        employeeId: state.employeeId,
+        visitorId: state.visitorId,
+        timestamp: new Date().toISOString()
+      });
+      state.routeLog = state.routeLog.slice(0, 12);
+      saveState();
+    }
+  }
+
+  const textReplayPendingBtn = e.target.closest('[data-text-replay-pending]');
+  if (textReplayPendingBtn) {
+    const guest = getGuestById(textReplayPendingBtn.getAttribute('data-text-replay-pending'));
+    showToast(`<strong>权限异常</strong><br>${guest ? `嘉宾「${guest.name}」` : '该嘉宾'}的文字版录播通道暂未接入。`);
+    state.suspicion = clamp(state.suspicion + 1, 0, 100);
+    saveState();
+    renderMetrics();
+    return;
+  }
+
+  const link = e.target.closest('[data-guest-link]');
+  if (link) {
+    const guest = getGuestById(link.getAttribute('data-guest-link'));
+    if (guest) {
+      const routeContext = {
+        sourceType: 'follow-dossier',
+        guestId: guest.id,
+        guestName: guest.name,
+        entryMode: state.mode,
+        employeeId: state.employeeId,
+        visitorId: state.visitorId,
+        timestamp: new Date().toISOString(),
+        routeTag: state.mode === 'ops' ? 'ops-follow-entry' : 'public-follow-entry'
+      };
+      localStorage.setItem(ROUTE_KEY, JSON.stringify(routeContext));
+      if (!state.viewedPages.includes(`follow:${guest.id}`)) state.viewedPages.push(`follow:${guest.id}`);
+      saveState();
+    }
+    closeGuestDossier();
+  }
+  const copyBtn = e.target.closest('[data-copy-guest]');
+  if (copyBtn) {
+    const guest = getGuestById(copyBtn.getAttribute('data-copy-guest'));
+    if (guest) {
+      showToast(`<strong>已记录查看行为</strong><br>关注档案「${guest.name}」已写入当前终端的会话日志。`);
+      state.suspicion = clamp(state.suspicion + 1, 0, 100);
+      saveState();
+      renderMetrics();
+      renderTraces();
+    }
+  }
+});
 
 window.addEventListener('copy', () => {
   state.suspicion = clamp(state.suspicion + 2, 0, 100);
