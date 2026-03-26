@@ -846,6 +846,7 @@ const GUEST_PAGE_ID = "xiaoxiao";
 const SHARED_SYSTEM_KEY = 'qy_system_state_v2';
 const SHARED_ROUTE_KEY = 'qy_route_context_v2';
 const CONTEXT_WINDOW_MS = 1000 * 60 * 60 * 24;
+const GUEST_ARCHIVE_PAGE = 'guest-xiaoxiao-archive.html';
 
 
 
@@ -1073,17 +1074,31 @@ function getRecentRouteLogEntry(state, predicate) {
   return (state.routeLog || []).find(item => predicate(item) && isFreshTimestamp(item.timestamp, CONTEXT_WINDOW_MS)) || null;
 }
 
+
 function getGuestContext() {
   const shared = getSharedSystemState();
   const route = getRouteContext();
   const fromFollow = !!(route && route.guestId === GUEST_PAGE_ID && route.sourceType === 'follow-dossier' && isFreshTimestamp(route.timestamp, CONTEXT_WINDOW_MS));
-  const fromOps = !!(fromFollow && route.entryMode === 'ops');
-  const textReplayEntry = getRecentRouteLogEntry(shared, item => item.sourceType === 'follow-dossier-text-replay' && item.guestId === GUEST_PAGE_ID);
+  const fromArchive = !!(route && route.guestId === GUEST_PAGE_ID && route.sourceType === 'guest-archive' && isFreshTimestamp(route.timestamp, CONTEXT_WINDOW_MS));
+  const fromOps = !!((fromFollow || fromArchive) && route.entryMode === 'ops');
+  const textReplayEntry = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier-text-replay' || item.sourceType === 'guest-archive-text-replay') &&
+    item.guestId === GUEST_PAGE_ID
+  );
   const watchedTextReplay = !!textReplayEntry;
-  const directOpsTrace = getRecentRouteLogEntry(shared, item => item.sourceType === 'follow-dossier' && item.guestId === GUEST_PAGE_ID && item.entryMode === 'ops');
-  const directPublicTrace = getRecentRouteLogEntry(shared, item => item.sourceType === 'follow-dossier' && item.guestId === GUEST_PAGE_ID && item.entryMode !== 'ops');
+  const directOpsTrace = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier' || item.sourceType === 'guest-archive') &&
+    item.guestId === GUEST_PAGE_ID &&
+    item.entryMode === 'ops'
+  );
+  const directPublicTrace = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier' || item.sourceType === 'guest-archive') &&
+    item.guestId === GUEST_PAGE_ID &&
+    item.entryMode !== 'ops'
+  );
   let sourceLabel = '副本链路';
-  if (fromFollow) sourceLabel = fromOps ? '运营层关注档案' : '公开层关注档案';
+  if (fromArchive) sourceLabel = fromOps ? '运营层个人直播档案列表' : '个人直播档案列表';
+  else if (fromFollow) sourceLabel = fromOps ? '运营层关注档案' : '公开层关注档案';
   else if (route && route.instanceId === 'qianzishu') sourceLabel = route.entryMode === 'ops' ? '运营层副本入口' : '公开层副本入口';
   else if (directOpsTrace) sourceLabel = '运营层残留来源';
   else if (directPublicTrace) sourceLabel = '关注档案残留来源';
@@ -1092,6 +1107,7 @@ function getGuestContext() {
     shared,
     route,
     fromFollow,
+    fromArchive,
     fromOps,
     watchedTextReplay,
     textReplayEntry,
@@ -1105,6 +1121,7 @@ function getGuestContext() {
     lastRouteTime: route?.timestamp || directOpsTrace?.timestamp || directPublicTrace?.timestamp || null,
   };
 }
+
 
 const GUEST_CONTEXT = getGuestContext();
 
@@ -1233,7 +1250,7 @@ function renderContextShell() {
 
   const routeTime = GUEST_CONTEXT.lastRouteTime ? new Date(GUEST_CONTEXT.lastRouteTime).toLocaleString('zh-CN') : '未记录';
   const flagsText = GUEST_CONTEXT.inheritedFlags.length ? GUEST_CONTEXT.inheritedFlags.join(' / ') : '无显式标记';
-  const topLine = GUEST_CONTEXT.fromFollow
+  const topLine = (GUEST_CONTEXT.fromFollow || GUEST_CONTEXT.fromArchive)
     ? `系统已识别到本页并非由常规副本目录展开，而是通过<strong>${GUEST_CONTEXT.sourceLabel}</strong>转入。该来源会改变部分说明字段与隐形批注的可见范围。`
     : '当前页按默认录播档案方式打开。若你是通过关注档案或运营层进入，这里本应先于正文显示来源残留。';
   top.innerHTML = parseMarkup(topLine);
@@ -1242,14 +1259,17 @@ function renderContextShell() {
     `来源：<strong>${GUEST_CONTEXT.sourceLabel}</strong><br>` +
     `当前员工：<strong>${GUEST_CONTEXT.employeeId}</strong> // 权限：<strong>${GUEST_CONTEXT.clearanceLabel}</strong><br>` +
     `终端编号：<strong>${GUEST_CONTEXT.visitorId}</strong><br>` +
-    (GUEST_CONTEXT.fromFollow
-      ? '本页已读取到关注档案入口留下的会话上下文。返回时主页仍会保持相同的视图层级。'
-      : '未检测到有效的关注档案入口标记，系统暂按普通副本链路处理。')
+    (GUEST_CONTEXT.fromArchive
+      ? '本页已读取到个人直播档案列表留下的会话上下文。返回时你会回到该嘉宾的副本列表，而不是默认副本简介。'
+      : (GUEST_CONTEXT.fromFollow
+        ? '本页已读取到关注档案入口留下的会话上下文。返回时主页仍会保持相同的视图层级。'
+        : '未检测到有效的关注档案入口标记，系统暂按普通副本链路处理。'))
   );
 
   const badgeList = [];
   badgeList.push(`<span class="context-badge blue">来源：${GUEST_CONTEXT.sourceLabel}</span>`);
   if (GUEST_CONTEXT.fromFollow) badgeList.push('<span class="context-badge gold">关注档案转入</span>');
+  if (GUEST_CONTEXT.fromArchive) badgeList.push('<span class="context-badge gold">个人档案列表转入</span>');
   if (GUEST_CONTEXT.fromOps) badgeList.push('<span class="context-badge gold">运营层额外批注</span>');
   if (GUEST_CONTEXT.watchedTextReplay) badgeList.push('<span class="context-badge red">检测到文字版录播残留</span>');
   if (isReturn) badgeList.push('<span class="context-badge">本页二次访问</span>');
@@ -1261,7 +1281,7 @@ function renderContextShell() {
   if (GUEST_CONTEXT.watchedTextReplay && GUEST_CONTEXT.textReplayEntry) {
     residueHtml += `<span class="context-mini">检测到站外文本备份浏览痕迹：${new Date(GUEST_CONTEXT.textReplayEntry.timestamp).toLocaleString('zh-CN')}。系统判断你可能先读取过“文字版录播”，再回到本页。{{hidden:这会让某些被删掉的地方显得更像是被故意删掉的。}}</span>`;
   } else {
-    residueHtml += `<span class="context-mini">当前未检测到站外文字备份残留。若你先从主页的“转入文字版录播”离开，再回来，这一栏会留下痕迹。</span>`;
+    residueHtml += `<span class="context-mini">当前未检测到站外文字备份残留。若你先从主页或个人直播档案列表的“转入文字版录播”离开，再回来，这一栏会留下痕迹。</span>`;
   }
   residue.innerHTML = parseMarkup(residueHtml);
 
@@ -1276,8 +1296,10 @@ function renderContextShell() {
 function renderBroadcast() {
   // Back link
   const backEl = document.getElementById('backLink');
-  backEl.href = GUEST_CONTEXT.fromFollow ? 'index.html' : PAGE_CONFIG.backLink;
-  backEl.textContent = GUEST_CONTEXT.fromFollow ? (GUEST_CONTEXT.fromOps ? '← 返回运营层关注列表' : '← 返回关注列表') : PAGE_CONFIG.backText;
+  backEl.href = GUEST_CONTEXT.fromArchive ? GUEST_ARCHIVE_PAGE : (GUEST_CONTEXT.fromFollow ? 'index.html' : PAGE_CONFIG.backLink);
+  backEl.textContent = GUEST_CONTEXT.fromArchive
+    ? (GUEST_CONTEXT.fromOps ? '← 返回运营层个人档案列表' : '← 返回个人直播档案列表')
+    : (GUEST_CONTEXT.fromFollow ? (GUEST_CONTEXT.fromOps ? '← 返回运营层关注列表' : '← 返回关注列表') : PAGE_CONFIG.backText);
   document.getElementById('barInfo').textContent = GUEST_CONTEXT.fromOps ? PAGE_CONFIG.barInfo + ' // OPS TRACE' : PAGE_CONFIG.barInfo;
 
   // Header
