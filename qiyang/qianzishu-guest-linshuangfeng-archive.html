@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>祈殃娱乐 | 林霜枫个人直播档案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root{
+  --bg:#0b0909; --panel:#151111; --panel-soft:#191414; --panel-2:#110e0e;
+  --accent-red:#a11212; --accent-red-bright:#e14545; --accent-red-dim:#a1121233;
+  --accent-gold:#d0b06e; --accent-gold-dim:#d0b06e33; --accent-blue:#5ba7c7;
+  --text:#eee6de; --text-soft:#cbbfb2; --text-dim:#9a8d82; --text-ghost:#5d5048;
+  --border:#332626; --border-light:#4a3535;
+  --font-title:'Ma Shan Zheng', cursive; --font-display:'ZCOOL QingKe HuangYou', cursive;
+  --font-body:'Noto Serif SC', serif; --font-mono:'Share Tech Mono', monospace;
+}
+body{background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh; overflow-x:hidden;}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:1;
+  background:
+    radial-gradient(ellipse at 15% 20%, #2a000022 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 10%, #00101818 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, #2a160010 0%, transparent 60%);
+}
+body::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+a{color:inherit; text-decoration:none;}
+.nav{
+  position:sticky; top:0; z-index:80; display:flex; justify-content:space-between; align-items:center; gap:1rem;
+  padding:.9rem 1.25rem; background:#0b0909f0; backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-left{display:flex; align-items:center; gap:.8rem;}
+.nav-back{
+  display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .85rem; border:1px solid var(--border);
+  font-family:var(--font-mono); font-size:.72rem; color:var(--text-soft); transition:.25s;
+}
+.nav-back:hover{border-color:var(--accent-gold-dim); color:var(--accent-gold);}
+.nav-brand{font-family:var(--font-title); letter-spacing:.22em; font-size:1.35rem; color:var(--accent-red-bright);}
+.nav-meta{font-family:var(--font-mono); font-size:.68rem; color:var(--text-dim); text-align:right; line-height:1.7;}
+.hero{
+  position:relative; z-index:2; padding:3.5rem 1.25rem 2.2rem; border-bottom:1px solid var(--border); text-align:center;
+}
+.hero::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at center top, var(--accent-red-dim) 0%, transparent 60%);
+}
+.hero-inner{position:relative; z-index:2; max-width:920px; margin:0 auto;}
+.hero-kicker{
+  font-family:var(--font-mono); font-size:.72rem; color:var(--accent-gold);
+  letter-spacing:.25em; margin-bottom:.8rem; opacity:.9;
+}
+.hero-title{
+  font-family:var(--font-title); font-size:clamp(2.3rem, 8vw, 4.7rem);
+  color:var(--accent-red-bright); letter-spacing:.12em; margin-bottom:1rem;
+  text-shadow:0 0 40px #8b000020;
+}
+.hero-sub{
+  color:var(--text-soft); font-size:.98rem; line-height:2; max-width:760px; margin:0 auto;
+}
+.hero-tags{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem; margin-top:1.2rem;
+}
+.hero-tags span{
+  border:1px solid var(--border); background:#ffffff03; padding:.3rem .65rem;
+  font-family:var(--font-mono); font-size:.66rem; color:var(--text-dim);
+}
+.context-wrap{
+  max-width:1100px; margin:1.4rem auto 0; padding:0 1rem; position:relative; z-index:3;
+}
+.context-box{
+  display:none; background:linear-gradient(180deg,#120f0f,#0e0c0c); border:1px solid var(--accent-gold-dim);
+  padding:1rem 1.15rem; color:var(--text-soft);
+}
+.context-box.show{display:block;}
+.context-top{font-family:var(--font-mono); font-size:.68rem; color:var(--accent-gold); letter-spacing:.18em; margin-bottom:.55rem;}
+.context-body{font-size:.88rem; line-height:1.9;}
+.context-mini{display:block; margin-top:.7rem; font-size:.72rem; color:var(--text-dim);}
+.layout{
+  max-width:1100px; margin:0 auto; padding:1.5rem 1rem 4rem; position:relative; z-index:2;
+  display:grid; grid-template-columns: 320px 1fr; gap:1.2rem;
+}
+.side-card,.main-card{
+  background:var(--panel); border:1px solid var(--border); padding:1.15rem 1.1rem;
+}
+.side-card{align-self:start; position:sticky; top:4.8rem;}
+.card-title{
+  font-family:var(--font-display); font-size:1rem; color:var(--accent-gold); letter-spacing:.18em;
+  margin-bottom:.9rem;
+}
+.profile-top{
+  padding-bottom:1rem; border-bottom:1px solid var(--border); margin-bottom:1rem;
+}
+.profile-name{font-family:var(--font-display); font-size:1.45rem; letter-spacing:.08em; color:var(--text);}
+.profile-handle{font-family:var(--font-mono); font-size:.7rem; color:var(--text-dim); margin-top:.35rem; line-height:1.8;}
+.profile-status{
+  display:inline-block; margin-top:.85rem; padding:.28rem .6rem; border:1px solid var(--accent-red-dim);
+  color:var(--accent-red-bright); font-family:var(--font-mono); font-size:.66rem; background:#ffffff04;
+}
+.profile-note{font-size:.88rem; color:var(--text-soft); line-height:1.95;}
+.profile-grid{margin-top:.95rem; display:grid; gap:.55rem;}
+.profile-row{
+  display:grid; grid-template-columns:72px 1fr; gap:.65rem; font-size:.84rem; line-height:1.8; color:var(--text-soft);
+}
+.profile-row b{color:var(--text-dim); font-weight:700;}
+.list-head{display:flex; justify-content:space-between; gap:1rem; align-items:flex-end; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:.8rem;}
+.list-head p{color:var(--text-dim); font-size:.85rem; line-height:1.8; max-width:720px;}
+.archive-list{display:grid; gap:.95rem;}
+.archive-item{
+  background:var(--panel-2); border:1px solid var(--border); padding:1rem 1rem 1.05rem; transition:.25s;
+}
+.archive-item:hover{border-color:var(--border-light); background:var(--panel-soft);}
+.archive-top{display:flex; justify-content:space-between; gap:1rem; align-items:flex-start;}
+.archive-name{
+  font-family:var(--font-display); font-size:1.08rem; letter-spacing:.08em; color:var(--text);
+}
+.archive-id{font-family:var(--font-mono); font-size:.68rem; color:var(--text-dim); margin-top:.35rem;}
+.archive-status{
+  font-family:var(--font-mono); font-size:.66rem; color:var(--accent-gold); border:1px solid var(--accent-gold-dim);
+  padding:.28rem .5rem; white-space:nowrap; background:#ffffff03;
+}
+.archive-summary{
+  margin-top:.8rem; color:var(--text-soft); font-size:.9rem; line-height:1.9;
+}
+.archive-tags{display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.75rem;}
+.archive-tags span{
+  border:1px solid var(--border); padding:.22rem .55rem; font-family:var(--font-mono); font-size:.62rem; color:var(--text-dim);
+}
+.archive-tags .core{border-color:var(--accent-red-dim); color:var(--accent-red-bright);}
+.archive-tags .ops{border-color:var(--accent-gold-dim); color:var(--accent-gold);}
+.archive-actions{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.9rem;}
+.archive-btn{
+  border:1px solid var(--border); background:#ffffff04; color:var(--text-soft); padding:.55rem .85rem;
+  font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; cursor:pointer; transition:.25s;
+}
+.archive-btn:hover{border-color:var(--accent-gold-dim); color:var(--accent-gold);}
+.archive-btn.primary{border-color:var(--accent-gold-dim); color:var(--accent-gold);}
+.archive-btn.external{border-color:var(--accent-red-dim); color:#ffb8b8;}
+.archive-btn[disabled], .archive-btn.disabled{
+  opacity:.55; cursor:not-allowed; color:var(--text-dim); border-color:var(--border);
+}
+.note-box{
+  margin-top:1rem; border-top:1px dashed var(--border); padding-top:.9rem; color:var(--text-dim); font-size:.78rem; line-height:1.9;
+}
+.overlay{
+  position:fixed; inset:0; background:#070606e8; display:flex; align-items:center; justify-content:center;
+  z-index:120; opacity:0; pointer-events:none; transition:.25s;
+}
+.overlay.show{opacity:1; pointer-events:auto;}
+.overlay-card{
+  width:min(92vw,560px); background:var(--panel); border:1px solid var(--accent-red-dim); padding:1.35rem 1.2rem; text-align:center;
+  box-shadow:0 0 40px #00000055;
+}
+.overlay-card .kicker{
+  font-family:var(--font-mono); font-size:.7rem; color:var(--accent-gold); letter-spacing:.18em; margin-bottom:.8rem;
+}
+.overlay-card .msg{font-size:1rem; color:var(--text); line-height:1.9;}
+.overlay-card .sub{margin-top:.8rem; font-size:.78rem; color:var(--text-dim); line-height:1.8;}
+.toast{
+  position:fixed; right:1rem; bottom:1rem; z-index:130; width:min(88vw,360px); transform:translateY(18px); opacity:0; transition:.25s;
+  background:#130f0f; border:1px solid var(--accent-red-dim); color:var(--text); padding:.9rem 1rem; line-height:1.8; font-size:.82rem;
+}
+.toast.show{transform:translateY(0); opacity:1;}
+.footer{
+  border-top:1px solid var(--border); text-align:center; padding:2rem 1rem 3rem; color:var(--text-ghost); font-size:.76rem; line-height:2.1;
+}
+@media (max-width: 860px){
+  .layout{grid-template-columns:1fr;}
+  .side-card{position:static;}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-back" id="backLink">← 返回关注列表</a>
+    <div class="nav-brand">祈殃娱乐</div>
+  </div>
+  <div class="nav-meta" id="navMeta"></div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker">PERSONAL LIVE ARCHIVE // CHANNEL TRACE</div>
+    <h1 class="hero-title">林霜枫 · 个人直播档案</h1>
+    <p class="hero-sub">
+      当前页面并非单一副本回放，而是该嘉宾当前以碎片回放与局部站内片段为主，完整项目记录较少。现阶段页面更偏向“索引列表”，后续可以逐项补接文字版转播或新的站内片段页。
+    </p>
+    <div class="hero-tags">
+      <span>个人频道</span><span>高优先关注对象</span><span>员工残留关注关系</span><span id="viewTag">默认链路</span>
+    </div>
+  </div>
+</section>
+
+<div class="context-wrap">
+  <div class="context-box" id="contextBox">
+    <div class="context-top">会 话 残 留</div>
+    <div class="context-body" id="contextBody"></div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="side-card">
+    <div class="card-title">个 人 资 料</div>
+    <div class="profile-top">
+      <div class="profile-name">林霜枫</div>
+      <div class="profile-handle">@guest-linshuangfeng<br>QY-GUEST-11</div>
+      <div class="profile-status">碎片在线 / 档案偏移</div>
+    </div>
+    <div class="profile-note">
+      原号主曾长期回看她的单人片段。当前页不是单一副本说明，而是该嘉宾已登记的多项目个人档案索引。
+    </div>
+    <div class="profile-grid">
+      <div class="profile-row"><b>定位</b><div>观察型嘉宾 / 冷静判断 / 碎片高讨论度</div></div>
+      <div class="profile-row"><b>状态</b><div>公开层以碎片回放为主；运营层可见“剪辑残差”类额外批注。</div></div>
+      <div class="profile-row"><b>说明</b><div>后续可按不同副本补入文字版转播或独立片段页，只需改顶部数据数组。</div></div>
+    </div>
+    <div class="note-box">
+      当前接入规则：<br>
+      1. 可用站内片段会优先显示“打开站内片段档案”<br>
+      2. 有外部链接的条目会显示“转入文字版转播”<br>
+      3. 暂无链接的条目会返回权限异常提示
+    </div>
+  </aside>
+
+  <main class="main-card">
+    <div class="list-head">
+      <div>
+        <div class="card-title" style="margin-bottom:.45rem;">副 本 列 表</div>
+        <p>点击某个条目的按钮后，会写入新的路由上下文。这样站内片段页就能知道你是从个人直播档案列表进入，而不是直接从主页或副本简介进入。</p>
+      </div>
+    </div>
+    <div class="archive-list" id="archiveList"></div>
+  </main>
+</div>
+
+<div class="overlay" id="relayOverlay" aria-hidden="true">
+  <div class="overlay-card">
+    <div class="kicker">TEXT RELAY // LOADING</div>
+    <div class="msg" id="overlayMsg">权限异常 · 文字版转播加载中</div>
+    <div class="sub">当前请求将被登记为站外文本接入痕迹。</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  祈殃娱乐 // 个人频道档案索引<br>
+  本页只显示当前账号尚未被完全回收的个人信号残留。
+</footer>
+
+<script>
+const STATE_KEY = 'qy_system_state_v2';
+const ROUTE_KEY = 'qy_route_context_v2';
+const GUEST_ID = 'linshuangfeng';
+const GUEST_NAME = '林霜枫';
+const CONTEXT_WINDOW_MS = 1000 * 60 * 60 * 24;
+
+const INSTANCE_ARCHIVES = [
+  {
+    id: 'bloodmoon',
+    title: '镜中回廊',
+    instanceCode: 'ARCHIVE // LF-01',
+    status: '权限异常 · 直播内容已折叠',
+    summary: '该项目仍有零散讨论，但个人频道下的完整残留已被折叠，当前只保留索引名称。',
+    tags: ['旧项目', '折叠', '片段缺失'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'paihuaxi',
+    title: '白烛病房',
+    instanceCode: 'ARCHIVE // LF-02',
+    status: '片段索引已登记',
+    summary: '条目已登记，站内片段与文字版转播尚未补挂。可后续直接补入章节链接。',
+    tags: ['病房', '待挂载'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'xialou',
+    title: '下楼',
+    instanceCode: 'ARCHIVE // LF-03',
+    status: '片段索引存在 · 主画面未归档',
+    summary: '当前只保留到个人频道索引层。可后续补入文字版转播或独立站内页。',
+    tags: ['密室', '待挂载'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'qianzishu',
+    title: '千子树下',
+    instanceCode: 'ARCHIVE // LF-04',
+    status: '站内片段可见 · 文字版转播待接入',
+    summary: '当前唯一已接入的站内片段条目。文字版转播尚未接入，但后续可以随时补挂章节链接。',
+    tags: ['当前可用', '副本 #5732'],
+    stationLink: 'qianzishu-guest-linshuangfeng_context_v3_archiveaware.html',
+    textReplayUrl: '',
+  },
+  {
+    id: 'xi',
+    title: '拍花戏',
+    instanceCode: 'ARCHIVE // LF-05',
+    status: '分级封存',
+    summary: '该项目仍在讨论范围内，但个人回放权限被折叠。后续可单独补接文字版转播。',
+    tags: ['民俗', '封存'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'baiyi',
+    title: '囍',
+    instanceCode: 'ARCHIVE // LF-06',
+    status: '仅保留索引',
+    summary: '当前仅保留项目名称与人物索引痕迹，主回放未开放。',
+    tags: ['人物关系', '索引保留'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'tongbao',
+    title: '同胞',
+    instanceCode: 'ARCHIVE // LF-07',
+    status: '节点已登记',
+    summary: '条目已建立，但当前暂无可公开的个人片段与文字版转播入口。',
+    tags: ['人物关系', '待挂载'],
+    stationLink: '',
+    textReplayUrl: '',
+  },
+  {
+    id: 'zhuotudongtian',
+    title: '浊土洞天',
+    instanceCode: 'ARCHIVE // LF-08',
+    status: '现实副本 · 核心道具',
+    summary: '该条目不按常规直播项目归档。它更接近现实侧的核心道具记录。',
+    tags: ['现实副本·核心道具', '高优先级'],
+    stationLink: '',
+    textReplayUrl: '',
+    tagClass: 'core',
+  },
+  {
+    id: 'yiming',
+    title: '佚名',
+    instanceCode: 'ARCHIVE // LF-09',
+    status: '现实副本 · 核心道具',
+    summary: '相关记录被并入现实副本档案。后续若补文字版转播，可直接给本条加链接。',
+    tags: ['现实副本·核心道具', '高优先级'],
+    stationLink: '',
+    textReplayUrl: '',
+    tagClass: 'core',
+  },
+  {
+    id: 'moli',
+    title: '莫离',
+    instanceCode: 'ARCHIVE // LF-10',
+    status: '现实副本 · 核心道具',
+    summary: '当前只挂载名称与级别标签。该条目的文本化入口建议最后接入。',
+    tags: ['现实副本·核心道具', '高优先级'],
+    stationLink: '',
+    textReplayUrl: '',
+    tagClass: 'core',
+  }
+];
+
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+function writeJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function isFresh(ts) {
+  if (!ts) return false;
+  const t = new Date(ts).getTime();
+  return Number.isFinite(t) && (Date.now() - t <= CONTEXT_WINDOW_MS);
+}
+function parseMarkup(text) {
+  return String(text || '')
+    .replace(/\{\{hidden:(.*?)\}\}/g, '<span style="color:#e14545">$1</span>')
+    .replace(/\{\{redacted:(.*?)\}\}/g, '<span style="background:#7a000033;color:#ffb1b1;padding:0 4px;">$1</span>')
+    .replace(/\{\{select:(.*?)\}\}/g, '<span style="color:#d0b06e">$1</span>');
+}
+const shared = readJSON(STATE_KEY, { routeLog: [], unlockedFlags: [], viewedPages: [] });
+if (!Array.isArray(shared.routeLog)) shared.routeLog = [];
+if (!Array.isArray(shared.unlockedFlags)) shared.unlockedFlags = [];
+if (!Array.isArray(shared.viewedPages)) shared.viewedPages = [];
+const route = readJSON(ROUTE_KEY, null);
+const fromFollow = !!(route && route.guestId === GUEST_ID && route.sourceType === 'follow-dossier' && isFresh(route.timestamp));
+const fromOps = !!((fromFollow || (route && route.sourceType === 'guest-archive' && route.guestId === GUEST_ID && isFresh(route.timestamp))) && route.entryMode === 'ops');
+
+function pushRouteLog(entry) {
+  shared.routeLog.unshift(entry);
+  shared.routeLog = shared.routeLog.slice(0, 20);
+  writeJSON(STATE_KEY, shared);
+}
+function setRouteContext(entry) {
+  writeJSON(ROUTE_KEY, entry);
+}
+function showToast(html) {
+  const el = document.getElementById('toast');
+  el.innerHTML = html;
+  el.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+function showOverlay(msg) {
+  const box = document.getElementById('relayOverlay');
+  document.getElementById('overlayMsg').innerHTML = msg;
+  box.classList.add('show');
+  box.setAttribute('aria-hidden', 'false');
+}
+function hideOverlay() {
+  const box = document.getElementById('relayOverlay');
+  box.classList.remove('show');
+  box.setAttribute('aria-hidden', 'true');
+}
+function updateContext() {
+  const navMeta = document.getElementById('navMeta');
+  navMeta.innerHTML = `当前员工：${(route && route.employeeId) || shared.employeeId || 'EMP-UNKNOWN'}<br>当前层级：${fromOps ? '运营层' : '公开层'}`;
+  document.getElementById('viewTag').textContent = fromOps ? '运营层转入' : (fromFollow ? '关注档案转入' : '默认链路');
+
+  const back = document.getElementById('backLink');
+  back.textContent = fromOps ? '← 返回运营层关注列表' : '← 返回关注列表';
+  back.href = 'index.html';
+
+  const box = document.getElementById('contextBox');
+  const body = document.getElementById('contextBody');
+  const flags = (shared.unlockedFlags || []).length ? shared.unlockedFlags.join(' / ') : '无显式标记';
+  if (fromFollow || (route && route.guestId === GUEST_ID && isFresh(route.timestamp))) {
+    box.classList.add('show');
+    body.innerHTML = parseMarkup(
+      `检测到本页由<strong>${fromOps ? '运营层关注档案' : '关注档案'}</strong>转入。` +
+      `该来源会影响后续子页的返回路径与隐形批注范围。<br>` +
+      `终端编号：<strong>${(route && route.visitorId) || shared.visitorId || 'V-UNKNOWN'}</strong> // ` +
+      `权限：<strong>${(route && route.clearanceLabel) || shared.clearanceLabel || '未登记'}</strong>` +
+      `<span class="context-mini">继承标记：${flags}</span>`
+    );
+  }
+}
+function renderList() {
+  const list = document.getElementById('archiveList');
+  list.innerHTML = INSTANCE_ARCHIVES.map(item => {
+    const tags = (item.tags || []).map(tag => `<span class="${item.tagClass === 'core' && tag.includes('现实副本') ? 'core' : ''}">${tag}</span>`).join('');
+    return `
+      <div class="archive-item">
+        <div class="archive-top">
+          <div>
+            <div class="archive-name">${item.title}</div>
+            <div class="archive-id">${item.instanceCode}</div>
+          </div>
+          <div class="archive-status">${item.status}</div>
+        </div>
+        <div class="archive-summary">${parseMarkup(item.summary)}</div>
+        <div class="archive-tags">${tags}</div>
+        <div class="archive-actions">
+          ${item.stationLink
+            ? `<a class="archive-btn primary" href="${item.stationLink}" data-station-link="${item.id}">打开站内片段档案</a>`
+            : `<button class="archive-btn" type="button" data-station-pending="${item.id}">打开站内片段档案</button>`}
+          ${item.textReplayUrl
+            ? `<button class="archive-btn external" type="button" data-text-link="${item.id}">转入文字版转播</button>`
+            : `<button class="archive-btn external" type="button" data-text-pending="${item.id}">转入文字版转播</button>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+renderList();
+updateContext();
+
+if (!shared.viewedPages.includes('guest-archive:' + GUEST_ID)) {
+  shared.viewedPages.push('guest-archive:' + GUEST_ID);
+}
+shared.lastViewedGuestId = GUEST_ID;
+shared.lastViewedGuestName = GUEST_NAME;
+writeJSON(STATE_KEY, shared);
+
+document.addEventListener('click', (e) => {
+  const stationLink = e.target.closest('[data-station-link]');
+  if (stationLink) {
+    const item = INSTANCE_ARCHIVES.find(x => x.id === stationLink.getAttribute('data-station-link'));
+    if (!item) return;
+    const entry = {
+      sourceType: 'guest-archive',
+      guestId: GUEST_ID,
+      guestName: GUEST_NAME,
+      archiveId: item.id,
+      instanceTitle: item.title,
+      entryMode: fromOps ? 'ops' : 'public',
+      employeeId: (route && route.employeeId) || shared.employeeId || 'EMP-UNKNOWN',
+      visitorId: (route && route.visitorId) || shared.visitorId || 'V-UNKNOWN',
+      clearanceLabel: (route && route.clearanceLabel) || shared.clearanceLabel || '未登记',
+      contamination: typeof shared.contamination === 'number' ? shared.contamination : 0,
+      suspicion: typeof shared.suspicion === 'number' ? shared.suspicion : 0,
+      timestamp: new Date().toISOString(),
+      routeTag: fromOps ? 'ops-guest-archive-entry' : 'guest-archive-entry'
+    };
+    setRouteContext(entry);
+    pushRouteLog(entry);
+    writeJSON(STATE_KEY, shared);
+    return;
+  }
+
+  const stationPending = e.target.closest('[data-station-pending]');
+  if (stationPending) {
+    const item = INSTANCE_ARCHIVES.find(x => x.id === stationPending.getAttribute('data-station-pending'));
+    showToast(`<strong>权限异常</strong><br>${item ? `条目「${item.title}」` : '该条目'}的站内片段档案暂未接入。`);
+    return;
+  }
+
+  const textBtn = e.target.closest('[data-text-link]');
+  if (textBtn) {
+    const item = INSTANCE_ARCHIVES.find(x => x.id === textBtn.getAttribute('data-text-link'));
+    if (!item || !item.textReplayUrl) return;
+    const logEntry = {
+      sourceType: 'guest-archive-text-replay',
+      guestId: GUEST_ID,
+      guestName: GUEST_NAME,
+      archiveId: item.id,
+      instanceTitle: item.title,
+      entryMode: fromOps ? 'ops' : 'public',
+      employeeId: (route && route.employeeId) || shared.employeeId || 'EMP-UNKNOWN',
+      visitorId: (route && route.visitorId) || shared.visitorId || 'V-UNKNOWN',
+      timestamp: new Date().toISOString()
+    };
+    pushRouteLog(logEntry);
+    shared.lastTextReplayGuestId = GUEST_ID;
+    shared.lastTextReplayGuestName = GUEST_NAME;
+    writeJSON(STATE_KEY, shared);
+    showOverlay('权限异常 · 文字版转播加载中');
+    setTimeout(() => { window.location.href = item.textReplayUrl; }, 950);
+    return;
+  }
+
+  const textPending = e.target.closest('[data-text-pending]');
+  if (textPending) {
+    const item = INSTANCE_ARCHIVES.find(x => x.id === textPending.getAttribute('data-text-pending'));
+    showToast(`<strong>权限异常</strong><br>${item ? `条目「${item.title}」` : '该条目'}的文字版转播通道暂未接入。`);
+  }
+});
+</script>
+</body>
+</html>
