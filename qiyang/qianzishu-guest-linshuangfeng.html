@@ -596,6 +596,100 @@ a { color: inherit; text-decoration: none; }
   .bcast-content { padding: 0 1rem 2rem; }
   .text-block { padding-left: 2rem; }
 }
+
+
+/* ═══ CONTEXT PANELS ═══ */
+.context-shell {
+  margin: 1.6rem 0 2.2rem;
+  display: none;
+}
+.context-shell.show { display: block; }
+.context-topline {
+  margin-bottom: 0.85rem;
+  padding: 0.75rem 0.95rem;
+  background: #0d0c0c;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.context-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1.1rem;
+}
+.context-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.18em;
+  margin-bottom: 0.8rem;
+}
+.context-body {
+  font-size: 0.84rem;
+  line-height: 1.95;
+  color: var(--text-dim);
+}
+.context-badges {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.context-badge {
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid var(--border-light);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+.context-badge.gold {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold-dim);
+}
+.context-badge.red {
+  color: var(--accent-red-bright);
+  border-color: var(--accent-red-dim);
+}
+.context-badge.blue {
+  color: var(--accent-blue-bright);
+  border-color: var(--accent-blue-dim);
+}
+.context-ops-note {
+  margin-top: 1rem;
+  padding: 0.95rem 1.05rem;
+  border: 1px solid var(--border);
+  background: #0c0c0c;
+  font-size: 0.82rem;
+  line-height: 1.95;
+  color: var(--text-dim);
+}
+.context-ops-note.ops {
+  border-color: var(--accent-gold-dim);
+  color: #d5c19b;
+  box-shadow: inset 0 0 0 1px rgba(196,163,90,0.04);
+}
+.context-mini {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-ghost);
+  line-height: 1.8;
+}
+
+
+@media (max-width: 700px) {
+  .context-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -642,6 +736,22 @@ a { color: inherit; text-decoration: none; }
   <div class="bcast-header" id="bcastHeader"></div>
 
   <div class="bcast-content">
+    <div class="context-shell" id="contextShell">
+      <div class="context-topline" id="contextTopline"></div>
+      <div class="context-grid">
+        <div class="context-panel">
+          <div class="context-title">接 入 来 源</div>
+          <div class="context-body" id="contextBody"></div>
+          <div class="context-badges" id="contextBadges"></div>
+        </div>
+        <div class="context-panel">
+          <div class="context-title">会 话 残 留</div>
+          <div class="context-body" id="contextResidue"></div>
+        </div>
+      </div>
+      <div class="context-ops-note" id="contextOpsNote"></div>
+    </div>
+
     <div class="section-head"><h2>录 播 记 录</h2></div>
     <div class="block-timeline" id="blockTimeline"></div>
   </div>
@@ -732,6 +842,13 @@ const PAGE_CONFIG = {
   instanceName: "千子树下",               // 副本名称
 };
 
+const GUEST_PAGE_ID = "linshuangfeng";
+const SHARED_SYSTEM_KEY = 'qy_system_state_v2';
+const SHARED_ROUTE_KEY = 'qy_route_context_v2';
+const CONTEXT_WINDOW_MS = 1000 * 60 * 60 * 24;
+const GUEST_ARCHIVE_PAGE = 'index.html';
+
+
 
 // ═══ 身份抽取动画 ═══
 /*
@@ -744,7 +861,7 @@ const PAGE_CONFIG = {
  *
  *  text:      显示的文字
  *             identity 类型中，用 \n 分隔提示语和身份名
- *             例如: "您此次的身份是：\学徒"
+ *             例如: "您此次的身份是：\n巫"
  *
  *  delay:     该行出现前的等待时间（毫秒，相对于上一行出现后）
  *  duration:  该行显示多久后开始淡出（毫秒）
@@ -828,7 +945,7 @@ const TEXT_BLOCKS = [
     label: "录播开始",
     style: "system",
     dot: "blue",
-    content: "信号接入完成。正在回放参与者「萧潇」的录播记录。<br>⚠ 部分内容因权限限制已被截断或替换。",
+    content: "信号接入完成。正在回放参与者「林霜枫」的录播记录。<br>⚠ 部分内容因权限限制已被截断或替换。",
   },
 
   {
@@ -915,6 +1032,118 @@ function parseMarkup(text) {
 // --- Utility ---
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+
+
+
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch (err) {
+    return fallback;
+  }
+}
+
+function saveJSON(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {}
+}
+
+function isFreshTimestamp(ts, windowMs) {
+  if (!ts) return false;
+  const time = new Date(ts).getTime();
+  if (Number.isNaN(time)) return false;
+  return Date.now() - time <= windowMs;
+}
+
+function getSharedSystemState() {
+  const state = readJSON(SHARED_SYSTEM_KEY, {});
+  if (!Array.isArray(state.routeLog)) state.routeLog = [];
+  if (!Array.isArray(state.viewedPages)) state.viewedPages = [];
+  if (!Array.isArray(state.unlockedFlags)) state.unlockedFlags = [];
+  return state;
+}
+
+function getRouteContext() {
+  return readJSON(SHARED_ROUTE_KEY, null);
+}
+
+function getRecentRouteLogEntry(state, predicate) {
+  return (state.routeLog || []).find(item => predicate(item) && isFreshTimestamp(item.timestamp, CONTEXT_WINDOW_MS)) || null;
+}
+
+
+function getGuestContext() {
+  const shared = getSharedSystemState();
+  const route = getRouteContext();
+  const fromFollow = !!(route && route.guestId === GUEST_PAGE_ID && route.sourceType === 'follow-dossier' && isFreshTimestamp(route.timestamp, CONTEXT_WINDOW_MS));
+  const fromArchive = !!(route && route.guestId === GUEST_PAGE_ID && route.sourceType === 'guest-archive' && isFreshTimestamp(route.timestamp, CONTEXT_WINDOW_MS));
+  const fromOps = !!((fromFollow || fromArchive) && route.entryMode === 'ops');
+  const textReplayEntry = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier-text-replay' || item.sourceType === 'guest-archive-text-replay') &&
+    item.guestId === GUEST_PAGE_ID
+  );
+  const watchedTextReplay = !!textReplayEntry;
+  const directOpsTrace = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier' || item.sourceType === 'guest-archive') &&
+    item.guestId === GUEST_PAGE_ID &&
+    item.entryMode === 'ops'
+  );
+  const directPublicTrace = getRecentRouteLogEntry(shared, item =>
+    (item.sourceType === 'follow-dossier' || item.sourceType === 'guest-archive') &&
+    item.guestId === GUEST_PAGE_ID &&
+    item.entryMode !== 'ops'
+  );
+  let sourceLabel = '副本链路';
+  if (fromArchive) sourceLabel = fromOps ? '运营层个人直播档案列表' : '个人直播档案列表';
+  else if (fromFollow) sourceLabel = fromOps ? '运营层关注档案' : '公开层关注档案';
+  else if (route && route.instanceId === 'qianzishu') sourceLabel = route.entryMode === 'ops' ? '运营层副本入口' : '公开层副本入口';
+  else if (directOpsTrace) sourceLabel = '运营层残留来源';
+  else if (directPublicTrace) sourceLabel = '关注档案残留来源';
+
+  return {
+    shared,
+    route,
+    fromFollow,
+    fromArchive,
+    fromOps,
+    watchedTextReplay,
+    textReplayEntry,
+    sourceLabel,
+    employeeId: route?.employeeId || shared.employeeId || 'EMP-UNKNOWN',
+    visitorId: route?.visitorId || shared.visitorId || 'V-UNKNOWN',
+    clearanceLabel: route?.clearanceLabel || shared.clearanceLabel || '未登记',
+    contamination: typeof route?.contamination === 'number' ? route.contamination : (typeof shared.contamination === 'number' ? shared.contamination : 0),
+    suspicion: typeof route?.suspicion === 'number' ? route.suspicion : (typeof shared.suspicion === 'number' ? shared.suspicion : 0),
+    inheritedFlags: shared.unlockedFlags || [],
+    lastRouteTime: route?.timestamp || directOpsTrace?.timestamp || directPublicTrace?.timestamp || null,
+  };
+}
+
+
+const GUEST_CONTEXT = getGuestContext();
+
+function persistGuestVisitContext() {
+  const state = GUEST_CONTEXT.shared;
+  if (!state.viewedPages.includes('guest:' + GUEST_PAGE_ID)) state.viewedPages.push('guest:' + GUEST_PAGE_ID);
+  state.lastViewedGuestId = GUEST_PAGE_ID;
+  state.lastViewedGuestName = GUEST.name;
+  state.lastGuestSource = GUEST_CONTEXT.sourceLabel;
+  state.routeLog.unshift({
+    sourceType: 'guest-page-visit',
+    guestId: GUEST_PAGE_ID,
+    guestName: GUEST.name,
+    entryMode: GUEST_CONTEXT.fromOps ? 'ops' : 'public',
+    employeeId: GUEST_CONTEXT.employeeId,
+    visitorId: GUEST_CONTEXT.visitorId,
+    timestamp: new Date().toISOString(),
+    routeTag: GUEST_CONTEXT.fromOps ? 'ops-guest-page' : 'guest-page'
+  });
+  state.routeLog = state.routeLog.slice(0, 16);
+  saveJSON(SHARED_SYSTEM_KEY, state);
+}
 
 // ══════════════════════════════════════════
 // ═══ PHASE 1: EXTRACTION ANIMATION ═══
@@ -1007,20 +1236,81 @@ async function runExtraction() {
 // ═══ PHASE 2: RENDER BROADCAST ═══
 // ══════════════════════════════════════════
 
+
+function renderContextShell() {
+  const shell = document.getElementById('contextShell');
+  const top = document.getElementById('contextTopline');
+  const body = document.getElementById('contextBody');
+  const badges = document.getElementById('contextBadges');
+  const residue = document.getElementById('contextResidue');
+  const opsNote = document.getElementById('contextOpsNote');
+  if (!shell || !top || !body || !badges || !residue || !opsNote) return;
+
+  shell.classList.add('show');
+
+  const routeTime = GUEST_CONTEXT.lastRouteTime ? new Date(GUEST_CONTEXT.lastRouteTime).toLocaleString('zh-CN') : '未记录';
+  const flagsText = GUEST_CONTEXT.inheritedFlags.length ? GUEST_CONTEXT.inheritedFlags.join(' / ') : '无显式标记';
+  const topLine = (GUEST_CONTEXT.fromFollow || GUEST_CONTEXT.fromArchive)
+    ? `系统已识别到本页并非由常规副本目录展开，而是通过<strong>${GUEST_CONTEXT.sourceLabel}</strong>转入。该来源会改变部分说明字段与隐形批注的可见范围。`
+    : '当前页按默认录播档案方式打开。若你是通过关注档案或运营层进入，这里本应先于正文显示来源残留。';
+  top.innerHTML = parseMarkup(topLine);
+
+  body.innerHTML = parseMarkup(
+    `来源：<strong>${GUEST_CONTEXT.sourceLabel}</strong><br>` +
+    `当前员工：<strong>${GUEST_CONTEXT.employeeId}</strong> // 权限：<strong>${GUEST_CONTEXT.clearanceLabel}</strong><br>` +
+    `终端编号：<strong>${GUEST_CONTEXT.visitorId}</strong><br>` +
+    (GUEST_CONTEXT.fromArchive
+      ? '本页已读取到个人直播档案列表留下的会话上下文。返回时你会回到该嘉宾的副本列表，而不是默认副本简介。'
+      : (GUEST_CONTEXT.fromFollow
+        ? '本页已读取到关注档案入口留下的会话上下文。返回时主页仍会保持相同的视图层级。'
+        : '未检测到有效的关注档案入口标记，系统暂按普通副本链路处理。'))
+  );
+
+  const badgeList = [];
+  badgeList.push(`<span class="context-badge blue">来源：${GUEST_CONTEXT.sourceLabel}</span>`);
+  if (GUEST_CONTEXT.fromFollow) badgeList.push('<span class="context-badge gold">关注档案转入</span>');
+  if (GUEST_CONTEXT.fromArchive) badgeList.push('<span class="context-badge gold">个人档案列表转入</span>');
+  if (GUEST_CONTEXT.fromOps) badgeList.push('<span class="context-badge gold">运营层额外批注</span>');
+  if (GUEST_CONTEXT.watchedTextReplay) badgeList.push('<span class="context-badge red">检测到文字版录播残留</span>');
+  if (isReturn) badgeList.push('<span class="context-badge">本页二次访问</span>');
+  badges.innerHTML = badgeList.join('');
+
+  let residueHtml = `最近接入时间：<strong>${routeTime}</strong><br>` +
+    `污染值引用：<strong>${GUEST_CONTEXT.contamination}</strong> // 嫌疑值引用：<strong>${GUEST_CONTEXT.suspicion}</strong><br>` +
+    `继承标记：<strong>${flagsText}</strong>`;
+  if (GUEST_CONTEXT.watchedTextReplay && GUEST_CONTEXT.textReplayEntry) {
+    residueHtml += `<span class="context-mini">检测到站外文本备份浏览痕迹：${new Date(GUEST_CONTEXT.textReplayEntry.timestamp).toLocaleString('zh-CN')}。系统判断你可能先读取过“文字版录播”，再回到本页。{{hidden:这会让某些被删掉的地方显得更像是被故意删掉的。}}</span>`;
+  } else {
+    residueHtml += `<span class="context-mini">当前未检测到站外文字备份残留。若你先从主页或个人直播档案列表的“转入文字版录播”离开，再回来，这一栏会留下痕迹。</span>`;
+  }
+  residue.innerHTML = parseMarkup(residueHtml);
+
+  opsNote.className = 'context-ops-note' + (GUEST_CONTEXT.fromOps ? ' ops' : '');
+  opsNote.innerHTML = parseMarkup(
+    GUEST_CONTEXT.fromOps
+      ? '运营层批注：当前页已继承员工后台来源。公开档案里的“参与者录播记录”只是外层说法。对这个账号而言，她更像被持续观察的对象，而不是单纯的回放文件。{{hidden:原号主并不是在追她。更像是在确认她有没有注意到自己也被追。}}'
+      : '公开层提示：当前页仍以录播档案名义对外展示。若你从运营层进入，页内会额外浮现一段不对外公开的备注。'
+  );
+}
+
 function renderBroadcast() {
   // Back link
   const backEl = document.getElementById('backLink');
-  backEl.href = PAGE_CONFIG.backLink;
-  backEl.textContent = PAGE_CONFIG.backText;
-  document.getElementById('barInfo').textContent = PAGE_CONFIG.barInfo;
+  backEl.href = GUEST_CONTEXT.fromArchive ? GUEST_ARCHIVE_PAGE : (GUEST_CONTEXT.fromFollow ? 'index.html' : PAGE_CONFIG.backLink);
+  backEl.textContent = GUEST_CONTEXT.fromArchive
+    ? (GUEST_CONTEXT.fromOps ? '← 返回运营层个人档案列表' : '← 返回个人直播档案列表')
+    : (GUEST_CONTEXT.fromFollow ? (GUEST_CONTEXT.fromOps ? '← 返回运营层关注列表' : '← 返回关注列表') : PAGE_CONFIG.backText);
+  document.getElementById('barInfo').textContent = GUEST_CONTEXT.fromOps ? PAGE_CONFIG.barInfo + ' // OPS TRACE' : PAGE_CONFIG.barInfo;
 
   // Header
   const header = document.getElementById('bcastHeader');
   header.innerHTML = `
     <h1 class="bcast-name">${GUEST.name}</h1>
     <div class="bcast-identity">${GUEST.identity}</div>
-    <div class="bcast-meta">${GUEST.meta}</div>
+    <div class="bcast-meta">${GUEST.meta}<br>${GUEST_CONTEXT.fromFollow ? ('当前来源：' + GUEST_CONTEXT.sourceLabel + ' // 员工：' + GUEST_CONTEXT.employeeId) : '当前来源：默认录播链路'}</div>
   `;
+
+  renderContextShell();
 
   // Text blocks
   const timeline = document.getElementById('blockTimeline');
@@ -1088,6 +1378,7 @@ function renderBroadcast() {
   footer.innerHTML = `
     祈殃娱乐 — 副本录播系统<br>
     本记录由系统自动生成 // 部分内容因权限限制已截断<br>
+    ${GUEST_CONTEXT.watchedTextReplay ? '<span style="display:block;margin-top:0.35rem;font-family:var(--font-mono);font-size:0.62rem;color:var(--accent-blue-bright)">检测到外部文字备份浏览残留 // 站外转写痕迹已写入会话记录</span>' : ''}
     <span class="hidden-text">${FOOTER_HIDDEN}</span>
   `;
 }
@@ -1183,6 +1474,8 @@ async function runFragments() {
 
 
 // ═══ INIT ═══
+
+persistGuestVisitContext();
 
 // Prevent scroll during extraction
 document.body.style.overflow = 'hidden';
